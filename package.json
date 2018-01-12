@@ -14,7 +14,8 @@
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
-    "webpack": "webpack"
+    "webpack": "webpack",
+    "geth-dev": "geth --dev --datadir=.chaindata --dev.period 1 --rpc --rpcaddr 0.0.0.0 --ws --wsaddr 0.0.0.0 --wsorigins=*"
   },
   "dependencies": {
     "rxjs": "^5.5.6",
