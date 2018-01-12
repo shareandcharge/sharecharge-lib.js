@@ -1,0 +1,32 @@
+{
+  "name": "omos-bridge",
+  "version": "0.1.0",
+  "description": "OMOS Bridge SDK",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/motionwerkGmbH/omos-bridge.git"
+  },
+  "author": "MotionWerk GmbH",
+  "license": "LGPL-3.0",
+  "scripts": {
+    "build": "npm run build-ts && npm run tslint",
+    "test": "jest --forceExit --coverage --verbose",
+    "build-ts": "tsc",
+    "watch-ts": "tsc -w",
+    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "webpack": "webpack"
+  },
+  "dependencies": {
+    "rxjs": "^5.5.6",
+    "web3": "^1.0.0-beta.27"
+  },
+  "devDependencies": {
+    "@types/jest": "^21.1.8",
+    "chai": "^4.1.2",
+    "jest": "^21.2.1",
+    "ts-jest": "^21.2.4",
+    "ts-loader": "^3.2.0",
+    "tslint": "^5.9.1",
+    "typescript": "^2.6.2"
+  }
+}
