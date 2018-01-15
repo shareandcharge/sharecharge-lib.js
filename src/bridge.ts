@@ -8,7 +8,6 @@ import { config } from './config/config';
 import { Config } from './config/types';
 import { StartRequest } from './models/start-request';
 import { StopRequest } from './models/stop-request';
-import { EventEmitter } from 'events';
 
 export class Bridge {
 

@@ -1,5 +1,13 @@
 import { Bridge } from './src/bridge';
 
+/* REQUIREMENTS:
+    - array of pole IDs
+    - provider if rpc not available on ws://localhost:8546
+    - user account
+        - in keystore so available as eth.coinbase or eth.accounts[0]
+
+*/
+
 const poles = [
     '0x0100000000000000000000000000000000000000000000000000000000000000'
 ];
