@@ -5,22 +5,26 @@ import { Subject } from 'rxjs/Subject';
 import Web3 = require('web3');
 
 import { config } from './config/config';
+import { Config } from './config/types';
 import { StartRequest } from './models/start-request';
 import { StopRequest } from './models/stop-request';
+import { EventEmitter } from 'events';
 
 export class Bridge {
 
     private initialised = false;
+    private config: Config;
     private web3: Web3;
     private contract: any;
+
     private startSource = new Subject<StartRequest>();
     private stopSource = new Subject<StopRequest>();
 
     start$ = this.startSource.asObservable();
     stop$ = this.stopSource.asObservable();
 
-    constructor() {
-        this.web3 = new Web3(config.node);
+    constructor(provider?: any) {
+        this.web3 = new Web3(provider || config.node);
     }
 
     get version(): string {
@@ -30,16 +34,16 @@ export class Bridge {
     listen(): void {
         this.initialise();
 
-        this.contract.events.Start({}, (reject, resolve) => {
+        this.contract.events.ClientRequestedStart({}, (reject, resolve) => {
             const pole = resolve.returnValues['poleID'];
             const user = resolve.returnValues['user'];
-            
+
             // const wattPower = resolve.returnValues['_wattPower'];
             // const secondsToRent = resolve.returnValues['_secondsToRent'];
             this.startSource.next(new StartRequest(pole, user));
         });
 
-        this.contract.events.Stop({}, (reject, resolve) => {
+        this.contract.events.ClientRequestedStop({}, (reject, resolve) => {
             const pole = resolve.returnValues['poleID'];
             const user = resolve.returnValues['user'];
             // const measuredWatt = resolve.returnValues['_measuredWatt'];
