@@ -5,7 +5,13 @@
     "strict": true,
     "noImplicitAny": false,
     "sourceMap": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "types": [
+      "node"
+    ],
+    "typeRoots": [
+      "./node_modules/@types"
+    ]
   },
   "exclude": [
     "node_modules",
