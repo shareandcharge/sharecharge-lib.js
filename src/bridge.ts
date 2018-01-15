@@ -5,16 +5,19 @@ import { Subject } from 'rxjs/Subject';
 import Web3 = require('web3');
 
 import { config } from './config/config';
-import { Config } from './config/types';
+import { Receipt } from './config/types';
 import { StartRequest } from './models/start-request';
 import { StopRequest } from './models/stop-request';
 
 export class Bridge {
 
     private initialised = false;
-    private config: Config;
+    private config: any;
+    private pass: string;
     private web3: Web3;
+    private personal: any;
     private contract: any;
+    private coinbase: string;
 
     private startSource = new Subject<StartRequest>();
     private stopSource = new Subject<StopRequest>();
@@ -22,8 +25,13 @@ export class Bridge {
     start$ = this.startSource.asObservable();
     stop$ = this.stopSource.asObservable();
 
-    constructor(provider?: any) {
+    constructor(pass: string, provider?: string) {
+        this.pass = pass;
         this.web3 = new Web3(provider || config.node);
+        this.personal = this.web3.eth.personal;
+        this.web3.eth.getCoinbase()
+            .then(cb => this.coinbase = cb)
+            .catch(err => { throw Error(err); });
     }
 
     get version(): string {
@@ -50,19 +58,38 @@ export class Bridge {
         });
     }
 
-    // mock(): void {
-    //     this.web3.eth.getAccounts().then(result => {
-    //         const account = result[0];
-    //         this.contract.methods.start().send({ from: account, gas: 30000 });
-    //     });
+    async confirmStart(request: StartRequest): Promise<Receipt> {
+        const start = this.contract.methods.start;
+        const params = Array.from(Object.create(request));
+        return this.sendTx(start, ...params);
+    }
 
-    //     setTimeout(() => {
-    //         this.web3.eth.getAccounts().then(result => {
-    //             const account = result[0];
-    //             this.contract.methods.stop().send({ from: account, gas: 30000 });
-    //         });
-    //     }, 5000);
-    // }
+    async confirmStop(request: StopRequest): Promise<Receipt> {
+        const stop = this.contract.methods.stop;
+        const params = Array.from(Object.create(request));
+        return this.sendTx(stop, ...params);
+    }
+
+    async sendError(request: StartRequest | StopRequest): Promise<Receipt> {
+        const error = this.contract.methods.failure;
+        const params = Array.from(Object.create(request));
+        return this.sendTx(error, ...params);
+    }
+
+    private async sendTx(method, ...args: any[]): Promise<Receipt> {
+        const gas = await method(...args).estimateGas({from: this.coinbase});
+        const unlocked = await this.personal.unlockAccount(this.coinbase, this.pass, 60);
+        const receipt = await method(...args).send({from: this.coinbase, gas});
+        return this.formatReceipt(receipt);
+    }
+
+    private formatReceipt(txObject): Receipt {
+        return {
+            status: 'mined',
+            txHash: txObject.transactionHash,
+            blockNumber: txObject.blockNumber
+        };
+    }
 
     private initialise(): void {
         if (this.initialised) {

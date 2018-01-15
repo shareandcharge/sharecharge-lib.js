@@ -1,6 +1,5 @@
-export interface Config {
-    version: string;
-    node: string;
-    chargeAbi: any;
-    chargeAddr: string;
+export interface Receipt {
+    status: string;
+    txHash: string;
+    blockNumber: number;
 }
