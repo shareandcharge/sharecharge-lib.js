@@ -1,4 +1,8 @@
+import { TestContract } from './test/test-contract';
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 import { Bridge } from './src/bridge';
+import { PoleContract } from './src/models/pole-contract';
 
 /* REQUIREMENTS:
     - array of pole IDs
@@ -8,38 +12,43 @@ import { Bridge } from './src/bridge';
 
 */
 
-const poles = [
-    '0x0100000000000000000000000000000000000000000000000000000000000000'
-];
+const poles = ['0x0100000000000000000000000000000000000000000000000000000000000000'];
 
-const bridge = new Bridge('pass');
-
-bridge.listen();
+// Need to use dependancy injection here!
+const bridge = new Bridge(new PoleContract('pass'));
 
 bridge.start$.subscribe(request => {
-    const pole = request.command.pole;
+    const pole = request.params.pole;
     if (poles.includes(pole)) {
         console.log(`Received start request on ${pole}`);
         try {
             // charging pole started
-            console.log(`Start receipt: ${request.success()}`);
+            request.success().then(receipt =>
+                console.log(`Start receipt: ${JSON.stringify(receipt)}`)
+            );
         } catch (err) {
             // charging pole failed to start
-            console.log(`${err.message} with receipt: ${request.failure()}`);
+            request.failure().then(receipt =>
+                console.log(`${err.message} with receipt: ${JSON.stringify(receipt)}`)
+            );
         }
     }
 });
 
 bridge.stop$.subscribe(request => {
-    const pole = request.command.pole;
+    const pole = request.params.pole;
     if (poles.includes(pole)) {
         console.log(`Received stop request on ${pole}`);
         try {
             // charging pole stopped
-            console.log(`Stop receipt: ${request.success()}`);
+            request.success().then(receipt =>
+                console.log(`Stop receipt: ${JSON.stringify(receipt)}`)
+            );
         } catch (err) {
             // charging pole failed to stop
-            console.log(`${err.message} with receipt: ${request.failure()}`);
+            request.failure().then(receipt =>
+                console.log(`${err.message} with receipt: ${JSON.stringify(receipt)}`)
+            );
         }
     }
 });
