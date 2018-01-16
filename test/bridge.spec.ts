@@ -5,11 +5,11 @@ import FakeProvider = require('web3-fake-provider');
 import sinon = require('sinon');
 import Web3 = require('web3');
 
-const abi = require('../src/config/charge.json');
+// const abi = require('../src/config/charge.json');
 
 describe('version', () => {
   it('should report version', () => {
-    const bridge = new Bridge();
+    const bridge = new Bridge('');
     expect(bridge.version).to.equal('0.1.0');
   });
 });

@@ -19,8 +19,8 @@ export class Bridge {
     private contract: any;
     private coinbase: string;
 
-    private startSource = new Subject<StartRequest>();
-    private stopSource = new Subject<StopRequest>();
+    private startSource = new Subject<any>();
+    private stopSource = new Subject<any>();
 
     start$ = this.startSource.asObservable();
     stop$ = this.stopSource.asObservable();
@@ -44,33 +44,39 @@ export class Bridge {
         this.contract.events.ClientRequestedStart({}, (reject, resolve) => {
             const pole = resolve.returnValues['poleID'];
             const user = resolve.returnValues['user'];
-
-            // const wattPower = resolve.returnValues['_wattPower'];
-            // const secondsToRent = resolve.returnValues['_secondsToRent'];
-            this.startSource.next(new StartRequest(pole, user));
+            const request = new StartRequest(pole, user);
+            this.startSource.next({
+                command: request,
+                success: async () => await this.confirmStart(request),
+                failure: async () => await this.sendError(request)
+            });
         });
 
         this.contract.events.ClientRequestedStop({}, (reject, resolve) => {
             const pole = resolve.returnValues['poleID'];
             const user = resolve.returnValues['user'];
-            // const measuredWatt = resolve.returnValues['_measuredWatt'];
-            this.stopSource.next(new StopRequest(pole, user));
+            const request = new StopRequest(pole, user);
+            this.stopSource.next({
+                command: request,
+                success: async () => await this.confirmStop(request),
+                failure: async () => await this.sendError(request)
+            });
         });
     }
 
-    async confirmStart(request: StartRequest): Promise<Receipt> {
+    private async confirmStart(request: StartRequest): Promise<Receipt> {
         const start = this.contract.methods.start;
         const params = Array.from(Object.create(request));
         return this.sendTx(start, ...params);
     }
 
-    async confirmStop(request: StopRequest): Promise<Receipt> {
+    private async confirmStop(request: StopRequest): Promise<Receipt> {
         const stop = this.contract.methods.stop;
         const params = Array.from(Object.create(request));
         return this.sendTx(stop, ...params);
     }
 
-    async sendError(request: StartRequest | StopRequest): Promise<Receipt> {
+    private async sendError(request: StartRequest | StopRequest): Promise<Receipt> {
         const error = this.contract.methods.failure;
         const params = Array.from(Object.create(request));
         return this.sendTx(error, ...params);

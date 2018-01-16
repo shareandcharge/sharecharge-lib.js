@@ -16,31 +16,30 @@ const bridge = new Bridge('pass');
 
 bridge.listen();
 
-bridge.start$.subscribe(handleEvent);
-bridge.stop$.subscribe(handleEvent);
-
-async function handleEvent(ev): Promise<void> {
-    const type = ev['_event'];
-    const pole = ev['_pole'];
+bridge.start$.subscribe(request => {
+    const pole = request.command.pole;
     if (poles.includes(pole)) {
-        console.log(`received ${type} request on ${pole}`);
+        console.log(`Received start request on ${pole}`);
         try {
-            type === 'start' ? start(ev) : stop(ev);
+            // charging pole started
+            console.log(`Start receipt: ${request.success()}`);
         } catch (err) {
-            console.log(err.message);
-            const receipt = await bridge.sendError(ev);
+            // charging pole failed to start
+            console.log(`${err.message} with receipt: ${request.failure()}`);
         }
     }
-}
+});
 
-async function start(ev): Promise<void> {
-    // call start on charging pole
-    const receipt = await bridge.confirmStart(ev);
-    console.log('start receipt:', receipt);
-}
-
-async function stop(ev): Promise<void> {
-    // call stop on charging pole
-    const receipt = await bridge.confirmStop(ev);
-    console.log('stop receipt:', receipt);
-}
+bridge.stop$.subscribe(request => {
+    const pole = request.command.pole;
+    if (poles.includes(pole)) {
+        console.log(`Received stop request on ${pole}`);
+        try {
+            // charging pole stopped
+            console.log(`Stop receipt: ${request.success()}`);
+        } catch (err) {
+            // charging pole failed to stop
+            console.log(`${err.message} with receipt: ${request.failure()}`);
+        }
+    }
+});
