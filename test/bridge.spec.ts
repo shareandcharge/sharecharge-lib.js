@@ -51,9 +51,7 @@ describe('start', () => {
   it('should tell contract that start occurred via event callback', (done) => {
 
     bridge.start$.subscribe(request => {
-
       request.success().then(receipt => {
-
         expect(receipt.status).to.equal('start status');
         expect(receipt.txHash).to.equal('0x11');
         expect(receipt.blockNumber).to.equal(696969);
@@ -67,8 +65,16 @@ describe('start', () => {
 
   });
 
-  it('should tell contract that start failed via event callback', async () => {
-    // send error code 0
+  it('should tell contract that error occurred on start with correct error code', (done) => {
+
+    bridge.start$.subscribe(request => {
+      request.failure().then(receipt => {
+        expect(receipt.request.errorCode).to.equal(0);
+        done();
+      });
+    });
+
+    testContract.emitStart(connectorId, controller);
 
   });
 });
@@ -91,10 +97,16 @@ describe('stop', () => {
     testContract.emitStop(connectorId, controller);
   });
 
-  it('should tell contract that stop failed via event callback', async () => {
-    // send error code 1
+  it('should tell contract error occurred on stop with correct error code', (done) => {
+
+    bridge.stop$.subscribe(request => {
+      request.failure().then(receipt => {
+        expect(receipt.request.errorCode).to.equal(1);
+        done();
+      });
+    });
+
+    testContract.emitStop(connectorId, controller);
   });
-
-
 
 });
