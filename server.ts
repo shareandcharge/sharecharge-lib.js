@@ -12,15 +12,15 @@ import { PoleContract } from './src/models/pole-contract';
 
 */
 
-const poles = ['0x0100000000000000000000000000000000000000000000000000000000000000'];
+const connectors = ['0x0100000000000000000000000000000000000000000000000000000000000000'];
 
 // Need to use dependancy injection here!
 const bridge = new Bridge(new PoleContract('pass'));
 
 bridge.start$.subscribe(request => {
-    const pole = request.params.pole;
-    if (poles.includes(pole)) {
-        console.log(`Received start request on ${pole}`);
+    const connector = request.params.connectorId;
+    if (connectors.includes(connector)) {
+        console.log(`Received start request on ${connector}`);
         try {
             // charging pole started
             request.success().then(receipt =>
@@ -36,9 +36,9 @@ bridge.start$.subscribe(request => {
 });
 
 bridge.stop$.subscribe(request => {
-    const pole = request.params.pole;
-    if (poles.includes(pole)) {
-        console.log(`Received stop request on ${pole}`);
+    const connector = request.params.connectorId;
+    if (connectors.includes(connector)) {
+        console.log(`Received stop request on ${connector}`);
         try {
             // charging pole stopped
             request.success().then(receipt =>

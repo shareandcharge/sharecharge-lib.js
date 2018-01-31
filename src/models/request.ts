@@ -1,5 +1,5 @@
 export interface Request {
     type: string;
-    pole: string;
-    user: string;
+    connectorId: string;
+    controller: string;
 }

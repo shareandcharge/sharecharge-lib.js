@@ -4,37 +4,39 @@ import * as mocha from 'mocha';
 import * as sinon from 'sinon';
 import { TestContract } from './test-contract';
 
+let testContract, bridge;
+let connectorId, controller, args;
+
+beforeEach(async () => {
+  testContract = new TestContract();
+  bridge = new Bridge(testContract);
+  connectorId = (Math.random() * 0xFFFFFFFFF << 0).toString(16);
+  controller = (Math.random() * 0xFFFFFFFFF << 0).toString(16);
+  args = { connectorId, controller };
+});
+
 describe('events', () => {
 
-  const testContract = new TestContract();
-  const bridge = new Bridge(testContract);
-
-  it('should subscribe to start events', () => {
-
-    const randomPoleAddress = (Math.random() * 0xFFFFFFFFF << 0).toString(16);
-    const randomUserAddress = (Math.random() * 0xFFFFFFFFF << 0).toString(16);
+  it('should subscribe to start events and receive correct command parameters', () => {
 
     bridge.start$.subscribe(command => {
       expect(command.params.type).to.be.equal('start');
-      expect(command.params.pole).to.be.equal(randomPoleAddress);
-      expect(command.params.user).to.be.equal(randomUserAddress);
+      expect(command.params.connectorId).to.be.equal(connectorId);
+      expect(command.params.controller).to.be.equal(controller);
     });
 
-    testContract.emitStart(randomPoleAddress, randomUserAddress);
+    testContract.emitStart(connectorId, controller);
   });
 
-  it('should subscribe to stop events', () => {
-
-    const randomPoleAddress = (Math.random() * 0xFFFFFFFFF << 0).toString(16);
-    const randomUserAddress = (Math.random() * 0xFFFFFFFFF << 0).toString(16);
+  it('should subscribe to stop events and receieve correct command parameters', () => {
 
     bridge.stop$.subscribe(command => {
       expect(command.params.type).to.be.equal('stop');
-      expect(command.params.pole).to.be.equal(randomPoleAddress);
-      expect(command.params.user).to.be.equal(randomUserAddress);
+      expect(command.params.connectorId).to.be.equal(connectorId);
+      expect(command.params.controller).to.be.equal(controller);
     });
 
-    testContract.emitStop(randomPoleAddress, randomUserAddress);
+    testContract.emitStop(connectorId, controller);
 
   });
 
@@ -45,11 +47,54 @@ describe('register', () => {
 });
 
 describe('start', () => {
-  it('should tell contract that start occurred');
-  it('should tell contract that start failed');
+
+  it('should tell contract that start occurred via event callback', (done) => {
+
+    bridge.start$.subscribe(request => {
+
+      request.success().then(receipt => {
+
+        expect(receipt.status).to.equal('start status');
+        expect(receipt.txHash).to.equal('0x11');
+        expect(receipt.blockNumber).to.equal(696969);
+        expect(receipt.request).to.deep.equal(args);
+        done();
+
+      });
+    });
+
+    testContract.emitStart(connectorId, controller);
+
+  });
+
+  it('should tell contract that start failed via event callback', async () => {
+    // send error code 0
+
+  });
 });
 
 describe('stop', () => {
-  it('should tell contract that stop occurred');
-  it('should tell contract that stop failed');
+  it('should tell contract that stop occurred via event callback', (done) => {
+    bridge.stop$.subscribe(request => {
+
+      request.success().then(receipt => {
+
+        expect(receipt.status).to.equal('stop status');
+        expect(receipt.txHash).to.equal('0x22');
+        expect(receipt.blockNumber).to.equal(700131);
+        expect(receipt.request).to.deep.equal({ connectorId: args.connectorId });
+        done();
+
+      });
+    });
+
+    testContract.emitStop(connectorId, controller);
+  });
+
+  it('should tell contract that stop failed via event callback', async () => {
+    // send error code 1
+  });
+
+
+
 });

@@ -27,7 +27,7 @@ export class PoleContract implements IContract {
 
         this.contract = new this.web3.eth.Contract(config.chargeAbi, config.chargeAddr);
 
-        this.contract.events.ClientRequestedStart({}, (err, res) => {
+        this.contract.events.StartRequested({}, (err, res) => {
             if (err) {
                 this.source.error(new Error(err));
             } else {
@@ -35,7 +35,7 @@ export class PoleContract implements IContract {
             }
         });
 
-        this.contract.events.ClientRequestedStop({}, (err, res) => {
+        this.contract.events.StopRequested({}, (err, res) => {
             if (err) {
                 this.source.error(new Error(err));
             } else {
@@ -44,19 +44,19 @@ export class PoleContract implements IContract {
         });
     }
 
-    confirmStart(request: Request): Promise<Receipt> {
-        const start = this.contract.methods.start;
-        const params = Array.from(Object.create(request));
+    confirmStart(connectorId: string, controller: string): Promise<Receipt> {
+        const start = this.contract.methods.confirmStart;
+        const params = Array.from(arguments);
         return this.sendTx(start, ...params);
     }
-    confirmStop(request: Request): Promise<Receipt> {
-        const stop = this.contract.methods.stop;
-        const params = Array.from(Object.create(request));
+    confirmStop(connectorId: string): Promise<Receipt> {
+        const stop = this.contract.methods.confirmStop;
+        const params = Array.from(arguments);
         return this.sendTx(stop, ...params);
     }
-    sendError(request: Request): Promise<Receipt> {
-        const error = this.contract.methods.failure;
-        const params = Array.from(Object.create(request));
+    logError(connectorId: string, errorCode: number): Promise<Receipt> {
+        const error = this.contract.methods.logError;
+        const params = Array.from(arguments);
         return this.sendTx(error, ...params);
     }
 
@@ -75,11 +75,11 @@ export class PoleContract implements IContract {
         };
     }
 
-    private formatPayload(type, vals) {
+    private formatPayload(type, values): Request {
         return {
-            type: type,
-            pole: vals['poleID'],
-            user: vals['user'],
+            type,
+            connectorId: values.connectorId,
+            controller: values.controller
         };
     }
 }

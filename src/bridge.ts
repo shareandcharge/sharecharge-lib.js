@@ -17,14 +17,14 @@ export class Bridge {
                 if (request.type === 'start') {
                     this.startSource.next({
                         params: request,
-                        success: async () => await contract.confirmStart(request),
-                        failure: async () => await contract.sendError(request)
+                        success: async () => await contract.confirmStart(request.connectorId, request.controller),
+                        failure: async () => await contract.logError(request.connectorId, 0)
                     });
                 } else {
                     this.stopSource.next({
                         params: request,
-                        success: async () => await contract.confirmStop(request),
-                        failure: async () => await contract.sendError(request)
+                        success: async () => await contract.confirmStop(request.connectorId),
+                        failure: async () => await contract.logError(request.connectorId, 1)
                     });
                 }
             },

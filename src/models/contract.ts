@@ -6,9 +6,9 @@ export interface IContract {
 
     readonly events$: Observable<Request>;
 
-    confirmStart(request: Request): Promise<Receipt>;
+    confirmStart(connectorId: string, controller: string): Promise<Receipt>;
 
-    confirmStop(request: Request): Promise<Receipt>;
+    confirmStop(connectorId: string): Promise<Receipt>;
 
-    sendError(request: Request): Promise<Receipt>;
+    logError(connectorId: string, errorCode: number): Promise<Receipt>;
 }
