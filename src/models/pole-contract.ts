@@ -42,6 +42,8 @@ export class PoleContract implements IContract {
                 this.source.next(this.formatPayload('stop', res.returnValues));
             }
         });
+
+        console.log('Listening for events...');
     }
 
     confirmStart(connectorId: string, controller: string): Promise<Receipt> {

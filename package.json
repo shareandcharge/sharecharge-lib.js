@@ -9,6 +9,7 @@
   "author": "MotionWerk GmbH",
   "license": "LGPL-3.0",
   "scripts": {
+    "start": "node dist/server.js",
     "build": "npm run build-ts && npm run tslint",
     "test": "mocha -r ts-node/register test/**/*.spec.ts",
     "build-ts": "tsc",

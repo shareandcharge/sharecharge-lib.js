@@ -15,10 +15,11 @@ import { PoleContract } from './src/models/pole-contract';
 const connectors = ['0x0100000000000000000000000000000000000000000000000000000000000000'];
 
 // Need to use dependancy injection here!
-const bridge = new Bridge(new PoleContract('pass'));
+const bridge = new Bridge(new PoleContract(''));
 
 bridge.start$.subscribe(request => {
     const connector = request.params.connectorId;
+    console.log('request:', request);
     if (connectors.includes(connector)) {
         console.log(`Received start request on ${connector}`);
         try {
