@@ -1,1 +1,184 @@
-export const abi = [{ 'constant': false, 'inputs': [{ 'name': 'connectorId', 'type': 'bytes32' }], 'name': 'confirmStop', 'outputs': [], 'payable': false, 'stateMutability': 'nonpayable', 'type': 'function' }, { 'constant': false, 'inputs': [{ 'name': 'connectorId', 'type': 'bytes32' }, { 'name': 'errorCode', 'type': 'uint8' }], 'name': 'logError', 'outputs': [], 'payable': false, 'stateMutability': 'nonpayable', 'type': 'function' }, { 'constant': false, 'inputs': [{ 'name': 'connectorId', 'type': 'bytes32' }, { 'name': 'controller', 'type': 'address' }], 'name': 'confirmStart', 'outputs': [], 'payable': false, 'stateMutability': 'nonpayable', 'type': 'function' }, { 'constant': false, 'inputs': [{ 'name': 'connectorId', 'type': 'bytes32' }], 'name': 'requestStart', 'outputs': [], 'payable': false, 'stateMutability': 'nonpayable', 'type': 'function' }, { 'constant': false, 'inputs': [{ 'name': 'connectorId', 'type': 'bytes32' }], 'name': 'requestStop', 'outputs': [], 'payable': false, 'stateMutability': 'nonpayable', 'type': 'function' }, { 'inputs': [{ 'name': 'stationsAddress', 'type': 'address' }, { 'name': 'sessionsAddress', 'type': 'address' }, { 'name': 'coinAddress', 'type': 'address' }], 'payable': false, 'stateMutability': 'nonpayable', 'type': 'constructor' }, { 'anonymous': false, 'inputs': [{ 'indexed': true, 'name': 'connectorId', 'type': 'bytes32' }, { 'indexed': false, 'name': 'controller', 'type': 'address' }], 'name': 'StartRequested', 'type': 'event' }, { 'anonymous': false, 'inputs': [{ 'indexed': true, 'name': 'connectorId', 'type': 'bytes32' }], 'name': 'StartConfirmed', 'type': 'event' }, { 'anonymous': false, 'inputs': [{ 'indexed': true, 'name': 'connectorId', 'type': 'bytes32' }, { 'indexed': false, 'name': 'controller', 'type': 'address' }], 'name': 'StopRequested', 'type': 'event' }, { 'anonymous': false, 'inputs': [{ 'indexed': true, 'name': 'connectorId', 'type': 'bytes32' }], 'name': 'StopConfirmed', 'type': 'event' }, { 'anonymous': false, 'inputs': [{ 'indexed': true, 'name': 'connectorId', 'type': 'bytes32' }, { 'indexed': false, 'name': 'errorCode', 'type': 'uint8' }], 'name': 'Error', 'type': 'event' }];
+export const abi = [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "connectorId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "confirmStop",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "connectorId",
+          "type": "bytes32"
+        },
+        {
+          "name": "errorCode",
+          "type": "uint8"
+        }
+      ],
+      "name": "logError",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "connectorId",
+          "type": "bytes32"
+        },
+        {
+          "name": "controller",
+          "type": "address"
+        }
+      ],
+      "name": "confirmStart",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "connectorId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "requestStart",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "connectorId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "requestStop",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "name": "storageAddress",
+          "type": "address"
+        },
+        {
+          "name": "sessionsAddress",
+          "type": "address"
+        },
+        {
+          "name": "coinAddress",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "clientId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "connectorId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "name": "controller",
+          "type": "address"
+        }
+      ],
+      "name": "StartRequested",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "connectorId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "StartConfirmed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "clientId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "connectorId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "name": "controller",
+          "type": "address"
+        }
+      ],
+      "name": "StopRequested",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "connectorId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "StopConfirmed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "connectorId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "name": "errorCode",
+          "type": "uint8"
+        }
+      ],
+      "name": "Error",
+      "type": "event"
+    }
+  ];

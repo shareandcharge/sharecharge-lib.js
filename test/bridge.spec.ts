@@ -5,14 +5,15 @@ import * as sinon from 'sinon';
 import { TestContract } from './test-contract';
 
 let testContract, bridge;
-let connectorId, controller, args;
+let clientId, connectorId, controller, args;
 
 beforeEach(async () => {
   testContract = new TestContract();
   bridge = new Bridge(testContract);
+  clientId = (Math.random() * 0xFFFFFFFFF << 0).toString(16);
   connectorId = (Math.random() * 0xFFFFFFFFF << 0).toString(16);
   controller = (Math.random() * 0xFFFFFFFFF << 0).toString(16);
-  args = { connectorId, controller };
+  args = { clientId, connectorId, controller };
 });
 
 describe('events', () => {
@@ -21,11 +22,12 @@ describe('events', () => {
 
     bridge.start$.subscribe(command => {
       expect(command.params.type).to.be.equal('start');
+      expect(command.params.clientId).to.be.equal(clientId);
       expect(command.params.connectorId).to.be.equal(connectorId);
       expect(command.params.controller).to.be.equal(controller);
     });
 
-    testContract.emitStart(connectorId, controller);
+    testContract.emitStart(clientId, connectorId, controller);
   });
 
   it('should subscribe to stop events and receieve correct command parameters', () => {
@@ -36,7 +38,7 @@ describe('events', () => {
       expect(command.params.controller).to.be.equal(controller);
     });
 
-    testContract.emitStop(connectorId, controller);
+    testContract.emitStop(clientId, connectorId, controller);
 
   });
 
@@ -55,13 +57,13 @@ describe('start', () => {
         expect(receipt.status).to.equal('start status');
         expect(receipt.txHash).to.equal('0x11');
         expect(receipt.blockNumber).to.equal(696969);
-        expect(receipt.request).to.deep.equal(args);
+        expect(receipt.request).to.deep.equal({ connectorId: args.connectorId, controller: args.controller });
         done();
 
       });
     });
 
-    testContract.emitStart(connectorId, controller);
+    testContract.emitStart(clientId, connectorId, controller);
 
   });
 
@@ -74,7 +76,7 @@ describe('start', () => {
       });
     });
 
-    testContract.emitStart(connectorId, controller);
+    testContract.emitStart(clientId, connectorId, controller);
 
   });
 });
@@ -94,7 +96,7 @@ describe('stop', () => {
       });
     });
 
-    testContract.emitStop(connectorId, controller);
+    testContract.emitStop(clientId, connectorId, controller);
   });
 
   it('should tell contract error occurred on stop with correct error code', (done) => {
@@ -106,7 +108,7 @@ describe('stop', () => {
       });
     });
 
-    testContract.emitStop(connectorId, controller);
+    testContract.emitStop(clientId, connectorId, controller);
   });
 
 });

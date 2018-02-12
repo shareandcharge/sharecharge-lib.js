@@ -10,17 +10,19 @@ export class TestContract implements IContract {
 
     events$ = this.testSource.asObservable();
 
-    emitStart(connectorId: string, controller: string) {
+    emitStart(clientId: string, connectorId: string, controller: string) {
         this.testSource.next({
             type: 'start',
+            clientId,
             connectorId,
             controller
         });
     }
 
-    emitStop(connectorId: string, controller: string): void {
+    emitStop(clientId: string, connectorId: string, controller: string): void {
         this.testSource.next({
             type: 'stop',
+            clientId,
             connectorId,
             controller
         });
