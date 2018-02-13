@@ -3,24 +3,15 @@ import { expect } from 'chai';
 import * as mocha from 'mocha';
 import { TestContract } from './test-contract';
 
-<<<<<<< 0bb33b5f26774458e21b56f305a55c8b4a40210a
-let testContract, bridge;
+let testContract, sc;
 let clientId, connectorId, controller, args;
 
 beforeEach(async () => {
   testContract = new TestContract();
-  bridge = new Bridge(testContract);
-  clientId = (Math.random() * 0xFFFFFFFFF << 0).toString(16);
-=======
-let testContract, sc;
-let connectorId, controller, args;
-
-beforeEach(async () => {
-  testContract = new TestContract();
   sc = new ShareAndCharge(testContract);
->>>>>>> Rename Bridge class to ShareAndCharge
   connectorId = (Math.random() * 0xFFFFFFFFF << 0).toString(16);
   controller = (Math.random() * 0xFFFFFFFFF << 0).toString(16);
+  clientId = (Math.random() * 0xFFFFFFFFF << 0).toString(16);
   args = { clientId, connectorId, controller };
 });
 
