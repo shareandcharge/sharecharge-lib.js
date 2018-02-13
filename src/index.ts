@@ -3,7 +3,7 @@ import { Observable } from 'rxjs/Observable';
 import { IContract } from './models/contract';
 import { Command } from './models/command';
 
-export class Bridge {
+export class ShareAndCharge {
 
     private startSource = new Subject<Command>();
     private stopSource = new Subject<Command>();
