@@ -116,12 +116,12 @@ describe('#updateStatus()', function() {
 
   it('should filter conflicting statuses and return receipts after poles updated', async function() {
     const result = await sc.updateStatus(['123', '789']);
-    expect(result.length).to.equal(1);
+    expect(result.points.length).to.equal(1);
   });
 
   it('should return error if unable to update status', async function() {
     const result = await sc.updateStatus(['456']);
-    expect(result[0] instanceof Error).to.equal(true);
+    expect(result.errors[0] instanceof Error).to.equal(true);
   });
 
 });

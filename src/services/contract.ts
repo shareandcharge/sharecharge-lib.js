@@ -41,8 +41,9 @@ export class Contract implements IContract {
     }
 
     private async queryState(method, ...args: any[]): Promise<any> {
-        const query = this.contract.methods[method](...args);
-        return query.call();
+        // const query = this.contract.methods[method](...args);
+        // return query.call();
+        return true;
     }
 
     private async sendTx(method, ...args: any[]): Promise<Receipt> {
@@ -108,7 +109,8 @@ export class Contract implements IContract {
         };
         chargePoints.forEach(async point => {
             try {
-                receipts.points.push(await this.sendTx('setAvailability', [clientId, point, false]));
+                const receipt = await this.sendTx('setAvailability', [clientId, point, false]);
+                receipts.points.push(receipt);
             } catch (err) {
                 receipts.errors.push(Error(err.message));
             }
