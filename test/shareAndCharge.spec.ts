@@ -111,3 +111,12 @@ describe('stop', () => {
   });
 
 });
+
+describe('#updateStatus()', function() {
+
+  it('should return update availability receipts after poles updated', async function() {
+    const result = await sc.updateStatus(['123', '456']);
+    expect(result.length).to.equal(1);
+  });
+
+});

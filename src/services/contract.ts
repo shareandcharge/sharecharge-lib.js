@@ -1,11 +1,11 @@
 import Web3 = require('web3');
 import { Subject } from 'rxjs/Subject';
 import { config } from '../config/config';
-import { IContract } from './contract';
-import { Request } from './request';
-import { Receipt } from './receipt';
+import { IContract } from '../models/contract';
+import { Request } from '../models/request';
+import { Receipt } from '../models/receipt';
 
-export class PoleContract implements IContract {
+export class Contract implements IContract {
 
     private web3: Web3;
     private contract: any;
@@ -40,20 +40,9 @@ export class PoleContract implements IContract {
         });
     }
 
-    confirmStart(connectorId: string, controller: string): Promise<Receipt> {
-        const start = this.contract.methods.confirmStart;
-        const params = Array.from(arguments);
-        return this.sendTx(start, ...params);
-    }
-    confirmStop(connectorId: string): Promise<Receipt> {
-        const stop = this.contract.methods.confirmStop;
-        const params = Array.from(arguments);
-        return this.sendTx(stop, ...params);
-    }
-    logError(connectorId: string, errorCode: number): Promise<Receipt> {
-        const error = this.contract.methods.logError;
-        const params = Array.from(arguments);
-        return this.sendTx(error, ...params);
+    private queryState(method, ...args: any[]): Promise<any> {
+        const query = method(...args);
+        return query.call();
     }
 
     private async sendTx(method, ...args: any[]): Promise<Receipt> {
@@ -80,5 +69,40 @@ export class PoleContract implements IContract {
             connectorId: values.connectorId,
             controller: values.controller
         };
+    }
+
+    confirmStart(connectorId: string, controller: string): Promise<Receipt> {
+        const start = this.contract.methods.confirmStart;
+        const params = Array.from(arguments);
+        return this.sendTx(start, ...params);
+    }
+
+    confirmStop(connectorId: string): Promise<Receipt> {
+        const stop = this.contract.methods.confirmStop;
+        const params = Array.from(arguments);
+        return this.sendTx(stop, ...params);
+    }
+
+    logError(connectorId: string, errorCode: number): Promise<Receipt> {
+        const error = this.contract.methods.logError;
+        const params = Array.from(arguments);
+        return this.sendTx(error, ...params);
+    }
+
+    async conflictingStatuses(chargePoints: string[]): Promise<string[]> {
+        const conflicts = [];
+        chargePoints.forEach(async point => {
+            const isAvailable = await this.queryState('isAvailable', point);
+            if (isAvailable) {
+                conflicts.push(point);
+            }
+        });
+        return conflicts;
+    }
+
+    updateStatus(chargePoints: string[]): void {
+        Promise.all(chargePoints.map(async point => {
+            await this.sendTx('setAvailability', [point, false]);
+        }));
     }
 }

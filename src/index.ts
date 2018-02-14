@@ -5,6 +5,8 @@ import { Command } from './models/command';
 
 export class ShareAndCharge {
 
+    private contract;
+
     private startSource = new Subject<Command>();
     private stopSource = new Subject<Command>();
 
@@ -12,24 +14,35 @@ export class ShareAndCharge {
     stop$ = this.stopSource.asObservable();
 
     constructor(contract: IContract) {
-        contract.events$.subscribe(
+        this.contract = contract;
+        this.contract.events$.subscribe(
             request => {
                 if (request.type === 'start') {
                     this.startSource.next({
                         params: request,
-                        success: async () => await contract.confirmStart(request.connectorId, request.controller),
-                        failure: async () => await contract.logError(request.connectorId, 0)
+                        success: async () => await this.contract.confirmStart(request.connectorId, request.controller),
+                        failure: async () => await this.contract.logError(request.connectorId, 0)
                     });
                 } else {
                     this.stopSource.next({
                         params: request,
-                        success: async () => await contract.confirmStop(request.connectorId),
-                        failure: async () => await contract.logError(request.connectorId, 1)
+                        success: async () => await this.contract.confirmStop(request.connectorId),
+                        failure: async () => await this.contract.logError(request.connectorId, 1)
                     });
                 }
             },
             err => {
                 console.log(err);
             });
+    }
+
+    async updateStatus(chargePoints: string[]): Promise<boolean> {
+        try {
+            const pointsToUpdate = await this.contract.conflictingStatuses(chargePoints);
+            return this.contract.updateStatus(pointsToUpdate);
+        } catch (err) {
+            throw Error(err.message);
+        }
+
     }
 }
