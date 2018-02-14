@@ -41,9 +41,8 @@ export class Contract implements IContract {
     }
 
     private async queryState(method, ...args: any[]): Promise<any> {
-        // const query = this.contract.methods[method](...args);
-        // return query.call();
-        return true;
+        const query = this.contract.methods[method](...args);
+        return query.call();
     }
 
     private async sendTx(method, ...args: any[]): Promise<Receipt> {
