@@ -3,3 +3,8 @@ export interface Receipt {
     txHash: string;
     blockNumber: number;
 }
+
+export interface ReturnStatusObject {
+    points: Receipt[];
+    errors: Error[];
+}

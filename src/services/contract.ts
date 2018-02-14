@@ -3,7 +3,7 @@ import { Subject } from 'rxjs/Subject';
 import { config } from '../config/config';
 import { IContract } from '../models/contract';
 import { Request } from '../models/request';
-import { Receipt } from '../models/receipt';
+import { Receipt, ReturnStatusObject } from '../models/receipt';
 
 export class Contract implements IContract {
 
@@ -41,13 +41,13 @@ export class Contract implements IContract {
     }
 
     private queryState(method, ...args: any[]): Promise<any> {
-        const query = method(...args);
+        const query = this.contract.methods[method](...args);
         return query.call();
     }
 
     private async sendTx(method, ...args: any[]): Promise<Receipt> {
         const coinbase = await this.web3.eth.getCoinbase();
-        const tx = method(...args);
+        const tx = this.contract.methods[method](...args);
         const gas = await tx.estimateGas({ from: coinbase });
         const unlocked = await this.personal.unlockAccount(coinbase, this.pass, 60);
         const receipt = await tx.send({ from: coinbase, gas });
@@ -72,41 +72,48 @@ export class Contract implements IContract {
     }
 
     confirmStart(connectorId: string, controller: string): Promise<Receipt> {
-        const start = this.contract.methods.confirmStart;
         const params = Array.from(arguments);
-        return this.sendTx(start, ...params);
+        return this.sendTx('confirmStart', ...params);
     }
 
     confirmStop(connectorId: string): Promise<Receipt> {
-        const stop = this.contract.methods.confirmStop;
         const params = Array.from(arguments);
-        return this.sendTx(stop, ...params);
+        return this.sendTx('confirmStop', ...params);
     }
 
     logError(connectorId: string, errorCode: number): Promise<Receipt> {
-        const error = this.contract.methods.logError;
         const params = Array.from(arguments);
-        return this.sendTx(error, ...params);
+        return this.sendTx('logError', ...params);
     }
 
     async conflictingStatuses(chargePoints: string[]): Promise<string[]> {
-        const conflicts = [];
+        const conflicts: string[] = [];
         chargePoints.forEach(async point => {
-            const isAvailable = await this.queryState('isAvailable', point);
-            if (isAvailable) {
-                conflicts.push(point);
+            try {
+                const isAvailable = await this.queryState('isAvailable', point);
+                if (isAvailable) {
+                    conflicts.push(point);
+                }
+            } catch (err) {
+                throw Error(err.message);
             }
         });
         return conflicts;
     }
 
-    updateStatus(chargePoints: string[], clientId: string): Promise<(Receipt | Error)[]> {
-        return Promise.all(chargePoints.map(async point => {
+    async updateStatus(chargePoints: string[], clientId: string): Promise<ReturnStatusObject> {
+        const receipts: ReturnStatusObject = {
+            points: [],
+            errors: []
+        };
+        chargePoints.forEach(async point => {
             try {
-                return this.sendTx('setAvailability', [clientId, point, false]);
+                receipts.points.push(await this.sendTx('setAvailability', [clientId, point, false]));
             } catch (err) {
-                return Error(err.message);
+                receipts.errors.push(Error(err.message));
             }
-        }));
+        });
+
+        return receipts;
     }
 }
