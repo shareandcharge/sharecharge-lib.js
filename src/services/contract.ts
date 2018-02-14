@@ -100,9 +100,13 @@ export class Contract implements IContract {
         return conflicts;
     }
 
-    updateStatus(chargePoints: string[]): void {
-        Promise.all(chargePoints.map(async point => {
-            await this.sendTx('setAvailability', [point, false]);
+    updateStatus(chargePoints: string[], clientId: string): Promise<(Receipt | Error)[]> {
+        return Promise.all(chargePoints.map(async point => {
+            try {
+                return this.sendTx('setAvailability', [clientId, point, false]);
+            } catch (err) {
+                return Error(err.message);
+            }
         }));
     }
 }

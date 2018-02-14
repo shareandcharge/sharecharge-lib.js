@@ -36,13 +36,9 @@ export class ShareAndCharge {
             });
     }
 
-    async updateStatus(chargePoints: string[]): Promise<boolean> {
-        try {
-            const pointsToUpdate = await this.contract.conflictingStatuses(chargePoints);
-            return this.contract.updateStatus(pointsToUpdate);
-        } catch (err) {
-            throw Error(err.message);
-        }
+    async updateStatus(chargePoints: string[], clientId: string): Promise<boolean> {
+        const pointsToUpdate = await this.contract.conflictingStatuses(chargePoints);
+        return this.contract.updateStatus(pointsToUpdate, clientId);
 
     }
 }

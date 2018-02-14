@@ -114,9 +114,14 @@ describe('stop', () => {
 
 describe('#updateStatus()', function() {
 
-  it('should return update availability receipts after poles updated', async function() {
-    const result = await sc.updateStatus(['123', '456']);
+  it('should filter conflicting statuses and return receipts after poles updated', async function() {
+    const result = await sc.updateStatus(['123', '789']);
     expect(result.length).to.equal(1);
+  });
+
+  it('should return error if unable to update status', async function() {
+    const result = await sc.updateStatus(['456']);
+    expect(result[0] instanceof Error).to.equal(true);
   });
 
 });

@@ -55,17 +55,16 @@ export class TestContract implements IContract {
         });
     }
 
-    sendTx(point: string): Promise<any> {
-        return Promise.resolve({
-            txHash: '0x123',
-            blockNumber: 55
-        });
+    async sendTx(point: string): Promise<any> {
+        return point !== '123'
+            ? Error('Client ID incorrect')
+            : { txHash: '0x123', blockNumber: 55 };
     }
 
     async conflictingStatuses(chargePoints: string[]): Promise<string[]> {
         const conflicts: string[] = [];
         chargePoints.forEach(async point => {
-            if (point === '123') {
+            if (point !== '789') {
                 conflicts.push(point);
             }
         });
