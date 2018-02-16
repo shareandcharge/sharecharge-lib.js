@@ -1,9 +1,9 @@
 import Web3 = require('web3');
-import {Subject} from 'rxjs/Subject';
-import {config} from '../config/config';
-import {IContract} from '../models/contract';
-import {Request} from '../models/request';
-import {Receipt, ReturnStatusObject} from '../models/receipt';
+import { Subject } from 'rxjs/Subject';
+import { config } from '../config/config';
+import { IContract } from '../models/contract';
+import { Request } from '../models/request';
+import { Receipt, ReturnStatusObject } from '../models/receipt';
 
 export class Contract implements IContract {
 
@@ -43,9 +43,9 @@ export class Contract implements IContract {
     private async sendTx(method, ...args: any[]): Promise<Receipt> {
         const coinbase = await this.web3.eth.getCoinbase();
         const tx = this.contract.methods[method](...args);
-        const gas = await tx.estimateGas({from: coinbase});
+        const gas = await tx.estimateGas({ from: coinbase });
         const unlocked = await this.personal.unlockAccount(coinbase, this.pass, 60);
-        const receipt = await tx.send({from: coinbase, gas});
+        const receipt = await tx.send({ from: coinbase, gas });
         return this.formatReceipt(receipt);
     }
 
@@ -87,8 +87,8 @@ export class Contract implements IContract {
             try {
                 const isAvailable = await this.queryState('isAvailable', point);
                 if (isAvailable) {
-                const receipt = await this.sendTx('setAvailability', clientId, point, false);
-                return point;
+                    const receipt = await this.sendTx('setAvailability', clientId, point, false);
+                    return point;
                 }
             } catch (err) {
                 throw Error(err.message);

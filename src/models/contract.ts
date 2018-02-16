@@ -1,6 +1,6 @@
-import {Observable} from 'rxjs/Observable';
-import {Receipt} from './receipt';
-import {Request} from './request';
+import { Observable } from 'rxjs/Observable';
+import { Receipt } from './receipt';
+import { Request } from './request';
 
 export interface IContract {
 
@@ -11,4 +11,7 @@ export interface IContract {
     confirmStop(connectorId: string): Promise<Receipt>;
 
     logError(connectorId: string, errorCode: number): Promise<Receipt>;
+
+    updateStatuses(chargePoints: string[], clientId: string): Promise<(string | undefined)[]>;
+
 }
