@@ -10,7 +10,5 @@ export interface IContract {
 
     confirmStop(connectorId: string): Promise<Receipt>;
 
-    queryState(method: string, ...args: any[]): Promise<Receipt>;
-
     logError(connectorId: string, errorCode: number): Promise<Receipt>;
 }
