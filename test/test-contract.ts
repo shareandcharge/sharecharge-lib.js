@@ -65,4 +65,8 @@ export class TestContract implements IContract {
         }));
     }
 
+    async queryState(method: string, ...args: any[]): Promise<any> {
+        return true;
+    }
+
 }

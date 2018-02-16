@@ -96,7 +96,7 @@ export class Contract implements IContract {
         }));
     }
 
-    async queryState(method, ...args: any[]): Promise<any> {
+    async queryState(method: string, ...args: any[]): Promise<any> {
         const query = this.contract.methods[method](...args);
         return query.call();
     }
