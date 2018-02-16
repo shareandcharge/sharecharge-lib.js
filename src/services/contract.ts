@@ -81,40 +81,23 @@ export class Contract implements IContract {
         return this.sendTx('logError', ...params);
     }
 
-    async conflictingStatuses(chargePoints: string[]): Promise<string[]> {
-        const conflicts: string[] = [];
-        chargePoints.forEach(async point => {
+    async updateStatuses(chargePoints: string[], clientId: string): Promise<(string | undefined)[]> {
+
+        return Promise.all(chargePoints.map(async point => {
             try {
                 const isAvailable = await this.queryState('isAvailable', point);
                 if (isAvailable) {
-                    conflicts.push(point);
+                const receipt = await this.sendTx('setAvailability', clientId, point, false);
+                return point;
                 }
             } catch (err) {
                 throw Error(err.message);
             }
-        });
-        return conflicts;
+        }));
     }
 
     async queryState(method, ...args: any[]): Promise<any> {
         const query = this.contract.methods[method](...args);
         return query.call();
-    }
-
-    async updateStatus(chargePoints: string[], clientId: string): Promise<ReturnStatusObject> {
-        const receipts: ReturnStatusObject = {
-            points: [],
-            errors: []
-        };
-        chargePoints.forEach(async point => {
-            try {
-                const receipt = await this.sendTx('setAvailability', [clientId, point, false]);
-                receipts.points.push(receipt);
-            } catch (err) {
-                receipts.errors.push(Error(err.message));
-            }
-        });
-
-        return receipts;
     }
 }

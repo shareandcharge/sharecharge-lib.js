@@ -59,28 +59,10 @@ export class TestContract implements IContract {
         return point === '123';
     }
 
-    async conflictingStatuses(chargePoints: string[]): Promise<string[]> {
-        const conflicts: string[] = [];
-        chargePoints.forEach(async point => {
-            if (point !== '789') {
-                conflicts.push(point);
-            }
-        });
-        return conflicts;
-    }
-
-    async updateStatus(chargePoints: string[]): Promise<ReturnStatusObject> {
-        const receipts: ReturnStatusObject = {
-            points: [],
-            errors: []
-        };
-
-        chargePoints.forEach(async point => {
-            const receipt = { status: 'update', txHash: '0x123', blockNumber: 55, request: { point }};
-            await this.sendTx(point) ? receipts.points.push(receipt) : receipts.errors.push(Error('could not update'));
-        });
-
-        return receipts;
+    async updateStatuses(chargePoints: string[], clientId: string): Promise<(string | undefined)[]> {
+        return Promise.all(chargePoints.map(async point => {
+            return point === '123' ? point : undefined;
+        }));
     }
 
 }

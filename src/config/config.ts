@@ -4,5 +4,5 @@ export const config = {
     version: '0.1.0',
     node: 'ws://localhost:8546',
     chargeAbi: abi,
-    chargeAddr: '0x68e0dfe1421bc0e5584735546ade987a9f404eba'
+    chargeAddr: '0xdd87dabdfe86807ea6a4bbd688019c9446605fce'
 };

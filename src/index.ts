@@ -3,6 +3,7 @@ import { Observable } from 'rxjs/Observable';
 import { IContract } from './models/contract';
 import { Command } from './models/command';
 import { ReturnStatusObject } from './models/receipt';
+import { createStatusObject } from './utils/helpers';
 
 export class ShareAndCharge {
 
@@ -38,8 +39,7 @@ export class ShareAndCharge {
     }
 
     async updateStatus(chargePoints: string[], clientId: string): Promise<ReturnStatusObject> {
-        const pointsToUpdate = await this.contract.conflictingStatuses(chargePoints);
-        return this.contract.updateStatus(pointsToUpdate, clientId);
-
+        const updates = await this.contract.updateStatuses(chargePoints, clientId);
+        return createStatusObject(chargePoints, updates);
     }
 }
