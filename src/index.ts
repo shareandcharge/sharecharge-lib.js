@@ -42,4 +42,5 @@ export class ShareAndCharge {
         const updates = await this.contract.updateStatuses(chargePoints, clientId);
         return createStatusObject(chargePoints, updates);
     }
+
 }

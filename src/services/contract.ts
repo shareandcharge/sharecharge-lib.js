@@ -4,6 +4,7 @@ import { config } from '../config/config';
 import { IContract } from '../models/contract';
 import { Request } from '../models/request';
 import { Receipt, ReturnStatusObject } from '../models/receipt';
+import { createPayload, createReceipt } from '../utils/helpers';
 
 export class Contract implements IContract {
 
@@ -27,7 +28,7 @@ export class Contract implements IContract {
             if (err) {
                 this.source.error(new Error(err));
             } else {
-                this.source.next(this.formatPayload('start', res.returnValues));
+                this.source.next(createPayload('start', res.returnValues));
             }
         });
 
@@ -35,7 +36,7 @@ export class Contract implements IContract {
             if (err) {
                 this.source.error(new Error(err));
             } else {
-                this.source.next(this.formatPayload('stop', res.returnValues));
+                this.source.next(createPayload('stop', res.returnValues));
             }
         });
     }
@@ -46,24 +47,7 @@ export class Contract implements IContract {
         const gas = await tx.estimateGas({ from: coinbase });
         const unlocked = await this.personal.unlockAccount(coinbase, this.pass, 60);
         const receipt = await tx.send({ from: coinbase, gas });
-        return this.formatReceipt(receipt);
-    }
-
-    private formatReceipt(txObject): Receipt {
-        return {
-            status: 'mined',
-            txHash: txObject.transactionHash,
-            blockNumber: txObject.blockNumber
-        };
-    }
-
-    private formatPayload(type, values): Request {
-        return {
-            type,
-            clientId: values.clientId,
-            connectorId: values.connectorId,
-            controller: values.controller
-        };
+        return createReceipt(receipt);
     }
 
     confirmStart(connectorId: string, controller: string): Promise<Receipt> {

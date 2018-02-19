@@ -1,4 +1,5 @@
-import { ReturnStatusObject } from '../models/receipt';
+import { Receipt, ReturnStatusObject } from '../models/receipt';
+import { Request } from '../models/request';
 
 export const createStatusObject = (expected: string[], actual: any[]): ReturnStatusObject => {
     const status: ReturnStatusObject = { points: [], errors: [] };
@@ -8,4 +9,21 @@ export const createStatusObject = (expected: string[], actual: any[]): ReturnSta
     }
     status.points = actual.filter(point => point);
     return status;
+};
+
+export const createReceipt = (txObject): Receipt => {
+    return {
+        status: 'mined',
+        txHash: txObject.transactionHash,
+        blockNumber: txObject.blockNumber
+    };
+};
+
+export const createPayload = (type, values): Request => {
+    return {
+        type,
+        clientId: values.clientId,
+        connectorId: values.connectorId,
+        controller: values.controller
+    };
 };
