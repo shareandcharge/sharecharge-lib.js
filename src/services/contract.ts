@@ -56,19 +56,4 @@ export class Contract implements IContract {
         return createReceipt(receipt);
     }
 
-    confirmStart(connectorId: string, controller: string): Promise<Receipt> {
-        const params = Array.from(arguments);
-        return this.sendTx('confirmStart', ...params);
-    }
-
-    confirmStop(connectorId: string): Promise<Receipt> {
-        const params = Array.from(arguments);
-        return this.sendTx('confirmStop', ...params);
-    }
-
-    logError(connectorId: string, errorCode: number): Promise<Receipt> {
-        const params = Array.from(arguments);
-        return this.sendTx('logError', ...params);
-    }
-
 }

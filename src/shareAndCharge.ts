@@ -24,14 +24,14 @@ export class ShareAndCharge {
                 if (request.type === 'start') {
                     this.startSource.next({
                         params: request,
-                        success: async () => await this.contract.confirmStart(request.connectorId, request.controller),
-                        failure: async () => await this.contract.logError(request.connectorId, 0)
+                        success: async () => await this.confirmStart(request.connectorId, request.controller),
+                        failure: async () => await this.logError(request.connectorId, 0)
                     });
                 } else {
                     this.stopSource.next({
                         params: request,
-                        success: async () => await this.contract.confirmStop(request.connectorId),
-                        failure: async () => await this.contract.logError(request.connectorId, 1)
+                        success: async () => await this.confirmStop(request.connectorId),
+                        failure: async () => await this.logError(request.connectorId, 1)
                     });
                 }
             },
@@ -61,6 +61,21 @@ export class ShareAndCharge {
         if (available) {
             return this.contract.sendTx('setAvailability', clientId, connectorId, false);
         }
+    }
+
+    async confirmStart(connectorId: string, controller: string): Promise<Receipt> {
+        const params = Array.from(arguments);
+        return this.contract.sendTx('confirmStart', ...params);
+    }
+
+    async confirmStop(connectorId: string): Promise<Receipt> {
+        const params = Array.from(arguments);
+        return this.contract.sendTx('confirmStop', ...params);
+    }
+
+    async logError(connectorId: string, errorCode: number): Promise<Receipt> {
+        const params = Array.from(arguments);
+        return this.contract.sendTx('logError', ...params);
     }
 
 }

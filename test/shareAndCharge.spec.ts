@@ -54,16 +54,20 @@ describe('events', () => {
 
 describe('start', () => {
 
+  const stubReceipt = {
+    status: 'start status',
+    txHash: '0x11',
+    blockNumber: 696969
+  };
+
   it('should tell contract that start occurred via event callback', (done) => {
+
+    stub.resolves('sendTx', stubReceipt, 'confirmStart', connectorId, controller);
 
     sc.start$.subscribe(request => {
       request.success().then(receipt => {
-        expect(receipt.status).to.equal('start status');
-        expect(receipt.txHash).to.equal('0x11');
-        expect(receipt.blockNumber).to.equal(696969);
-        expect(receipt.request).to.deep.equal({ connectorId: args.connectorId, controller: args.controller });
+        expect(receipt).to.deep.equal(stubReceipt);
         done();
-
       });
     });
 
@@ -73,9 +77,11 @@ describe('start', () => {
 
   it('should tell contract that error occurred on start with correct error code', (done) => {
 
+    stub.resolves('sendTx', stubReceipt, 'logError', connectorId, 0);
+
     sc.start$.subscribe(request => {
       request.failure().then(receipt => {
-        expect(receipt.request.errorCode).to.equal(0);
+        expect(receipt).to.deep.equal(stubReceipt);
         done();
       });
     });
@@ -86,15 +92,19 @@ describe('start', () => {
 });
 
 describe('stop', () => {
+
+  const stubReceipt = {
+    status: 'stop status',
+    txHash: '0x22',
+    blockNumber: 700131
+  };
+
   it('should tell contract that stop occurred via event callback', (done) => {
+    stub.resolves('sendTx', stubReceipt, 'confirmStop', connectorId);
+
     sc.stop$.subscribe(request => {
-
       request.success().then(receipt => {
-
-        expect(receipt.status).to.equal('stop status');
-        expect(receipt.txHash).to.equal('0x22');
-        expect(receipt.blockNumber).to.equal(700131);
-        expect(receipt.request).to.deep.equal({ connectorId: args.connectorId });
+        expect(receipt).to.deep.equal(stubReceipt);
         done();
 
       });
@@ -105,9 +115,11 @@ describe('stop', () => {
 
   it('should tell contract error occurred on stop with correct error code', (done) => {
 
+    stub.resolves('sendTx', stubReceipt, 'logError', connectorId, 1);
+
     sc.stop$.subscribe(request => {
       request.failure().then(receipt => {
-        expect(receipt.request.errorCode).to.equal(1);
+        expect(receipt).to.deep.equal(stubReceipt);
         done();
       });
     });

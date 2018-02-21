@@ -18,21 +18,6 @@ describe('Contract Module', function() {
         sandbox.restore();
     });
 
-    context('sendTx wrappers', function() {
-
-        beforeEach(function() {
-            stub = new Stub(sandbox, contract);
-        });
-
-        it('should resolve with transaction receipt if confirm start successful', async function() {
-            const stubReceipt = { transactionHash: '0x123', blockNumber: 1 };
-            stub.resolves('sendTx', stubReceipt, 'confirmStart', 1, 2, 3);
-            const receipt = await contract.confirmStart(1, 2, 3);
-            expect(receipt).to.deep.equal(stubReceipt);
-        });
-
-    });
-
     context('#sendTx()', function() {
 
         it('should resolve with transaction receipt on success');
