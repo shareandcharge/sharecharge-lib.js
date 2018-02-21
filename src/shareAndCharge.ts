@@ -57,7 +57,7 @@ export class ShareAndCharge {
     }
 
     async setUnavailable(connectorId: string, clientId: string): Promise<Receipt | undefined> {
-        const available = this.contract.queryState('isAvailable', connectorId);
+        const available = await this.contract.queryState('isAvailable', connectorId);
         if (available) {
             return this.contract.sendTx('setAvailability', clientId, connectorId, false);
         }
