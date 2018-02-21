@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import * as mocha from 'mocha';
 import * as sinon from 'sinon';
 import { Stub } from './helpers';
+import { connector, registerParams } from './data';
 
 describe('Contract Module', function() {
 
@@ -21,6 +22,14 @@ describe('Contract Module', function() {
 
         beforeEach(function() {
             stub = new Stub(sandbox, contract);
+        });
+
+        it('should unpack connector parameters and resolve with receipt after registration', async function() {
+            const client = '0x09';
+            const stubReceipt = { transactionHash: '0x127', blockNumber: 5 };
+            stub.resolves('sendTx', stubReceipt, 'registerConnector', ...Object.values(registerParams(client)));
+            const receipt = await contract.register(connector, '0x09');
+            expect(receipt).to.deep.equal(stubReceipt);
         });
 
         it('should resolve with transaction receipt if confirm start successful', async function() {

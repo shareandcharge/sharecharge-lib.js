@@ -1,10 +1,11 @@
 import Web3 = require('web3');
-import {Subject} from 'rxjs/Subject';
-import {config} from '../config/config';
-import {IContract} from '../models/contract';
-import {Request} from '../models/request';
-import {Receipt, ReturnStatusObject} from '../models/receipt';
-import {createPayload, createReceipt} from '../utils/helpers';
+import { Subject } from 'rxjs/Subject';
+import { config } from '../config/config';
+import { IContract } from '../models/contract';
+import { Request } from '../models/request';
+import { Connector } from '../models/connector';
+import { Receipt, ReturnStatusObject } from '../models/receipt';
+import { createPayload, createReceipt } from '../utils/helpers';
 
 export class Contract implements IContract {
 
@@ -41,13 +42,34 @@ export class Contract implements IContract {
         });
     }
 
+    async queryState(method: string, ...args: any[]): Promise<any> {
+        const query = this.contract.methods[method](...args);
+        return query.call();
+    }
+
     async sendTx(method, ...args: any[]): Promise<Receipt> {
         const coinbase = await this.web3.eth.getCoinbase();
         const tx = this.contract.methods[method](...args);
-        const gas = await this.web3.eth.estimateGas({data: tx.rawTransaction, from: coinbase});
+        const gas = await this.web3.eth.estimateGas({ data: tx.rawTransaction, from: coinbase });
         const unlocked = await this.personal.unlockAccount(coinbase, this.pass, 60);
-        const receipt = await tx.send({from: coinbase, gas});
+        const receipt = await tx.send({ from: coinbase, gas });
         return createReceipt(receipt);
+    }
+
+    async register(conn: Connector, clientId: string): Promise<Receipt> {
+        return this.sendTx(
+            'registerConnector',
+            conn.id,
+            clientId,
+            conn.ownerName,
+            conn.lat,
+            conn.lng,
+            conn.price,
+            conn.priceModel,
+            conn.plugType,
+            conn.openingHours,
+            conn.isAvailable
+        );
     }
 
     confirmStart(connectorId: string, controller: string): Promise<Receipt> {
@@ -80,8 +102,4 @@ export class Contract implements IContract {
         }));
     }
 
-    async queryState(method: string, ...args: any[]): Promise<any> {
-        const query = this.contract.methods[method](...args);
-        return query.call();
-    }
 }
