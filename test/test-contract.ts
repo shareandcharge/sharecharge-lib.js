@@ -28,41 +28,8 @@ export class TestContract implements IContract {
         });
     }
 
-    confirmStart(connectorId: string, controller: string): Promise<Receipt> {
-        return Promise.resolve({
-            status: 'start status',
-            txHash: '0x11',
-            blockNumber: 696969,
-            request: { connectorId, controller }
-        });
-    }
-
-    confirmStop(connectorId: string): Promise<Receipt> {
-        return Promise.resolve({
-            status: 'stop status',
-            txHash: '0x22',
-            blockNumber: 700131,
-            request: { connectorId }
-        });
-    }
-
-    logError(connectorId: string, errorCode: number): Promise<Receipt> {
-        return Promise.resolve({
-            status: 'error status',
-            txHash: '0x33',
-            blockNumber: 78002,
-            request: { connectorId, errorCode }
-        });
-    }
-
     async sendTx(point: string): Promise<any> {
         return {};
-    }
-
-    async updateStatuses(chargePoints: string[], clientId: string): Promise<(string | undefined)[]> {
-        return Promise.all(chargePoints.map(async point => {
-            return point === '123' ? point : undefined;
-        }));
     }
 
     async queryState(method: string, ...args: any[]): Promise<any> {
