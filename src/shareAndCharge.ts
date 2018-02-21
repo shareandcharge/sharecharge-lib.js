@@ -2,6 +2,8 @@ import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import { IContract } from './models/contract';
 import { Command } from './models/command';
+import { Connector } from './models/connector';
+import { Receipt } from './models/receipt';
 import { ReturnStatusObject } from './models/receipt';
 import { createStatusObject } from './utils/helpers';
 
@@ -36,6 +38,22 @@ export class ShareAndCharge {
             err => {
                 console.log(err);
             });
+    }
+
+    async registerConnector(conn: Connector, clientId: string): Promise<Receipt> {
+        const parameters = [
+            conn.id,
+            clientId,
+            conn.ownerName,
+            conn.lat,
+            conn.lng,
+            conn.price,
+            conn.priceModel,
+            conn.plugType,
+            conn.openingHours,
+            conn.isAvailable
+        ];
+        return this.contract.sendTx('registerConnector', ...parameters);
     }
 
     async updateStatus(chargePoints: string[], clientId: string): Promise<ReturnStatusObject> {

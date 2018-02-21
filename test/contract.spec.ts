@@ -24,14 +24,6 @@ describe('Contract Module', function() {
             stub = new Stub(sandbox, contract);
         });
 
-        it('should unpack connector parameters and resolve with receipt after registration', async function() {
-            const client = '0x09';
-            const stubReceipt = { transactionHash: '0x127', blockNumber: 5 };
-            stub.resolves('sendTx', stubReceipt, 'registerConnector', ...Object.values(registerParams(client)));
-            const receipt = await contract.register(connector, '0x09');
-            expect(receipt).to.deep.equal(stubReceipt);
-        });
-
         it('should resolve with transaction receipt if confirm start successful', async function() {
             const stubReceipt = { transactionHash: '0x123', blockNumber: 1 };
             stub.resolves('sendTx', stubReceipt, 'confirmStart', 1, 2, 3);

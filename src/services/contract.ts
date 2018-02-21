@@ -56,22 +56,6 @@ export class Contract implements IContract {
         return createReceipt(receipt);
     }
 
-    async register(conn: Connector, clientId: string): Promise<Receipt> {
-        return this.sendTx(
-            'registerConnector',
-            conn.id,
-            clientId,
-            conn.ownerName,
-            conn.lat,
-            conn.lng,
-            conn.price,
-            conn.priceModel,
-            conn.plugType,
-            conn.openingHours,
-            conn.isAvailable
-        );
-    }
-
     confirmStart(connectorId: string, controller: string): Promise<Receipt> {
         const params = Array.from(arguments);
         return this.sendTx('confirmStart', ...params);

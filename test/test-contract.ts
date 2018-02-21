@@ -56,7 +56,7 @@ export class TestContract implements IContract {
     }
 
     async sendTx(point: string): Promise<any> {
-        return point === '123';
+        return {};
     }
 
     async updateStatuses(chargePoints: string[], clientId: string): Promise<(string | undefined)[]> {

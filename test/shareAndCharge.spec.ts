@@ -1,18 +1,27 @@
-import { ShareAndCharge } from '../src/index';
+import { ShareAndCharge } from '../src/shareAndCharge';
 import { expect } from 'chai';
+import * as sinon from 'sinon';
 import * as mocha from 'mocha';
 import { TestContract } from './test-contract';
+import { connector, registerParams } from './data';
+import { Stub } from './helpers';
 
-let testContract, sc;
+let testContract, sc, stub;
 let clientId, connectorId, controller, args;
+const sandbox = sinon.createSandbox();
 
 beforeEach(async () => {
   testContract = new TestContract();
   sc = new ShareAndCharge(testContract);
+  stub = new Stub(sandbox, sc.contract);
   connectorId = (Math.random() * 0xFFFFFFFFF << 0).toString(16);
   controller = (Math.random() * 0xFFFFFFFFF << 0).toString(16);
   clientId = (Math.random() * 0xFFFFFFFFF << 0).toString(16);
   args = { clientId, connectorId, controller };
+});
+
+afterEach(async () => {
+  sandbox.restore();
 });
 
 describe('events', () => {
@@ -44,7 +53,12 @@ describe('events', () => {
 });
 
 describe('register', () => {
-  it('should register pole');
+  it('should register connector and return receipts if successful', async () => {
+    const stubReceipt = { transactionHash: '0x01', blockNumber: 55 };
+    stub.resolves('sendTx', stubReceipt, 'registerConnector', ...Object.values(registerParams('0x01')));
+    const result = await sc.registerConnector(connector, '0x01');
+    expect(result).to.deep.equal(stubReceipt);
+  });
 });
 
 describe('start', () => {
