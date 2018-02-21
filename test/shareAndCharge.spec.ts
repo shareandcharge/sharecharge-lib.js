@@ -117,7 +117,7 @@ describe('stop', () => {
 
 });
 
-describe('register', () => {
+describe('#registerConnector()', () => {
   it('should register connector and return receipts if successful', async () => {
     const stubReceipt = { transactionHash: '0x01', blockNumber: 55 };
     stub.resolves('sendTx', stubReceipt, 'registerConnector', ...Object.values(registerParams('0x01')));

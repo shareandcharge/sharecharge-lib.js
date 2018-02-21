@@ -12,6 +12,4 @@ export interface IContract {
 
     logError(connectorId: string, errorCode: number): Promise<Receipt>;
 
-    updateStatuses(chargePoints: string[], clientId: string): Promise<(string | undefined)[]>;
-
 }
