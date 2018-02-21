@@ -7,7 +7,7 @@ import { connector, registerParams } from './data';
 
 describe('Contract Module', function() {
 
-    let contract, stub;
+    let contract;
     const sandbox = sinon.createSandbox();
 
     beforeEach(function() {
