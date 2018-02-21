@@ -71,19 +71,4 @@ export class Contract implements IContract {
         return this.sendTx('logError', ...params);
     }
 
-    async updateStatuses(chargePoints: string[], clientId: string): Promise<(string | undefined)[]> {
-
-        return Promise.all(chargePoints.map(async point => {
-            try {
-                const isAvailable = await this.queryState('isAvailable', point);
-                if (isAvailable) {
-                    const receipt = await this.sendTx('setAvailability', clientId, point, false);
-                    return point;
-                }
-            } catch (err) {
-                throw Error(err.message);
-            }
-        }));
-    }
-
 }

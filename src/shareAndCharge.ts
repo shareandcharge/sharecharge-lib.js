@@ -56,9 +56,11 @@ export class ShareAndCharge {
         return this.contract.sendTx('registerConnector', ...parameters);
     }
 
-    async updateStatus(chargePoints: string[], clientId: string): Promise<ReturnStatusObject> {
-        const updates = await this.contract.updateStatuses(chargePoints, clientId);
-        return createStatusObject(chargePoints, updates);
+    async setUnavailable(connectorId: string, clientId: string): Promise<Receipt | undefined> {
+        const available = this.contract.queryState('isAvailable', connectorId);
+        if (available) {
+            return this.contract.sendTx('setAvailability', clientId, connectorId, false);
+        }
     }
 
 }

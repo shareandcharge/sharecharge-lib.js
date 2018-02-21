@@ -52,15 +52,6 @@ describe('events', () => {
 
 });
 
-describe('register', () => {
-  it('should register connector and return receipts if successful', async () => {
-    const stubReceipt = { transactionHash: '0x01', blockNumber: 55 };
-    stub.resolves('sendTx', stubReceipt, 'registerConnector', ...Object.values(registerParams('0x01')));
-    const result = await sc.registerConnector(connector, '0x01');
-    expect(result).to.deep.equal(stubReceipt);
-  });
-});
-
 describe('start', () => {
 
   it('should tell contract that start occurred via event callback', (done) => {
@@ -126,16 +117,23 @@ describe('stop', () => {
 
 });
 
-describe('#updateStatus()', function() {
-
-  it('should filter conflicting statuses and return receipts after poles updated', async function() {
-    const result = await sc.updateStatus(['123', '789']);
-    expect(result.points.length).to.equal(1);
+describe('register', () => {
+  it('should register connector and return receipts if successful', async () => {
+    const stubReceipt = { transactionHash: '0x01', blockNumber: 55 };
+    stub.resolves('sendTx', stubReceipt, 'registerConnector', ...Object.values(registerParams('0x01')));
+    const result = await sc.registerConnector(connector, '0x01');
+    expect(result).to.deep.equal(stubReceipt);
   });
+});
 
-  it('should return error if unable to update status', async function() {
-    const result = await sc.updateStatus(['456']);
-    expect(result.errors[0] instanceof Error).to.equal(true);
+describe('#setUnavailable()', function() {
+
+  it('should resolve with receipt if successfully updated', async function() {
+    const stubReceipt = { transactionHash: '0x1', blockNumber: 1 };
+    stub.resolves('queryState', true, 'isAvailable', connectorId);
+    stub.resolves('sendTx', stubReceipt, 'setAvailability', clientId, connectorId, false);
+    const result = await sc.setUnavailable(connectorId, clientId);
+    expect(result).to.deep.equal(stubReceipt);
   });
 
 });
