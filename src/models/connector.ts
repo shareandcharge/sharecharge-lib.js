@@ -1,10 +1,10 @@
 export interface Connector {
     id: string;
-    ownerName: string;
+    owner: string;
     lat: string;
     lng: string;
     price: number;
-    priceModel: number;
+    model: number;
     plugType: number;
     openingHours: string;
     isAvailable: boolean;

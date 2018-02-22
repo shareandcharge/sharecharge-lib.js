@@ -44,11 +44,11 @@ export class ShareAndCharge {
         const parameters = [
             conn.id,
             clientId,
-            conn.ownerName,
+            conn.owner,
             conn.lat,
             conn.lng,
             conn.price,
-            conn.priceModel,
+            conn.model,
             conn.plugType,
             conn.openingHours,
             conn.isAvailable
