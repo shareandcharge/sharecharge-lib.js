@@ -53,8 +53,8 @@ export class Contract implements IContract {
         const tx = this.contract.methods[method](...args);
         // const gas1 = await this.web3.eth.estimateGas({ data: tx.rawTransaction, from: coinbase });
         const gas2 = await tx.estimateGas({ from: coinbase });
-        const unlocked = await this.personal.unlockAccount(coinbase, this.pass, 60);
-        const receipt = await tx.send({ from: coinbase, gas2 });
+        await this.personal.unlockAccount(coinbase, this.pass, 30);
+        const receipt = await tx.send({ from: coinbase, gas: gas2 });
         return createReceipt(receipt);
     }
 
