@@ -16,7 +16,7 @@
     "watch-ts": "tsc -w",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
     "webpack": "webpack",
-    "geth-dev": "geth --dev --datadir=.chaindata --dev.period 1 --rpc --rpcaddr 0.0.0.0 --ws --wsaddr 0.0.0.0 --wsorigins=*"
+    "geth-dev": "geth --dev --datadir=.chaindata --dev.period 1 --rpc --rpcaddr 0.0.0.0 --ws --wsaddr 0.0.0.0 --wsorigins=* --wsapi=eth,personal,net,pubsub"
   },
   "dependencies": {
     "@types/node": "^9.4.6",
