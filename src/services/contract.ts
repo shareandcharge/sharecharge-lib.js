@@ -47,7 +47,7 @@ export class Contract implements IContract {
         return query.call();
     }
 
-    async sendTx(method, ...args: any[]): Promise<Receipt> {
+    async sendTx(method: string, ...args: any[]): Promise<Receipt> {
         const coinbase = await this.web3.eth.getCoinbase();
         // console.log('args:', args);
         const tx = this.contract.methods[method](...args);

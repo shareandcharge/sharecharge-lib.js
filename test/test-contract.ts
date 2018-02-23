@@ -28,8 +28,12 @@ export class TestContract implements IContract {
         });
     }
 
-    async sendTx(point: string): Promise<any> {
-        return {};
+    async sendTx(method: string, ...args: any[]): Promise<Receipt> {
+        return {
+            status: 'status',
+            txHash: '0xTxHash',
+            blockNumber: 55
+        };
     }
 
     async queryState(method: string, ...args: any[]): Promise<any> {

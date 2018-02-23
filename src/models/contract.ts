@@ -8,6 +8,6 @@ export interface IContract {
 
     queryState(method: string, ...args: any[]): Promise<any>;
 
-    sendTx(method, ...args: any[]): Promise<Receipt>;
+    sendTx(method: string, ...args: any[]): Promise<Receipt>;
 
 }
