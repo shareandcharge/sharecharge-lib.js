@@ -52,7 +52,26 @@ describe('events', () => {
 
 });
 
-describe('start', () => {
+describe.only('#requestStart()', () => {
+
+  const secondsToRent = 600;
+
+  const stubReceipt = {
+    status: 'start request hash',
+    txHash: '0x22',
+    blockNumber: 100
+  };
+
+  it('should ask EV Network for a start on a given connector', async () => {
+
+    stub.resolves('sendTx', stubReceipt, 'requestStart', connectorId, secondsToRent);
+    const receipt = await sc.requestStart(connectorId, secondsToRent);
+    expect(receipt).to.deep.equal(stubReceipt);
+  });
+
+});
+
+describe('#confirmStart()', () => {
 
   const stubReceipt = {
     status: 'start status',
@@ -91,7 +110,7 @@ describe('start', () => {
   });
 });
 
-describe('stop', () => {
+describe('#confirmStop()', () => {
 
   const stubReceipt = {
     status: 'stop status',

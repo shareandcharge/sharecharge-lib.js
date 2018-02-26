@@ -63,6 +63,11 @@ export class ShareAndCharge {
         }
     }
 
+    async requestStart(connectorId: string, secondsToRent: number): Promise<Receipt> {
+        const params = Array.from(arguments);
+        return this.contract.sendTx('requestStart', ...params);
+    }
+
     async confirmStart(connectorId: string, controller: string): Promise<Receipt> {
         const params = Array.from(arguments);
         return this.contract.sendTx('confirmStart', ...params);
