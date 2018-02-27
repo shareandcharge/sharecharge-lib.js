@@ -125,6 +125,95 @@
         {
           "name": "id",
           "type": "bytes32"
+        }
+      ],
+      "name": "getOwnerInformation",
+      "outputs": [
+        {
+          "name": "client",
+          "type": "bytes32"
+        },
+        {
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "name": "ownerName",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "id",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getLocationInformation",
+      "outputs": [
+        {
+          "name": "lat",
+          "type": "string"
+        },
+        {
+          "name": "lng",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "id",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getGeneralInformation",
+      "outputs": [
+        {
+          "name": "price",
+          "type": "uint16"
+        },
+        {
+          "name": "priceModel",
+          "type": "uint8"
+        },
+        {
+          "name": "plugType",
+          "type": "uint8"
+        },
+        {
+          "name": "openingHours",
+          "type": "string"
+        },
+        {
+          "name": "isAvailable",
+          "type": "bool"
+        },
+        {
+          "name": "session",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "id",
+          "type": "bytes32"
         },
         {
           "name": "client",
@@ -348,5 +437,5 @@
       "type": "function"
     }
   ],
-  "address": "0x026a10a89b88c3754d67903bc8506916d96b9a88"
+  "address": "0x727ab96d37d83468aad584184922017ffc899729"
 }
