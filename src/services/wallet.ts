@@ -9,11 +9,14 @@ export class Wallet {
         this.keystore = lightwallet.keystore;
     }
 
-    create(password = ''): Promise<string> {
+    seed(): string {
+        return this.keystore.generateRandomSeed();
+    }
+
+    create(seedPhrase: string, password = ''): Promise<string> {
         return new Promise((resolve, reject) => {
 
             const hdPathString = "m/44'/60'/0'/0";
-            const seedPhrase = this.keystore.generateRandomSeed();
 
             this.keystore.createVault({ password, hdPathString, seedPhrase }, (err, ks) => {
 

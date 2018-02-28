@@ -5,7 +5,7 @@ import { Stub } from './helpers';
 
 import { Wallet } from '../src/services/wallet';
 
-describe('Wallet', function() {
+describe.only('Wallet', function() {
 
     let wallet;
 
@@ -13,10 +13,17 @@ describe('Wallet', function() {
         wallet = new Wallet();
     });
 
-    it('should create new keypair and resolve with public address', async function() {
-        const addresses = await wallet.create();
+    it('should create 12 word mnemonic seed', function() {
+        const seed = wallet.seed();
+        expect(seed.split(' ').length).to.equal(12);
+    });
+
+    it('should create new keypair and resolve with single public address', async function() {
+        const seed = wallet.seed();
+        const addresses = await wallet.create(seed);
         expect(addresses.length).to.equal(1);
         expect(addresses[0].length).to.equal(42);
     });
+
 
 });
