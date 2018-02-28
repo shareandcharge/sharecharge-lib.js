@@ -52,7 +52,7 @@ describe('events', () => {
 
 });
 
-describe.only('#requestStart()', () => {
+describe('#requestStart()', () => {
 
   const secondsToRent = 600;
 
