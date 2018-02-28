@@ -42,4 +42,8 @@ export class Wallet {
         });
     }
 
+    get address(): string {
+        return this.ks.getAddresses()[0];
+    }
+
 }

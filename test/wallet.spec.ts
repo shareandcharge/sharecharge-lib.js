@@ -25,5 +25,11 @@ describe.only('Wallet', function() {
         expect(addresses[0].length).to.equal(42);
     });
 
+    it('should retreive address from private ks', async function() {
+        await wallet.create(wallet.seed());
+        const address = wallet.address;
+        expect(address.length).to.equal(42);
+    });
+
 
 });
