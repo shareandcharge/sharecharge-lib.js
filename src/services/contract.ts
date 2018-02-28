@@ -1,15 +1,15 @@
-import Web3 = require('web3');
-import {Subject} from 'rxjs/Subject';
-import {config} from '../config/config';
-import {IContract} from '../models/contract';
-import {Request} from '../models/request';
-import {Connector} from '../models/connector';
-import {Receipt, ReturnStatusObject} from '../models/receipt';
-import {createPayload, createReceipt} from '../utils/helpers';
+import Web3 from 'web3';
+import { Subject } from 'rxjs/Subject';
+import { config } from '../config/config';
+import { IContract } from '../models/contract';
+import { Request } from '../models/request';
+import { Connector } from '../models/connector';
+import { Receipt, ReturnStatusObject } from '../models/receipt';
+import { createPayload, createReceipt } from '../utils/helpers';
 
 export class Contract implements IContract {
 
-    private web3: Web3;
+    private web3: any;
     private contract: any;
     private personal: any;
     private pass: any;
@@ -56,9 +56,9 @@ export class Contract implements IContract {
         // console.log('args:', args);
         const tx = this.contract.methods[method](...args);
         // const gas1 = await this.web3.eth.estimateGas({ data: tx.rawTransaction, from: coinbase });
-        const gas2 = await tx.estimateGas({from: coinbase});
+        const gas2 = await tx.estimateGas({ from: coinbase });
         await this.personal.unlockAccount(coinbase, this.pass, 30);
-        const receipt = await tx.send({from: coinbase, gas: gas2});
+        const receipt = await tx.send({ from: coinbase, gas: gas2 });
         return createReceipt(receipt);
     }
 

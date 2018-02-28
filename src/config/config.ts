@@ -1,4 +1,4 @@
-import * as ChargingStationConfiguration from './ChargingStation.json';
+import ChargingStationConfiguration from './ChargingStation.json';
 
 export const config = {
     version: '0.1.0',

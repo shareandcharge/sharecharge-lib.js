@@ -23,4 +23,4 @@ export const registerParams = (client) => {
         openingHours: connector.openingHours,
         isAvailable: connector.isAvailable
     };
-}
+};

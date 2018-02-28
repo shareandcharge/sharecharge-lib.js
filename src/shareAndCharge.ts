@@ -64,23 +64,19 @@ export class ShareAndCharge {
     }
 
     async requestStart(connectorId: string, secondsToRent: number): Promise<Receipt> {
-        const params = Array.from(arguments);
-        return this.contract.sendTx('requestStart', ...params);
+        return this.contract.sendTx('requestStart', connectorId, secondsToRent);
     }
 
     async confirmStart(connectorId: string, controller: string): Promise<Receipt> {
-        const params = Array.from(arguments);
-        return this.contract.sendTx('confirmStart', ...params);
+        return this.contract.sendTx('confirmStart', connectorId, controller);
     }
 
     async confirmStop(connectorId: string): Promise<Receipt> {
-        const params = Array.from(arguments);
-        return this.contract.sendTx('confirmStop', ...params);
+        return this.contract.sendTx('confirmStop', connectorId);
     }
 
     async logError(connectorId: string, errorCode: number): Promise<Receipt> {
-        const params = Array.from(arguments);
-        return this.contract.sendTx('logError', ...params);
+        return this.contract.sendTx('logError', connectorId, errorCode);
     }
 
 }
