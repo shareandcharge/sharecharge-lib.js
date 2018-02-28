@@ -5,7 +5,7 @@ import { Stub } from './helpers';
 
 import { Wallet } from '../src/services/wallet';
 
-describe.only('Wallet', function () {
+describe('Wallet', function () {
 
     let wallet;
 

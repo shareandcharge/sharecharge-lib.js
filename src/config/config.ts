@@ -1,4 +1,4 @@
-import ChargingStationConfiguration from './ChargingStation.json';
+const ChargingStationConfiguration = require('./ChargingStation.json');
 
 export const config = {
     version: '0.1.0',
