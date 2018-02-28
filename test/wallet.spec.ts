@@ -31,5 +31,8 @@ describe.only('Wallet', function() {
         expect(address.length).to.equal(42);
     });
 
+    it('should return undefined if keypair not yet generated', function() {
+        expect(wallet.address).to.equal(undefined);
+    });
 
 });

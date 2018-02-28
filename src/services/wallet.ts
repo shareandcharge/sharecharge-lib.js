@@ -42,8 +42,10 @@ export class Wallet {
         });
     }
 
-    get address(): string {
-        return this.ks.getAddresses()[0];
+    get address(): string | undefined {
+        if (this.ks) {
+            return this.ks.getAddresses()[0];
+        }
     }
 
 }
