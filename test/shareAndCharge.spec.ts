@@ -1,4 +1,4 @@
-import { ShareAndCharge } from '../src/index';
+import { ShareAndCharge } from '../src/services/shareAndCharge';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import * as mocha from 'mocha';
