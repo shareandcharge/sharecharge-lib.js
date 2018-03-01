@@ -1,4 +1,4 @@
-import Web3 from 'web3';
+const Web3 = require('web3');
 import { Subject } from 'rxjs/Subject';
 import { config } from '../config/config';
 import { IContract } from '../models/contract';
