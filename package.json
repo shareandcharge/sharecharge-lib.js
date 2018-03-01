@@ -1,16 +1,18 @@
 {
-  "name": "omos-bridge",
+  "name": "sharecharge-lib",
   "version": "0.1.0",
-  "description": "OMOS Bridge SDK",
+  "description": "Share & Charge EV Network Library",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/motionwerkGmbH/omos-bridge.git"
+    "url": "git+https://github.com/motionwerkGmbH/sharecharge-lib.git"
   },
   "author": "MotionWerk GmbH",
   "license": "LGPL-3.0",
+  "main": "dist/index.js",
   "scripts": {
     "start": "node dist/server.js",
     "build": "npm run build-ts && npm run tslint",
+    "dts-gen": "dts-gen",
     "test": "mocha -r ts-node/register test/**/*.spec.ts",
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
@@ -29,6 +31,7 @@
     "@types/mocha": "^2.2.48",
     "@types/sinon": "^4.1.3",
     "chai": "^4.1.2",
+    "dts-gen": "^0.5.7",
     "mocha": "^5.0.1",
     "sinon": "^4.3.0",
     "ts-loader": "^3.5.0",

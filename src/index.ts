@@ -1,5 +1,6 @@
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
+import { Contract } from './services/contract';
 import { IContract } from './models/contract';
 import { Command } from './models/command';
 import { Connector } from './models/connector';
@@ -9,7 +10,7 @@ import { createStatusObject } from './utils/helpers';
 
 export class ShareAndCharge {
 
-    private contract;
+    private contract: IContract;
 
     private startSource = new Subject<Command>();
     private stopSource = new Subject<Command>();
@@ -17,7 +18,7 @@ export class ShareAndCharge {
     start$ = this.startSource.asObservable();
     stop$ = this.stopSource.asObservable();
 
-    constructor(contract: IContract) {
+    constructor(contract: IContract = new Contract()) {
         this.contract = contract;
         this.contract.events$.subscribe(
             request => {

@@ -1,5 +1,6 @@
 const Web3 = require('web3');
 import { Subject } from 'rxjs/Subject';
+import { Observable } from 'rxjs/Observable';
 import { config } from '../config/config';
 import { IContract } from '../models/contract';
 import { Request } from '../models/request';
@@ -16,10 +17,10 @@ export class Contract implements IContract {
 
     private source = new Subject<Request>();
 
-    events$ = this.source.asObservable();
+    readonly events$: Observable<Request> = this.source.asObservable();
 
-    constructor(pass: string, provider?: string) {
-        this.pass = pass;
+    constructor(pass?: string, provider?: string) {
+        this.pass = pass || '';
         this.web3 = new Web3(provider || config.node);
         this.personal = this.web3.eth.personal;
 
