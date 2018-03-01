@@ -7,39 +7,53 @@ Geth should be running in the background in dev mode with websocket support. A c
 npm run geth-dev
 ```
 
+### Development && Deployment
+
+Transpile your TypeScript code and package the lib as a tarball:
+```
+npm run deploy
+```
+
+Specify as a dependency in another project's `package.json`:
+```json
+{
+    "dependencies": {
+        "sharecharge-lib": "path/to/sharecharge-lib.tgz"
+    }
+}
+```
+
 ### Usage
 
-By default, the OMOS Bridge will connect via websockets to the locally running Geth node. The Bridge class can be configured to use a different provider, howver, for instance a HTTP connection.
+By default, the sharecharge-lib will connect via websockets to the locally running Geth node. The Bridge class can be configured to use a different provider, howver, for instance a HTTP connection.
 
+*JavaScript*
 ```js
-const ShareAndCharge = require('share-and-charge'); 
-const sc = new ShareAndCharge('http://localhost:8545');
+const ShareAndCharge = require('sharecharge-lib').ShareAndCharge; 
+const Contract = require('sharecharge-lib').Contract;
+
+const contract = new Contract();
+const sc = new ShareAndCharge(contract);
 ```
+
+*TypeScript*
+```ts
+import { ShareAndCharge, Contract } from 'sharecharge-lib';
+
+const contract = new Contract();
+const sc = new ShareAndCharge(contract);
+```
+
 
 Events can be easily subscribed to and handled with a callback and filter, for instance:
 
 ```js
-
-bridge.start$.subscribe(request => {
-    if (myClientId === request.params.clientId) {
+sc.start$.subscribe(request => {
+    if (request.params.clientId === myClientId) {
         try {
-            // try to start the charging session
-            myBridge.start();
+            bridge.start();
             request.success();
         } catch (err) {
-            // inform the EV Network that an error occurred
-            request.failure();
-        }
-    }
-});
-bridge.stop$.subscribe(request => {
-    if (myClientId === request.params.clientId) {
-        try {
-            // try to stop the charging session
-            myBridge.stop();
-            request.success();
-        } catch (err) {
-            // inform the EV Network that an error occurred
             request.failure();
         }
     }
