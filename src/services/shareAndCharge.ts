@@ -18,7 +18,7 @@ export class ShareAndCharge {
     start$ = this.startSource.asObservable();
     stop$ = this.stopSource.asObservable();
 
-    constructor(contract: IContract = new Contract()) {
+    constructor(contract) {
         this.contract = contract;
         this.contract.events$.subscribe(
             request => {

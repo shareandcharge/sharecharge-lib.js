@@ -19,9 +19,9 @@ export class Contract implements IContract {
 
     readonly events$: Observable<Request> = this.source.asObservable();
 
-    constructor(pass?: string, provider?: string) {
-        this.pass = pass || '';
-        this.web3 = new Web3(provider || config.node);
+    constructor(pass = '', provider = config.node) {
+        this.pass = pass;
+        this.web3 = new Web3(provider);
         this.personal = this.web3.eth.personal;
 
         this.contract = new this.web3.eth.Contract(config.chargeAbi, config.chargeAddr);
