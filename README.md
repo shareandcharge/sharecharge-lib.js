@@ -9,12 +9,14 @@ npm run geth-dev
 
 ### Development && Deployment
 
-Transpile your TypeScript code and package the lib as a tarball:
+1. Transpile your TypeScript code and package the lib as a tarball:
 ```
 npm run deploy
 ```
 
-Specify as a dependency in another project's `package.json`:
+*Note*: `tsc` may complain about overwriting input files. In such cases delete the `dist` directory and retry.
+
+2. Specify as a dependency in another project's `package.json`:
 ```json
 {
     "dependencies": {

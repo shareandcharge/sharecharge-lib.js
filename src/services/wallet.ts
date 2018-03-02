@@ -1,51 +1,26 @@
-import * as lightwallet from 'eth-lightwallet';
+import * as hdkey from 'ethereumjs-wallet/hdkey';
+import * as bip39 from 'bip39';
 
 export class Wallet {
 
-    private keystore;
     private ks;
+    private addressString;
 
-    constructor() {
-        this.keystore = lightwallet.keystore;
-    }
+    constructor() {}
 
     seed(): string {
-        return this.keystore.generateRandomSeed();
+        return bip39.generateMnemonic();
     }
 
-    create(seedPhrase: string, password = ''): Promise<string> {
-        return new Promise((resolve, reject) => {
-
-            const hdPathString = "m/44'/60'/0'/0";
-
-            this.keystore.createVault({ password, hdPathString, seedPhrase }, (err, ks) => {
-
-                if (err) {
-                    reject(Error(err));
-                }
-
-                this.ks = ks;
-
-                this.ks.keyFromPassword(password, (err, pwDerivedKey) => {
-
-                    if (err) {
-                        reject(Error(err));
-                    }
-
-                    this.ks.generateNewAddress(pwDerivedKey);
-
-                    resolve(this.ks.getAddresses());
-                });
-
-            });
-
-        });
+    create(seedPhrase: string): string {
+        const hdWallet = hdkey.fromMasterSeed(seedPhrase);
+        const wallet = hdWallet.getWallet();
+        this.addressString = wallet.getAddressString();
+        return this.addressString;
     }
 
     get address(): string | undefined {
-        if (this.ks) {
-            return this.ks.getAddresses()[0];
-        }
+        return this.addressString;
     }
 
 }

@@ -40,4 +40,8 @@ export class TestContract implements IContract {
         return true;
     }
 
+    async getCoinbase(): Promise<string> {
+        return (Math.random() * 0xFFFFFFFFF << 0).toString(16);
+    }
+
 }

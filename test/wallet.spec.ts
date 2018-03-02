@@ -22,23 +22,25 @@ describe('Wallet', function () {
 
     context('#create()', function () {
 
-        it('should create new keypair and resolve with single public address', async function () {
+        it('should create new keypair and resolve with single public address', function () {
             const seed = wallet.seed();
-            const addresses = await wallet.create(seed);
-            expect(addresses.length).to.equal(1);
-            expect(addresses[0].length).to.equal(42);
+            const address = wallet.create(seed);
+            expect(address.length).to.equal(42);
         });
 
-        it('should generate same key from a single seed and password', async function () {
+        it('should generate same key from a single seed', function () {
             const seed = wallet.seed();
-            await wallet.create(seed, '123');
-            const address1 = wallet.address;
-
-            const wallet2 = new Wallet();
-            await wallet2.create(seed, '123');
-            const address2 = wallet2.address;
-
+            const address1 = wallet.create(seed);
+            const address2 =  wallet.create(seed);
             expect(address1).to.equal(address2);
+        });
+
+        it('should generate different keys from different seeds', function() {
+            const seed1 = wallet.seed();
+            const seed2 = wallet.seed();
+            const address1 = wallet.create(seed1);
+            const address2 = wallet.create(seed2);
+            expect(address1).to.not.equal(address2);
         });
 
     });
