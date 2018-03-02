@@ -1,4 +1,5 @@
 const Web3 = require('web3');
+import * as EthereumTx from 'ethereumjs-tx';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import { config } from '../config/config';
@@ -45,6 +46,30 @@ export class Contract implements IContract {
 
     async getCoinbase() {
         return await this.web3.eth.getCoinbase();
+    }
+
+    async createTxData(method: string, ...args: any[]): Promise<string> {
+        const tx = this.contract.methods[method](...args);
+        return tx.encodeABI();
+    }
+
+    createTxObject(from: string, data: string): any {
+        return {
+            from,
+            to: this.contract.address,
+            value: 0,
+            data
+        };
+    }
+
+    signTx(txObject, privKey: Buffer): string {
+        const tx = new EthereumTx(txObject);
+        tx.sign(privKey);
+        return tx.serialize();
+    }
+
+    sendRawTx(serializedTx: string) {
+        this.web3.eth.sendSignedTransaction('0x' + serializedTx, console.log);
     }
 
     async queryState(method: string, ...args: any[]): Promise<any> {

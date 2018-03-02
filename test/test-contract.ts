@@ -36,6 +36,10 @@ export class TestContract implements IContract {
         };
     }
 
+    async createTxData(method: string, ...args: any[]): Promise<string> {
+        return 'string';
+    }
+
     async queryState(method: string, ...args: any[]): Promise<any> {
         return true;
     }
