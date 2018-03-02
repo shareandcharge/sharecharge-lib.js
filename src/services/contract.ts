@@ -57,6 +57,7 @@ export class Contract implements IContract {
         return {
             from,
             to: config.chargeAddr,
+            gasPrice: config.gasPrice,
             value: 0,
             data
         };
