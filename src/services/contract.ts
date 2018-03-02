@@ -56,20 +56,20 @@ export class Contract implements IContract {
     createTxObject(from: string, data: string): any {
         return {
             from,
-            to: this.contract.address,
+            to: config.chargeAddr,
             value: 0,
             data
         };
     }
 
-    signTx(txObject, privKey: Buffer): string {
+    signTx(txObject, privKey: Buffer): Buffer {
         const tx = new EthereumTx(txObject);
         tx.sign(privKey);
         return tx.serialize();
     }
 
-    sendRawTx(serializedTx: string) {
-        this.web3.eth.sendSignedTransaction('0x' + serializedTx, console.log);
+    async sendRawTx(serializedTx: Buffer): Promise<any> {
+        return this.web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), console.log);
     }
 
     async queryState(method: string, ...args: any[]): Promise<any> {
