@@ -3,8 +3,8 @@ import * as bip39 from 'bip39';
 
 export class Wallet {
 
-    private ks;
-    private addressString;
+    public ks;
+    public address;
 
     constructor() {}
 
@@ -14,13 +14,9 @@ export class Wallet {
 
     create(seedPhrase: string): string {
         const hdWallet = hdkey.fromMasterSeed(seedPhrase);
-        const wallet = hdWallet.getWallet();
-        this.addressString = wallet.getAddressString();
-        return this.addressString;
-    }
-
-    get address(): string | undefined {
-        return this.addressString;
+        this.ks = hdWallet.getWallet();
+        this.address = this.ks.getAddressString();
+        return this.address;
     }
 
 }
