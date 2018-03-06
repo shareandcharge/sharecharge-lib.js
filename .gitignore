@@ -96,4 +96,4 @@ dist/
 
 build/
 .chaindata
-src/config/ChargingStation.json
+ChargingStation.json
