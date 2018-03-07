@@ -22,17 +22,18 @@ export class ShareAndCharge {
         this.contract = contract;
         this.contract.events$.subscribe(
             request => {
-                if (request.type === 'start') {
+                const values = request.values;
+                if (request.type === 'StartRequested') {
                     this.startSource.next({
                         params: request,
-                        success: async () => await this.confirmStart(request.connectorId, request.controller),
-                        failure: async () => await this.logError(request.connectorId, 0)
+                        success: async () => await this.confirmStart(values.connectorId, values.controller),
+                        failure: async () => await this.logError(values.connectorId, 0)
                     });
-                } else {
+                } else if (request.type === 'StopRequested') {
                     this.stopSource.next({
                         params: request,
-                        success: async () => await this.confirmStop(request.connectorId),
-                        failure: async () => await this.logError(request.connectorId, 1)
+                        success: async () => await this.confirmStop(values.connectorId),
+                        failure: async () => await this.logError(values.connectorId, 1)
                     });
                 }
             },

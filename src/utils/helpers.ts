@@ -22,8 +22,6 @@ export const createReceipt = (txObject): Receipt => {
 export const createPayload = (type, values): Request => {
     return {
         type,
-        clientId: values.clientId,
-        connectorId: values.connectorId,
-        controller: values.controller
+        values
     };
 };

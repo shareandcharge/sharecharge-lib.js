@@ -27,20 +27,52 @@ export class Contract implements IContract {
 
         this.contract = new this.web3.eth.Contract(config.chargeAbi, config.chargeAddr);
 
-        this.contract.events.StartRequested({}, (err, res) => {
-            if (err) {
-                this.source.error(new Error(err));
-            } else {
-                this.source.next(createPayload('start', res.returnValues));
-            }
-        });
 
-        this.contract.events.StopRequested({}, (err, res) => {
-            if (err) {
-                this.source.error(new Error(err));
-            } else {
-                this.source.next(createPayload('stop', res.returnValues));
-            }
+        this.watchEvents();
+
+        // this.contract.events.StartRequested({}, (err, res) => {
+        //     if (err) {
+        //         this.source.error(new Error(err));
+        //     } else {
+        //         this.source.next(createPayload('start', res.returnValues));
+        //     }
+        // });
+
+        // this.contract.events.StartConfirmed({}, (err, res) => {
+        //     if (err) {
+        //         this.source.error(new Error(err));
+        //     } else {
+        //         this.source.next(createPayload('StartConfirmed', res.returnValues));
+        //     }
+        // });
+
+        // this.contract.events.StopRequested({}, (err, res) => {
+        //     if (err) {
+        //         this.source.error(new Error(err));
+        //     } else {
+        //         this.source.next(createPayload('stop', res.returnValues));
+        //     }
+        // });
+
+        // this.contract.events.StopConfirmed({}, (err, res) => {
+        //     if (err) {
+        //         this.source.error(new Error(err));
+        //     } else {
+        //         this.source.next(createPayload('StopConfirmed', res.returnValues));
+        //     }
+        // });
+    }
+
+    watchEvents(): void {
+        const events = ['StartRequested', 'StartConfirmed', 'StopRequested', 'StopConfirmed', 'Error'];
+        events.forEach(ev => {
+            this.contract.events[ev]({}, (err, res) => {
+                if (err) {
+                    this.source.error(new Error(err));
+                } else {
+                    this.source.next(createPayload(ev, res.returnValues));
+                }
+            });
         });
     }
 

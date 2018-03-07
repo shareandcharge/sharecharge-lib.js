@@ -12,19 +12,23 @@ export class TestContract implements IContract {
 
     emitStart(clientId: string, connectorId: string, controller: string) {
         this.testSource.next({
-            type: 'start',
-            clientId,
-            connectorId,
-            controller
+            type: 'StartRequested',
+            values: {
+                clientId,
+                connectorId,
+                controller
+            }
         });
     }
 
     emitStop(clientId: string, connectorId: string, controller: string): void {
         this.testSource.next({
-            type: 'stop',
-            clientId,
-            connectorId,
-            controller
+            type: 'StopRequested',
+            values: {
+                clientId,
+                connectorId,
+                controller
+            }
         });
     }
 

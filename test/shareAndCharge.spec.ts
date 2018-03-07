@@ -31,10 +31,11 @@ describe('ShareAndCharge', function () {
     it('should subscribe to start events and receive correct command parameters', () => {
 
       sc.start$.subscribe(command => {
-        expect(command.params.type).to.be.equal('start');
-        expect(command.params.clientId).to.be.equal(clientId);
-        expect(command.params.connectorId).to.be.equal(connectorId);
-        expect(command.params.controller).to.be.equal(controller);
+        console.log(command);
+        expect(command.params.type).to.be.equal('StartRequested');
+        expect(command.params.values.clientId).to.be.equal(clientId);
+        expect(command.params.values.connectorId).to.be.equal(connectorId);
+        expect(command.params.values.controller).to.be.equal(controller);
       });
 
       testContract.emitStart(clientId, connectorId, controller);
@@ -43,9 +44,9 @@ describe('ShareAndCharge', function () {
     it('should subscribe to stop events and receieve correct command parameters', () => {
 
       sc.stop$.subscribe(command => {
-        expect(command.params.type).to.be.equal('stop');
-        expect(command.params.connectorId).to.be.equal(connectorId);
-        expect(command.params.controller).to.be.equal(controller);
+        expect(command.params.type).to.be.equal('StopRequested');
+        expect(command.params.values.connectorId).to.be.equal(connectorId);
+        expect(command.params.values.controller).to.be.equal(controller);
       });
 
       testContract.emitStop(clientId, connectorId, controller);
