@@ -52,7 +52,7 @@ export class Contract implements IContract {
         return this.web3.eth.getTransactionCount(address);
     }
 
-    private async createTx(from: string, method: string, ...args: any[]): Promise<any> {
+    private async createTxData(from: string, method: string, ...args: any[]): Promise<any> {
         const tx = this.contract.methods[method](...args);
         return {
             data: await tx.encodeABI(),
@@ -60,7 +60,7 @@ export class Contract implements IContract {
         };
     }
 
-    async createTxObject(from: string, method: string, ...args: any[]): Promise<any> {
+    async createTx(from: string, method: string, ...args: any[]): Promise<any> {
         const tx = await this.createTx(from, method, ...args);
         const nonce = await this.getNonce(from);
         return {
