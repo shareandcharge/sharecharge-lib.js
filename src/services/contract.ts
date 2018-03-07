@@ -61,7 +61,7 @@ export class Contract implements IContract {
     }
 
     async createTx(from: string, method: string, ...args: any[]): Promise<any> {
-        const tx = await this.createTx(from, method, ...args);
+        const tx = await this.createTxData(from, method, ...args);
         const nonce = await this.getNonce(from);
         return {
             nonce,
@@ -81,7 +81,7 @@ export class Contract implements IContract {
     }
 
     async sendRawTx(serializedTx: Buffer): Promise<any> {
-        return this.web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), console.log);
+        return this.web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'));
     }
 
     async queryState(method: string, ...args: any[]): Promise<any> {
