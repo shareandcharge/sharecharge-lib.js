@@ -48,18 +48,23 @@ export class Contract implements IContract {
         return await this.web3.eth.getCoinbase();
     }
 
-    async createTxData(method: string, ...args: any[]): Promise<string> {
+    private async createTx(from: string, method: string, ...args: any[]): Promise<any> {
         const tx = this.contract.methods[method](...args);
-        return tx.encodeABI();
+        return {
+            data: await tx.encodeABI(),
+            gas: await tx.estimateGas({ from })
+        };
     }
 
-    createTxObject(from: string, data: string): any {
+    async createTxObject(from: string, method: string, ...args: any[]): Promise<any> {
+        const tx = await this.createTx(from, method, ...args);
         return {
             from,
             to: config.chargeAddr,
             gasPrice: config.gasPrice,
+            gas: tx.gas,
             value: 0,
-            data
+            data: tx.data
         };
     }
 
@@ -98,5 +103,7 @@ export class Contract implements IContract {
         const receipt = await tx.send({from: coinbase, gas: gas2});
         return createReceipt(receipt);
     }
+
+
 
 }

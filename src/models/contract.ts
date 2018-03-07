@@ -6,7 +6,7 @@ export interface IContract {
 
     readonly events$: Observable<Request>;
 
-    createTxData(method: string, ...args: any[]): Promise<string>;
+    createTx(method: string, ...args: any[]): Promise<any>;
 
     queryState(method: string, ...args: any[]): Promise<any>;
 

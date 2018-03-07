@@ -47,8 +47,8 @@ describe('Wallet', function () {
 
     context('#address', function () {
 
-        it('should retreive address from private ks', async function () {
-            await wallet.create(wallet.seed());
+        it('should retrieve address from private ks', function () {
+            wallet.create(wallet.seed());
             const address = wallet.address;
             expect(address.length).to.equal(42);
         });
@@ -57,6 +57,13 @@ describe('Wallet', function () {
             expect(wallet.address).to.equal(undefined);
         });
 
+    });
+
+    context('#ks', function() {
+        it('should retrieve ks after generation', function() {
+            wallet.create(wallet.seed());
+            expect(wallet.ks).to.haveOwnProperty('_privKey');
+        });
     });
 
 });
