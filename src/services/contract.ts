@@ -45,7 +45,11 @@ export class Contract implements IContract {
     }
 
     async getCoinbase() {
-        return await this.web3.eth.getCoinbase();
+        return this.web3.eth.getCoinbase();
+    }
+
+    async getNonce(address: string): Promise<number> {
+        return this.web3.eth.getTransactionCount(address);
     }
 
     private async createTx(from: string, method: string, ...args: any[]): Promise<any> {
@@ -58,7 +62,9 @@ export class Contract implements IContract {
 
     async createTxObject(from: string, method: string, ...args: any[]): Promise<any> {
         const tx = await this.createTx(from, method, ...args);
+        const nonce = await this.getNonce(from);
         return {
+            nonce,
             from,
             to: config.chargeAddr,
             gasPrice: config.gasPrice,
