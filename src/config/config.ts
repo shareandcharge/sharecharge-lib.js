@@ -1,4 +1,14 @@
-const ChargingStationConfiguration = require('./ChargingStation.json');
+let ChargingStationConfiguration;
+
+try {
+    ChargingStationConfiguration = require('./ChargingStation.json');
+} catch (err) {
+    console.log('WARNING: No ChargingStation.json');
+    ChargingStationConfiguration = {
+        abi: [],
+        address: '123'
+    };
+}
 
 export const config = {
     version: '0.1.0',
