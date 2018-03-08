@@ -27,40 +27,7 @@ export class Contract implements IContract {
 
         this.contract = new this.web3.eth.Contract(config.chargeAbi, config.chargeAddr);
 
-
         this.watchEvents();
-
-        // this.contract.events.StartRequested({}, (err, res) => {
-        //     if (err) {
-        //         this.source.error(new Error(err));
-        //     } else {
-        //         this.source.next(createPayload('start', res.returnValues));
-        //     }
-        // });
-
-        // this.contract.events.StartConfirmed({}, (err, res) => {
-        //     if (err) {
-        //         this.source.error(new Error(err));
-        //     } else {
-        //         this.source.next(createPayload('StartConfirmed', res.returnValues));
-        //     }
-        // });
-
-        // this.contract.events.StopRequested({}, (err, res) => {
-        //     if (err) {
-        //         this.source.error(new Error(err));
-        //     } else {
-        //         this.source.next(createPayload('stop', res.returnValues));
-        //     }
-        // });
-
-        // this.contract.events.StopConfirmed({}, (err, res) => {
-        //     if (err) {
-        //         this.source.error(new Error(err));
-        //     } else {
-        //         this.source.next(createPayload('StopConfirmed', res.returnValues));
-        //     }
-        // });
     }
 
     watchEvents(): void {
@@ -141,7 +108,5 @@ export class Contract implements IContract {
         const receipt = await tx.send({from: coinbase, gas: gas2});
         return createReceipt(receipt);
     }
-
-
 
 }
