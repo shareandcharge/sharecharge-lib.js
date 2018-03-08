@@ -31,7 +31,6 @@ describe('ShareAndCharge', function () {
     it('should subscribe to start events and receive correct command parameters', () => {
 
       sc.start$.subscribe(command => {
-        console.log(command);
         expect(command.params.type).to.be.equal('StartRequested');
         expect(command.params.values.clientId).to.be.equal(clientId);
         expect(command.params.values.connectorId).to.be.equal(connectorId);

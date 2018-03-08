@@ -29,5 +29,4 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
         
       # run tests!
-      - run: sudo npm install
-      - run: npm deploy
+      - run: npm test
