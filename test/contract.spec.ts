@@ -5,20 +5,20 @@ import * as sinon from 'sinon';
 import { Stub } from './helpers';
 import { connector, registerParams } from './data';
 
-describe('Contract Module', function() {
+describe('Contract Module', function () {
 
     let contract;
     const sandbox = sinon.createSandbox();
 
-    beforeEach(function() {
-        contract = new Contract('');
+    beforeEach(function () {
+        contract = new Contract({pass: ''});
     });
 
-    afterEach(function() {
+    afterEach(function () {
         sandbox.restore();
     });
 
-    context('#sendTx()', function() {
+    context('#sendTx()', function () {
 
         it('should resolve with transaction receipt on success');
         it('should throw if unable to form transaction');

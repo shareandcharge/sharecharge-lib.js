@@ -1,7 +1,7 @@
-import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
+import { Observable } from 'rxjs/Observable';
 import { IContract } from '../src/models/contract';
-import { Receipt, ReturnStatusObject } from '../src/models/receipt';
+import { Receipt } from '../src/models/receipt';
 import { Request } from '../src/models/request';
 
 export class TestContract implements IContract {
@@ -41,7 +41,7 @@ export class TestContract implements IContract {
     }
 
     async createTx(method: string, ...args: any[]): Promise<any> {
-        return { data: 'string' };
+        return {data: 'string'};
     }
 
     async queryState(method: string, ...args: any[]): Promise<any> {

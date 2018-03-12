@@ -1,12 +1,9 @@
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
-import { Contract } from './contract';
 import { IContract } from '../models/contract';
 import { Command } from '../models/command';
 import { Connector } from '../models/connector';
 import { Receipt } from '../models/receipt';
-import { ReturnStatusObject } from '../models/receipt';
-import { createStatusObject } from '../utils/helpers';
 
 export class ShareAndCharge {
 
@@ -18,8 +15,10 @@ export class ShareAndCharge {
     start$ = this.startSource.asObservable();
     stop$ = this.stopSource.asObservable();
 
-    constructor(contract) {
+    constructor({contract}) {
+
         this.contract = contract;
+
         this.contract.events$.subscribe(
             request => {
                 const values = request.values;
@@ -36,8 +35,7 @@ export class ShareAndCharge {
                         failure: async () => await this.logError(values.connectorId, 1)
                     });
                 }
-            },
-            err => {
+            }, err => {
                 console.log(err);
             });
     }

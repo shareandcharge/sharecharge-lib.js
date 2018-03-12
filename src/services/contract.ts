@@ -1,13 +1,13 @@
-const Web3 = require('web3');
 import * as EthereumTx from 'ethereumjs-tx';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import { config } from '../config/config';
 import { IContract } from '../models/contract';
 import { Request } from '../models/request';
-import { Connector } from '../models/connector';
-import { Receipt, ReturnStatusObject } from '../models/receipt';
+import { Receipt } from '../models/receipt';
 import { createPayload, createReceipt } from '../utils/helpers';
+
+const Web3 = require('web3');
 
 export class Contract implements IContract {
 
@@ -17,10 +17,10 @@ export class Contract implements IContract {
     private pass: any;
 
     private source = new Subject<Request>();
-
     readonly events$: Observable<Request> = this.source.asObservable();
 
-    constructor(pass = '', provider = config.node) {
+    constructor({pass = '', provider = config.node}) {
+
         this.pass = pass;
         this.web3 = new Web3(provider);
         this.personal = this.web3.eth.personal;
@@ -31,7 +31,14 @@ export class Contract implements IContract {
     }
 
     watchEvents(): void {
-        const events = ['StartRequested', 'StartConfirmed', 'StopRequested', 'StopConfirmed', 'Error'];
+
+        const events = [
+            'StartRequested',
+            'StartConfirmed',
+            'StopRequested',
+            'StopConfirmed',
+            'Error'];
+
         events.forEach(ev => {
             this.contract.events[ev]({}, (err, res) => {
                 if (err) {
@@ -55,7 +62,7 @@ export class Contract implements IContract {
         const tx = this.contract.methods[method](...args);
         return {
             data: await tx.encodeABI(),
-            gas: await tx.estimateGas({ from })
+            gas: await tx.estimateGas({from})
         };
     }
 
