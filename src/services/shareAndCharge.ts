@@ -26,13 +26,13 @@ export class ShareAndCharge {
                     this.startSource.next({
                         params: request,
                         success: async () => await this.confirmStart(values.connectorId, values.controller),
-                        failure: async () => await this.logError(values.connectorId, 0)
+                        failure: async () => await this.logError(values.connectorId, values.controller, 0)
                     });
                 } else if (request.type === 'StopRequested') {
                     this.stopSource.next({
                         params: request,
-                        success: async () => await this.confirmStop(values.connectorId),
-                        failure: async () => await this.logError(values.connectorId, 1)
+                        success: async () => await this.confirmStop(values.connectorId, values.controller),
+                        failure: async () => await this.logError(values.connectorId, values.controller, 1)
                     });
                 }
             }, err => {
@@ -71,12 +71,12 @@ export class ShareAndCharge {
         return this.contract.sendTx('confirmStart', connectorId, controller);
     }
 
-    async confirmStop(connectorId: string): Promise<Receipt> {
-        return this.contract.sendTx('confirmStop', connectorId);
+    async confirmStop(connectorId: string, controller: string): Promise<Receipt> {
+        return this.contract.sendTx('confirmStop', connectorId, controller);
     }
 
-    async logError(connectorId: string, errorCode: number): Promise<Receipt> {
-        return this.contract.sendTx('logError', connectorId, errorCode);
+    async logError(connectorId: string, controller: string, errorCode: number): Promise<Receipt> {
+        return this.contract.sendTx('logError', connectorId, controller, errorCode);
     }
 
 }
