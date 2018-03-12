@@ -13,7 +13,7 @@
   "scripts": {
     "install": "npm run build",
     "start": "node dist/server.js",
-    "build": "npm run build-ts && cp src/config/ChargingStation.json dist/src/config/ChargingStation.json && npm run tslint",
+    "build": "npm run build-ts && npm run tslint",
     "deploy": "rm -rf dist && npm run build && npm pack",
     "dts-gen": "dts-gen",
     "test": "mocha -r ts-node/register test/**/*.spec.ts",
