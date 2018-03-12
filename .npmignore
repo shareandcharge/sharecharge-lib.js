@@ -1,4 +1,3 @@
-*
-!/src/
-!/src/*
-!/src/**/*
+/node_modules/
+/dist/
+/.circleci
