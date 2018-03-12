@@ -58,6 +58,11 @@ export class Contract implements IContract {
         return this.web3.eth.getTransactionCount(address);
     }
 
+    convertBytes(bytes: string): string {
+        const str = this.web3.utils.hexToString(bytes);
+        return this.web3.utils.fromAscii(str);
+    }
+
     private async createTxData(from: string, method: string, ...args: any[]): Promise<any> {
         const tx = this.contract.methods[method](...args);
         return {
