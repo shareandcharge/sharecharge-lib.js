@@ -27,7 +27,11 @@ export class Contract implements IContract {
 
         this.contract = new this.web3.eth.Contract(config.chargeAbi, config.chargeAddr);
 
-        this.watchEvents();
+        try {
+            this.watchEvents();
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     watchEvents(): void {

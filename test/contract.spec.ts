@@ -25,8 +25,8 @@ describe('Contract Module', function () {
 
     });
 
-    context('#convertBytes()', function() {
-        it('should convert bytes returned from solidity getter method', function() {
+    context('#convertBytes()', function () {
+        it('should convert bytes returned from solidity getter method', function () {
             const bytes = '0x0200000000000000000000000000000000000000000000000000000000000000';
             expect(contract.convertBytes(bytes)).to.equal('0x02');
         });
