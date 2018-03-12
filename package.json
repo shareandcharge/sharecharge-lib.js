@@ -11,6 +11,7 @@
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "scripts": {
+    "install": "npm run build",
     "start": "node dist/server.js",
     "build": "npm run build-ts && cp src/config/ChargingStation.json dist/src/config/ChargingStation.json && npm run tslint",
     "deploy": "rm -rf dist && npm run build && npm pack",
