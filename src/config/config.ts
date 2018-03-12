@@ -6,7 +6,7 @@ try {
     console.log('WARNING: No ChargingStation.json');
     ChargingStationConfiguration = {
         abi: [],
-        address: '123'
+        address: '0x547de1b5914a4b194df58f5818daabee76125e75'
     };
 }
 
