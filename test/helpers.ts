@@ -1,5 +1,3 @@
-import * as sinon from 'sinon';
-
 export class Stub {
 
     sandbox;
