@@ -21,6 +21,6 @@
   "exclude": [
     "node_modules",
     "logs",
-    "test"
+    "test/**/*.spec.ts"
   ]
 }
