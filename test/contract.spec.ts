@@ -20,8 +20,13 @@ describe('Contract Module', function () {
 
     context('#sendTx()', function () {
 
-        it('should resolve with transaction receipt on success');
-        it('should throw if unable to form transaction');
+        it('should resolve with transaction receipt on success', function () {
+
+        });
+
+        it('should throw if unable to form transaction', function () {
+
+        });
 
     });
 
