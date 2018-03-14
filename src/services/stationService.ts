@@ -1,31 +1,42 @@
+import * as crypto from 'crypto';
 import { Station } from './../models/station';
+import { Contract } from './contract';
+import { Wallet } from './wallet';
+const web3Utils = require('web3').utils;
 
-export class StorageService {
+export class StationService {
 
-    constructor(datastore: object) {
+    constructor(private contract: Contract, private wallet: Wallet) {
     }
 
-    getAllStations(): Station[] {
-        return [];
+    async getAllStations(): Promise<Station[]> {
+        const stations = new Array();
+        const quantity = await this.contract.call("getNumberOfStations");
+        for (let i = 0; i < quantity; i++) {
+            const stationId = await this.contract.call("getIdByIndex", i);
+            const station = await this.contract.call("getStation", stationId);
+            stations.push(Station.deserialize(station));
+        }
+        return stations;
     }
 
-    getStation(stationId: string): Station {
-        // read from block chain
-        return new Station();
+    async getStation(stationId: string): Promise<Station> {
+        const stationOnContract = await this.contract.call("getStation", stationId);
+        return Station.deserialize(stationOnContract);
     }
 
-    createStation(data: { owner: string, latitude: number, longitude: number, openingHours: string }): Station {
-        let station = new Station();
-        station.owner = data.owner;
-        station.latitude = data.latitude;
-        station.longitude = data.longitude;
-        station.openingHours = data.openingHours;
-        // persist station to blockchain or throw!
-        return station;
+    async createStation(data: { latitude: number, longitude: number, openingHours: string }): Promise<string> {
+        const id = '0x' + crypto.randomBytes(32).toString('hex');
+        const owner = this.wallet.address;
+        const lat = data.latitude * 1000000 << 0;
+        const lng = data.longitude * 1000000 << 0;
+        const openingHours = web3Utils.asciiToHex(data.openingHours);
+        await this.contract.send(owner, "addStation", id, owner, lat, lng, openingHours);
+        return id;
     }
 
     updateStation(station: Station) {
-        let changedFields = station.changedFields();
+        const changedFields = station.changedFields();
         station.resetFieldChanges();
     }
 

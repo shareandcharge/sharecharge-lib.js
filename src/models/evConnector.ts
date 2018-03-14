@@ -8,6 +8,6 @@ export class Connector {
     private _isAvailable: boolean = false;
 
     resetFieldChanges() {
-        ["plugTypes", "isAvailable"].forEach(name => this._fieldChange[name] = false)
+        ["plugTypes", "isAvailable"].forEach(name => this._fieldChange[name] = false);
     }
 }

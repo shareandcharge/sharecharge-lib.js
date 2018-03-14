@@ -1,15 +1,16 @@
 import { Connector } from './../models/evConnector';
+import { Contract } from './contract';
 
 export class ConnectorService {
 
-    constructor(datastore: object) {
+    constructor(contract: Contract) {
     }
 
     getById(connectorId: string): Connector {
         return new Connector();
     }
 
-    getConnectors(stationId: string): Connector[] {
+    getStationConnectors(stationId: string): Connector[] {
         return [];
     }
 

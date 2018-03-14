@@ -1,9 +1,8 @@
-import { ChargingStation } from "sharecharge-contracts";
+import contracts = require("../../config.json");
 
 export const config = {
     version: '0.1.0',
-    node: 'ws://localhost:8546',
-    chargeAbi: ChargingStation.abi,
-    chargeAddr: ChargingStation.address,
+    provider: 'http://localhost:8545',
+    contracts: contracts,
     gasPrice: 18000000000
 };

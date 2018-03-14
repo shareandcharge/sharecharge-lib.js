@@ -1,3 +1,5 @@
+const web3Utils = require('web3').utils;
+
 export class Station {
     private _fieldChange: object = {};
 
@@ -8,7 +10,7 @@ export class Station {
     private _openingHours: string = "";
 
     get id(): string {
-        return this.id;
+        return this._id;
     }
 
     get owner(): string {
@@ -64,7 +66,17 @@ export class Station {
     }
 
     resetFieldChanges() {
-        ["owner", "latitude", "longitude", "openingHours"].forEach(name => this._fieldChange[name] = false)
+        ["owner", "latitude", "longitude", "openingHours"].forEach(name => this._fieldChange[name] = false);
+    }
+
+    static deserialize(payload: any): Station {
+        const station = new Station();
+        station._id = payload["id"];
+        station._owner = payload["owner"];
+        station._latitude = payload["latitude"] / 1000000;
+        station._longitude = payload["longitude"] / 1000000;
+        station._openingHours = web3Utils.hexToString(payload["openingHours"]);
+        return station;
     }
 }
 

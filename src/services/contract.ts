@@ -1,130 +1,48 @@
-import * as EthereumTx from 'ethereumjs-tx';
-import { Subject } from 'rxjs/Subject';
-import { Observable } from 'rxjs/Observable';
-import { config } from '../config/config';
-import { IContract } from '../models/contract';
-import { Request } from '../models/request';
-import { Receipt } from '../models/receipt';
-import { createPayload, createReceipt } from '../utils/helpers';
+import { Wallet } from "./wallet";
 
 const Web3 = require('web3');
 
-export class Contract implements IContract {
+export class Contract {
 
     private web3: any;
     private contract: any;
-    private personal: any;
-    private pass: any;
 
-    private source = new Subject<Request>();
-    readonly events$: Observable<Request> = this.source.asObservable();
+    private address: string;
+    private gasPrice: number;
+    private wallet: Wallet;
 
-    constructor({pass = '', provider = config.node}) {
-
-        this.pass = pass;
-        this.web3 = new Web3(provider);
-        this.personal = this.web3.eth.personal;
-
-        this.contract = new this.web3.eth.Contract(config.chargeAbi, config.chargeAddr);
-
-        console.log("Contract Address:", config.chargeAddr);
-
-        try {
-            this.watchEvents();
-        } catch (err) {
-            console.error(err);
-        }
+    constructor(config: any, name: string, wallet: Wallet) {
+        this.web3 = new Web3(config.provider);
+        this.address = config.contracts[name].address;
+        this.gasPrice = config.gasPrice;
+        this.wallet = wallet;
+        this.contract = new this.web3.eth.Contract(config.contracts[name].abi, this.address);
     }
 
-    watchEvents(): void {
-
-        const events = [
-            'StartRequested',
-            'StartConfirmed',
-            'StopRequested',
-            'StopConfirmed',
-            'Error'];
-
-        events.forEach(ev => {
-            this.contract.events[ev]({}, (err, res) => {
-                if (err) {
-                    this.source.error(new Error(err));
-                } else {
-                    this.source.next(createPayload(ev, res.returnValues));
-                }
-            });
-        });
+    async call(method: string, ...args: any[]): Promise<any> {
+        return this.contract.methods[method](...args).call();
     }
 
-    async getCoinbase() {
-        return this.web3.eth.getCoinbase();
-    }
-
-    async getNonce(address: string): Promise<number> {
-        return this.web3.eth.getTransactionCount(address);
-    }
-
-    convertBytes(bytes: string): string {
-        const str = this.web3.utils.hexToString(bytes);
-        return this.web3.utils.fromAscii(str);
-    }
-
-    private async createTxData(from: string, method: string, ...args: any[]): Promise<any> {
-        const tx = this.contract.methods[method](...args);
-        return {
-            data: await tx.encodeABI(),
-            gas: await tx.estimateGas({from})
-        };
-    }
-
-    async createTx(from: string, method: string, ...args: any[]): Promise<any> {
-        const tx = await this.createTxData(from, method, ...args);
-        const nonce = await this.getNonce(from);
-        return {
-            nonce,
-            from,
-            to: config.chargeAddr,
-            gasPrice: config.gasPrice,
-            gas: tx.gas,
-            value: 0,
-            data: tx.data
-        };
-    }
-
-    signTx(txObject, privKey: Buffer): Buffer {
-        const tx = new EthereumTx(txObject);
-        tx.sign(privKey);
-        return tx.serialize();
-    }
-
-    async sendRawTx(serializedTx: Buffer): Promise<any> {
+    async send(from: string, method: string, ...args: any[]): Promise<any> {
+        const tx = await this.createTx(from, method, ...args);
+        const serializedTx = this.wallet.sign(tx);
         return this.web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'));
     }
 
-    async queryState(method: string, ...args: any[]): Promise<any> {
-
-        if (!this.contract.methods[method]) {
-            throw new Error(`Method: ${method} not found in contract`);
-        }
-
-        const query = this.contract.methods[method](...args);
-        return query.call();
-    }
-
-    async sendTx(method: string, ...args: any[]): Promise<Receipt> {
-
-        if (!this.contract.methods[method]) {
-            throw new Error(`Method: ${method} not found in contract`);
-        }
-
-        const coinbase = await this.web3.eth.getCoinbase();
-        // console.log('args:', args);
+    private async createTx(from: string, method: string, ...args: any[]): Promise<any> {
         const tx = this.contract.methods[method](...args);
-        const gas = await tx.estimateGas({from: coinbase});
-        // console.log("gas:", gas);
-        await this.personal.unlockAccount(coinbase, this.pass, 30);
-        const receipt = await tx.send({from: coinbase, gas: gas});
-        return createReceipt(receipt);
+        const gas = await tx.estimateGas({ from });
+        const data = await tx.encodeABI();
+        const nonce = await this.web3.eth.getTransactionCount(from);
+        return {
+            nonce,
+            from,
+            to: this.address,
+            gasPrice: this.gasPrice,
+            gas,
+            value: 0,
+            data
+        };
     }
 
 }
