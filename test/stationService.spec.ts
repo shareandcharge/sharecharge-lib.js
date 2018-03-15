@@ -41,7 +41,7 @@ describe('StationService', function () {
             const id3 = await stationService.createStation({ latitude: -3.000, longitude: 20.91232, openingHours: "123455677" });
 
             const stations = await stationService.getAllStations();
-            expect(stationSet.size).to.equal(3);
+            expect(stations.size).to.equal(3);
         });
 
     });
