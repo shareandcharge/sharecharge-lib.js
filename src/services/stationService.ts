@@ -10,7 +10,7 @@ export class StationService {
     }
 
     async getAllStations(): Promise<Station[]> {
-        const stations = new Array();
+        const stations: Station[] = [];
         const quantity = await this.contract.call("getNumberOfStations");
         for (let i = 0; i < quantity; i++) {
             const stationId = await this.contract.call("getIdByIndex", i);

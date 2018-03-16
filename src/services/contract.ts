@@ -1,22 +1,15 @@
 import { Wallet } from "./wallet";
 
-const Web3 = require('web3');
-
 export class Contract {
 
-    private web3: any;
     private contract: any;
-
     private address: string;
     private gasPrice: number;
-    private wallet: Wallet;
 
-    constructor(config: any, name: string, wallet: Wallet) {
-        this.web3 = new Web3(config.provider);
-        this.address = config.contracts[name].address;
+    constructor(private wallet: Wallet, private web3: any, private config: { abi: any, address: string, gasPrice: number }) {
+        this.address = config.address;
         this.gasPrice = config.gasPrice;
-        this.wallet = wallet;
-        this.contract = new this.web3.eth.Contract(config.contracts[name].abi, this.address);
+        this.contract = new this.web3.eth.Contract(config.abi, config.address);
     }
 
     async call(method: string, ...args: any[]): Promise<any> {
