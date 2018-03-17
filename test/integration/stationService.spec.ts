@@ -1,17 +1,16 @@
-import { StationBuilder } from './stationBuilder';
-import { StationEventHandler } from './../src/services/stationEventHandler';
-import { StationEvents } from './../src/models/stationEvents';
 import * as sinon from 'sinon';
 import * as mocha from 'mocha';
 import { expect } from 'chai';
-import { StationService } from '../src/services/stationService';
-import { Helper } from './helpers';
-import { Wallet } from '../src/models/wallet';
-import { Contract } from '../src/models/contract';
-import { EventPollerService } from '../src/services/eventPollerService';
-import { Station } from '../src';
-import { stat } from 'fs';
 const Web3 = require('web3');
+
+import { StationBuilder } from '../stationBuilder';
+import { TestHelper } from '../testHelper';
+import { Wallet } from '../../src/models/wallet';
+import { Contract } from '../../src/models/contract';
+import { EventPollerService } from '../../src/services/eventPollerService';
+import { StationService } from '../../src/services/stationService';
+import { StationEventHandler } from '../../src/services/stationEventHandler';
+import { StationEvents } from '../../src/models/stationEvents';
 
 describe('StationService', function () {
 
@@ -27,11 +26,11 @@ describe('StationService', function () {
         web3 = new Web3(provider);
         wallet = new Wallet(seed);
 
-        Helper.ensureFunds(web3, wallet);
+        TestHelper.ensureFunds(web3, wallet);
     });
 
     beforeEach(async () => {
-        const address = await Helper.deployContract(web3, stationStorage);
+        const address = await TestHelper.deployContract(web3, stationStorage);
         contract = new Contract(wallet, web3, EventPollerService.instance, stationEventHandler, {
             abi: stationStorage.abi,
             address: address,

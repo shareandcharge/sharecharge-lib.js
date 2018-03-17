@@ -1,7 +1,7 @@
 import * as crypto from 'crypto';
 import { Station } from '../models/station';
 import { Contract } from '../models/contract';
-const web3Utils = require('web3').utils;
+import { ToolKit } from '../utils/toolKit';
 
 export class StationService {
 
@@ -28,7 +28,7 @@ export class StationService {
         const owner = station.owner;
         const lat = station.latitude * 1000000 << 0;
         const lng = station.longitude * 1000000 << 0;
-        const hours = web3Utils.asciiToHex(station.openingHours);
+        const hours = ToolKit.asciiToHex(station.openingHours);
         const available = station.available;
         await this.contract.send("addStation", id, owner, lat, lng, hours, available);
     }

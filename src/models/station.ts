@@ -1,4 +1,4 @@
-import { ToolKit } from './toolKit';
+import { ToolKit } from '../utils/toolKit';
 import { ChangeTracker } from './changeTracker';
 
 export class Station {
@@ -26,10 +26,9 @@ export class Station {
 
     set owner(value: string) {
         value = value.toLowerCase();
-        if (!ToolKit.isAddress(value)) {
-            throw new Error('Value is not a valid address string');
+        if (ToolKit.isAddress(value)) {
+            this.tracker.setProperty("owner", value);
         }
-        this.tracker.setProperty("owner", value);
     }
 
     get latitude(): number {
@@ -37,10 +36,9 @@ export class Station {
     }
 
     set latitude(value: number) {
-        if (value < -90 || value > 90) {
-            throw new Error('Latitude range is -90 to 90 degrees');
+        if (value >= -90 && value <= 90) {
+            this.tracker.setProperty("latitude", value);
         }
-        this.tracker.setProperty("latitude", value);
     }
 
     get longitude(): number {
@@ -48,10 +46,9 @@ export class Station {
     }
 
     set longitude(value: number) {
-        if (value < -180 || value > 180) {
-            throw new Error('Longitude range is -180 to 180 degrees');
+        if (value >= -180 && value <= 180) {
+            this.tracker.setProperty("longitude", value);
         }
-        this.tracker.setProperty("longitude", value);
     }
 
     get openingHours(): string {

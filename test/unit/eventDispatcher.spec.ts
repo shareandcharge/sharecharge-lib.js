@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import { StationEvents } from './../src/models/stationEvents';
-import { EventDispatcher } from './../src/models/eventDispatcher';
+import { StationEvents } from '../../src/models/stationEvents';
+import { EventDispatcher } from '../../src/models/eventDispatcher';
 
 describe('EventDispatcher', function () {
 

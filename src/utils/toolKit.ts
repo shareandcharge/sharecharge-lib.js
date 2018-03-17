@@ -7,11 +7,15 @@ export class ToolKit {
         return '0x' + crypto.randomBytes(32).toString('hex');
     }
 
-    static hexToString(hex: string): string {
-        return web3Utils.hexToString(hex);
+    static hexToString(val: string): string {
+        return web3Utils.hexToString(val);
     }
 
     static isAddress(val: string): boolean {
         return web3Utils.isAddress(val);
+    }
+
+    static asciiToHex(val: string): string {
+        return web3Utils.asciiToHex(val);
     }
 }

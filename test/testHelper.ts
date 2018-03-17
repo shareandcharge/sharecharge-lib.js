@@ -1,6 +1,6 @@
 import { Wallet } from '../src/models/wallet';
 
-export class Helper {
+export class TestHelper {
 
     static generateRandom() {
         return (Math.random() * 0xFFFFFFFFF << 0).toString(16);
