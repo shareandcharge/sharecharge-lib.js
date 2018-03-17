@@ -4,7 +4,7 @@ export class StationBuilder {
     private owner: string = "0x0000000000000000000000000000000000000000";
     private latitude: number = 52.51667;
     private longitude: number = 13.38333;
-    private openingHours: string = "00000000000000000000000000000000";
+    private openingHours: string = "0000000000000000000000000000";
     private available: boolean = true;
 
     withOwner(val: string): StationBuilder {

@@ -10,4 +10,8 @@ export class ToolKit {
     static hexToString(hex: string): string {
         return web3Utils.hexToString(hex);
     }
+
+    static isAddress(val: string): boolean {
+        return web3Utils.isAddress(val);
+    }
 }

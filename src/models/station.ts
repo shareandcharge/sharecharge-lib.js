@@ -9,7 +9,7 @@ export class Station {
     private _owner: string = "0x0000000000000000000000000000000000000000";
     private _latitude: number = 0;
     private _longitude: number = 0;
-    private _openingHours: string = "00000000000000000000000000000000";
+    private _openingHours: string = "0000000000000000000000000000";
     private _available: boolean = true;
 
     constructor() {
@@ -25,6 +25,10 @@ export class Station {
     }
 
     set owner(value: string) {
+        value = value.toLowerCase();
+        if (!ToolKit.isAddress(value)) {
+            throw new Error('Value is not a valid address string');
+        }
         this.tracker.setProperty("owner", value);
     }
 
@@ -33,6 +37,9 @@ export class Station {
     }
 
     set latitude(value: number) {
+        if (value < -90 || value > 90) {
+            throw new Error('Latitude range is -90 to 90 degrees');
+        }
         this.tracker.setProperty("latitude", value);
     }
 
@@ -41,6 +48,9 @@ export class Station {
     }
 
     set longitude(value: number) {
+        if (value < -180 || value > 180) {
+            throw new Error('Longitude range is -180 to 180 degrees');
+        }
         this.tracker.setProperty("longitude", value);
     }
 
@@ -58,17 +68,6 @@ export class Station {
 
     set available(value: boolean) {
         this.tracker.setProperty("available", value);
-    }
-
-    static serialize(station: Station): any {
-        return {
-            id: station._id,
-            owner: station._owner,
-            latitude: station._latitude,
-            longitude: station._longitude,
-            openingHours: station._openingHours,
-            available: station._available
-        }
     }
 
     static deserialize(payload: any): Station {

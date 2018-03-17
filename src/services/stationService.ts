@@ -5,8 +5,7 @@ const web3Utils = require('web3').utils;
 
 export class StationService {
 
-    constructor(private contract: Contract) {
-    }
+    constructor(private contract: Contract) {}
 
     async getAllStations(): Promise<Station[]> {
         const stations: Station[] = [];
