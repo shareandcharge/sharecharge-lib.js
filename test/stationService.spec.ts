@@ -1,3 +1,4 @@
+import { StationBuilder } from './stationBuilder';
 import { StationEventHandler } from './../src/services/stationEventHandler';
 import { StationEvents } from './../src/models/stationEvents';
 import * as sinon from 'sinon';
@@ -8,6 +9,8 @@ import { Helper } from './helpers';
 import { Wallet } from '../src/models/wallet';
 import { Contract } from '../src/models/contract';
 import { EventPollerService } from '../src/services/eventPollerService';
+import { Station } from '../src';
+import { stat } from 'fs';
 const Web3 = require('web3');
 
 describe('StationService', function () {
@@ -44,68 +47,80 @@ describe('StationService', function () {
 
     context('#createStation()', () => {
         it('should create station', async () => {
-            const owner = wallet.address;
+            const station = new StationBuilder()
+                .withOwner(wallet.address)
+                .withLatitude(51.345)
+                .withLongitude(-0.92332)
+                .isAvailable(true)
+                .build();
 
-            const id = await stationService.createStation({
-                owner: wallet.address,
-                latitude: 51.345,
-                longitude: -0.92332,
-                openingHours: "123455677"
-            });
-            const station = await stationService.getStation(id);
-            expect(station.id).to.not.equal(undefined);
-            expect(station.owner.toLowerCase()).to.equal(owner.toLowerCase());
-            expect(station.latitude).to.equal(51.345);
-            expect(station.longitude).to.equal(-0.92332);
-            expect(station.openingHours).to.equal("123455677");
-            expect(station.enabled).to.equal(true);
+            await stationService.createStation(station);
+
+            const result = await stationService.getStation(station.id);
+
+            expect(result.id).to.not.equal(undefined);
+            expect(result.owner.toLowerCase()).to.equal(station.owner.toLowerCase());
+            expect(result.latitude).to.equal(station.latitude);
+            expect(result.longitude).to.equal(station.longitude);
+            expect(result.openingHours).to.equal(station.openingHours);
+            expect(result.available).to.equal(station.available);
         });
     });
 
     context('#getAllStations()', () => {
         it('return all stations', async function () {
-            const payload = {
-                owner: wallet.address,
-                latitude: 50.345,
-                longitude: 41.92332,
-                openingHours: ""
-            };
-            const id1 = await stationService.createStation(payload);
-            const id2 = await stationService.createStation(payload);
-            const id3 = await stationService.createStation(payload);
-            const stations = await stationService.getAllStations();
-            expect(stations.length).to.equal(3);
+            const station = new StationBuilder().withOwner(wallet.address).build();
+
+            await stationService.createStation(station);
+            await stationService.createStation(station);
+            await stationService.createStation(station);
+
+            const result = await stationService.getAllStations();
+            expect(result.length).to.equal(3);
+        });
+    });
+
+    context('#isPersisted()', () => {
+        it('should return true for persisted stations', async function () {
+            const station = new StationBuilder().withOwner(wallet.address).build();
+
+            await stationService.createStation(station);
+
+            const result = await stationService.isPersisted(station);
+
+            expect(result).to.equal(true);
         });
 
+        it('should return false for unpersisted stations', async function () {
+            const station = new StationBuilder().withOwner(wallet.address).build();
+
+            const result = await stationService.isPersisted(station);
+
+            expect(result).to.equal(false);
+        });
     });
 
     context('#on', () => {
         it('should listen to events', async () => {
             let createdId = "";
             let updatedId = "";
-            let disabledId = "";
-            let enabledId = "";
 
             stationEventHandler = new StationEventHandler(EventPollerService.instance, contract);
             stationEventHandler.on(StationEvents.Created, id => createdId = id);
             stationEventHandler.on(StationEvents.Updated, id => updatedId = id);
 
-            const id = await stationService.createStation({
-                owner: wallet.address,
-                latitude: 10,
-                longitude: 0,
-                openingHours: ""
-            });
+            const station = new StationBuilder().withOwner(wallet.address).build();
+            await stationService.createStation(station);
 
-            const station = await stationService.getStation(id);
-            station.latitude = 50;
+            const result = await stationService.getStation(station.id);
+            result.latitude = 50;
 
-            await stationService.updateStation(station)
+            await stationService.updateStation(result)
 
             await EventPollerService.instance.poll();
 
-            expect(createdId).to.equal(id);
-            expect(updatedId).to.equal(id);
+            expect(createdId).to.equal(station.id);
+            expect(updatedId).to.equal(station.id);
 
         });
 

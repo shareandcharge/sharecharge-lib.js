@@ -26,4 +26,5 @@ export class Helper {
         const receipt = await contract.deploy().send({ from: coinbase });
         return receipt.options.address;
     }
+
 }

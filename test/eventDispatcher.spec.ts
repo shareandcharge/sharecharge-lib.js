@@ -69,10 +69,10 @@ describe('EventDispatcher', function () {
         it('should dispatch all events for given event type', () => {
             let actual = 0;
 
-            eventDispatcher.addEventListener(StationEvents.Enabled, result => actual++);
-            eventDispatcher.addEventListener(StationEvents.Enabled, result => actual++);
+            eventDispatcher.addEventListener(StationEvents.Created, result => actual++);
+            eventDispatcher.addEventListener(StationEvents.Created, result => actual++);
 
-            eventDispatcher.dispatchAll(StationEvents.Enabled);
+            eventDispatcher.dispatchAll(StationEvents.Created);
 
             expect(actual).to.equal(2);
         });

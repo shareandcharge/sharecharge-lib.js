@@ -20,17 +20,18 @@ export class StationService {
     }
 
     async getStation(stationId: string): Promise<Station> {
-        const stationOnContract = await this.contract.call("getStation", stationId);
-        return Station.deserialize(stationOnContract);
+        const result = await this.contract.call("getStation", stationId);
+        return Station.deserialize(result);
     }
 
-    async createStation(data: { owner: string, latitude: number, longitude: number, openingHours: string }): Promise<string> {
-        const id = '0x' + crypto.randomBytes(32).toString('hex');
-        const lat = data.latitude * 1000000 << 0;
-        const lng = data.longitude * 1000000 << 0;
-        const openingHours = web3Utils.asciiToHex(data.openingHours);
-        await this.contract.send("addStation", id, data.owner, lat, lng, openingHours);
-        return id;
+    async createStation(station: Station) {
+        const id = station.id;
+        const owner = station.owner;
+        const lat = station.latitude * 1000000 << 0;
+        const lng = station.longitude * 1000000 << 0;
+        const hours = web3Utils.asciiToHex(station.openingHours);
+        const available = station.available;
+        await this.contract.send("addStation", id, owner, lat, lng, hours, available);
     }
 
     async updateStation(station: Station) {
@@ -41,6 +42,11 @@ export class StationService {
             }
         }));
         station.tracker.resetProperties();
+    }
+
+    async isPersisted(station: Station): Promise<boolean> {
+        const result = await this.contract.call("getIndexById", station.id);
+        return result >= 0;
     }
 
 }

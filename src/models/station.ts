@@ -1,16 +1,16 @@
+import { ToolKit } from './toolKit';
 import { ChangeTracker } from './changeTracker';
-const web3Utils = require('web3').utils;
 
 export class Station {
 
     public readonly tracker: ChangeTracker;
 
-    private _id: string = "";
-    private _owner: string = "";
+    private _id: string = ToolKit.randomBytes32String();
+    private _owner: string = "0x0000000000000000000000000000000000000000";
     private _latitude: number = 0;
     private _longitude: number = 0;
-    private _openingHours: string = "";
-    private _enabled: boolean = true;
+    private _openingHours: string = "00000000000000000000000000000000";
+    private _available: boolean = true;
 
     constructor() {
         this.tracker = new ChangeTracker(this);
@@ -52,12 +52,12 @@ export class Station {
         this.tracker.setProperty("openingHours", value);
     }
 
-    get enabled(): boolean {
-        return this._enabled;
+    get available(): boolean {
+        return this._available;
     }
 
-    set enabled(value: boolean) {
-        this.tracker.setProperty("enabled", value);
+    set available(value: boolean) {
+        this.tracker.setProperty("available", value);
     }
 
     static serialize(station: Station): any {
@@ -67,7 +67,7 @@ export class Station {
             latitude: station._latitude,
             longitude: station._longitude,
             openingHours: station._openingHours,
-            enabled: station._enabled
+            available: station._available
         }
     }
 
@@ -77,8 +77,8 @@ export class Station {
         station._owner = payload["owner"];
         station._latitude = payload["latitude"] / 1000000;
         station._longitude = payload["longitude"] / 1000000;
-        station._openingHours = web3Utils.hexToString(payload["openingHours"]);
-        station._enabled = payload["enabled"];
+        station._openingHours = ToolKit.hexToString(payload["openingHours"]);
+        station._available = payload["available"];
         return station;
     }
 }
