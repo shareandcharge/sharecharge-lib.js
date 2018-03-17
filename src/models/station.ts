@@ -1,13 +1,20 @@
+import { ChangeTracker } from './changeTracker';
 const web3Utils = require('web3').utils;
 
 export class Station {
-    private _fieldChange: object = {};
+
+    public readonly tracker: ChangeTracker;
 
     private _id: string = "";
     private _owner: string = "";
     private _latitude: number = 0;
     private _longitude: number = 0;
     private _openingHours: string = "";
+    private _enabled: boolean = true;
+
+    constructor() {
+        this.tracker = new ChangeTracker(this);
+    }
 
     get id(): string {
         return this._id;
@@ -18,10 +25,7 @@ export class Station {
     }
 
     set owner(value: string) {
-        if (value != this._owner) {
-            this._fieldChange["owner"] = true;
-            this._owner = value;
-        }
+        this.tracker.setProperty("owner", value);
     }
 
     get latitude(): number {
@@ -29,10 +33,7 @@ export class Station {
     }
 
     set latitude(value: number) {
-        if (value != this._latitude) {
-            this._fieldChange["latitude"] = true;
-            this._latitude = value;
-        }
+        this.tracker.setProperty("latitude", value);
     }
 
     get longitude(): number {
@@ -40,10 +41,7 @@ export class Station {
     }
 
     set longitude(value: number) {
-        if (value != this._longitude) {
-            this._fieldChange["longitude"] = true;
-            this._longitude = value;
-        }
+        this.tracker.setProperty("longitude", value);
     }
 
     get openingHours(): string {
@@ -51,22 +49,26 @@ export class Station {
     }
 
     set openingHours(value: string) {
-        if (value != this._openingHours) {
-            this._fieldChange["openingHours"] = true;
-            this._openingHours = value;
+        this.tracker.setProperty("openingHours", value);
+    }
+
+    get enabled(): boolean {
+        return this._enabled;
+    }
+
+    set enabled(value: boolean) {
+        this.tracker.setProperty("enabled", value);
+    }
+
+    static serialize(station: Station): any {
+        return {
+            id: station._id,
+            owner: station._owner,
+            latitude: station._latitude,
+            longitude: station._longitude,
+            openingHours: station._openingHours,
+            enabled: station._enabled
         }
-    }
-
-    hasFieldChanged(fieldName: string): boolean {
-        return this._fieldChange[fieldName];
-    }
-
-    changedFields(): string[] {
-        return [];
-    }
-
-    resetFieldChanges() {
-        ["owner", "latitude", "longitude", "openingHours"].forEach(name => this._fieldChange[name] = false);
     }
 
     static deserialize(payload: any): Station {
@@ -76,6 +78,7 @@ export class Station {
         station._latitude = payload["latitude"] / 1000000;
         station._longitude = payload["longitude"] / 1000000;
         station._openingHours = web3Utils.hexToString(payload["openingHours"]);
+        station._enabled = payload["enabled"];
         return station;
     }
 }

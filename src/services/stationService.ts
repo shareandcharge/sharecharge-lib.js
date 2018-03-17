@@ -1,12 +1,11 @@
 import * as crypto from 'crypto';
-import { Station } from './../models/station';
-import { Contract } from './contract';
-import { Wallet } from './wallet';
+import { Station } from '../models/station';
+import { Contract } from '../models/contract';
 const web3Utils = require('web3').utils;
 
 export class StationService {
 
-    constructor(private contract: Contract, private wallet: Wallet) {
+    constructor(private contract: Contract) {
     }
 
     async getAllStations(): Promise<Station[]> {
@@ -25,19 +24,23 @@ export class StationService {
         return Station.deserialize(stationOnContract);
     }
 
-    async createStation(data: { latitude: number, longitude: number, openingHours: string }): Promise<string> {
+    async createStation(data: { owner: string, latitude: number, longitude: number, openingHours: string }): Promise<string> {
         const id = '0x' + crypto.randomBytes(32).toString('hex');
-        const owner = this.wallet.address;
         const lat = data.latitude * 1000000 << 0;
         const lng = data.longitude * 1000000 << 0;
         const openingHours = web3Utils.asciiToHex(data.openingHours);
-        await this.contract.send(owner, "addStation", id, owner, lat, lng, openingHours);
+        await this.contract.send("addStation", id, data.owner, lat, lng, openingHours);
         return id;
     }
 
-    updateStation(station: Station) {
-        const changedFields = station.changedFields();
-        station.resetFieldChanges();
+    async updateStation(station: Station) {
+        await Promise.all(station.tracker.getProperties().map(async name => {
+            if (station.tracker.didPropertyChange(name)) {
+                const contractName = "set" + name.charAt(0).toUpperCase() + name.substr(1);
+                return await this.contract.send(contractName, station.id, station[name]);
+            }
+        }));
+        station.tracker.resetProperties();
     }
 
 }

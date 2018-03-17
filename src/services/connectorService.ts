@@ -1,25 +1,24 @@
-import { Connector } from './../models/evConnector';
-import { Contract } from './contract';
+import { Connector } from '../models/connector';
+import { Contract } from "../models/contract";
 
 export class ConnectorService {
 
-    constructor(contract: Contract) {
+    constructor(private contract: Contract) {
     }
 
-    getById(connectorId: string): Connector {
+    async getStationConnectors(stationId: string): Promise<Connector[]> {
+        return Promise.resolve([]);
+    }
+
+    async getConnector(connectorId: string): Promise<Connector> {
         return new Connector();
     }
 
-    getStationConnectors(stationId: string): Connector[] {
-        return [];
-    }
-
-    createConnector(stationId: string, data: object): string {
+    async createConnector(stationId: string, data: object): Promise<string> {
         return "";
     }
 
-    updateConnector(connector: Connector, data: object) {
-        connector.resetFieldChanges();
+    async updateConnector(connector: Connector) {
     }
 
 }

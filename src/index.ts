@@ -1,11 +1,15 @@
-import { ShareAndCharge } from './services/shareAndCharge';
-import { Wallet } from './services/wallet';
-import { Contract } from './services/contract';
-import { TestContract } from '../test/test-contract';
+import { Connector } from './models/connector';
+import { Wallet } from './models/wallet';
+import { StationEvents } from './models/stationEvents';
+import { Station } from './models/station';
+import { ConnectorService } from './services/connectorService';
+import { StationService } from './services/stationService';
 
 export {
-    ShareAndCharge,
-    Wallet,
-    Contract,
-    TestContract
+    Connector,
+    Station,
+    StationEvents,
+    ConnectorService,
+    StationService,
+    Wallet
 };
