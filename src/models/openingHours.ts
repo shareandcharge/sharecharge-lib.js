@@ -1,4 +1,4 @@
-import {range, map } from '../utils/range';
+import { range } from '../utils/range';
 
 export class Uhr {
 

@@ -1,4 +1,3 @@
-
 export function range(max: number) {
     function* ranger() {
         let index = 0;

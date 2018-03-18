@@ -1,4 +1,5 @@
 import { Station } from './../src/models/station';
+
 export class StationBuilder {
 
     private owner: string = "0x0000000000000000000000000000000000000000";

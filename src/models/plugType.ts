@@ -1,9 +1,9 @@
 export enum PlugType {
     SchukoSteckdose = 1,
     CEEStecker = 2,
-    Typ2 = 3,
-    CCS = 4,
-    Typ1 = 5,
-    TeslaSupercharger = 6,
-    CHAdeMO = 7
+    Typ2 = 4,
+    CCS = 8,
+    Typ1 = 16,
+    TeslaSupercharger = 32,
+    CHAdeMO = 64
 }

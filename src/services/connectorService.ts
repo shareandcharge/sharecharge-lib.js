@@ -21,10 +21,4 @@ export class ConnectorService {
     async updateConnector(connector: Connector) {
     }
 
-    async requestStart(connector: Connector) {
-    }
-
-    async requestStop(connector: Connector) {
-    }
-
 }
