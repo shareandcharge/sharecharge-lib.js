@@ -30,4 +30,7 @@ export class ConnectorService {
     async update(connector: Connector, wallet: Wallet) {
     }
 
+    async delete(connector: Connector, wallet: Wallet) {
+    }
+
 }
