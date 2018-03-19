@@ -1,4 +1,3 @@
-import { WithWallet } from './../../src/services/stationService';
 import * as sinon from 'sinon';
 import * as mocha from 'mocha';
 import { expect } from 'chai';
@@ -20,7 +19,7 @@ import { ChargingEventHandler } from '../../src/services/chargingEventHandler';
 describe('ChargingService', function () {
 
     const provider = "http://localhost:8545";
-    const config = require(process.env["HOME"] + '/.sharecharge/config.json');
+    const config = require(process.env["HOME"] + '/.sharecharge/contract-defs.development.json');
     const stationStorage = config['StationStorage'];
     const connectorStorage = config['ConnectorStorage'];
     const charging = config['Charging'];

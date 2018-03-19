@@ -15,7 +15,7 @@ import { ConnectorBuilder } from "../../src/utils/connectorBuilder";
 describe('ConnectorService', function () {
 
     const provider = "http://localhost:8545";
-    const config = require(process.env["HOME"] + '/.sharecharge/config.json');
+    const config = require(process.env["HOME"] + '/.sharecharge/contract-defs.development.json');
     const connectorStorage = config['ConnectorStorage'];
     const gasPrice = 18000000000;
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
