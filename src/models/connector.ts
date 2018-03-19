@@ -24,37 +24,44 @@ export class Connector {
         return this._owner;
     }
 
+    set owner(value: string) {
+        value = value.toLowerCase();
+        if (ToolKit.isAddress(value)) {
+            this.tracker.setProperty("owner", value);
+        }
+    }
+
     get stationId(): string {
         return this._stationId;
+    }
+
+    set stationId(value: string) {
+        this.tracker.setProperty("stationId", value);
     }
 
     get plugTypes(): PlugType[] {
         return this._plugTypes;
     }
 
+    set plugTypes(value: PlugType[]) {
+        this.tracker.setProperty("plugTypes", value);
+    }
+
     get available(): boolean {
         return this._available;
     }
 
+    set available(value: boolean) {
+        this.tracker.setProperty("available", value);
+    }
+
     static deserialize(payload: any): Connector {
-        const station = new Connector();
-        station._id = payload["id"];
-        station._owner = payload["owner"];
-        station._stationId = payload["stationId"];
-        station._plugTypes = this.fromPlugMask(payload["plugMask"]);
-        station._available = payload["available"];
-        return station;
+        const connector = new Connector();
+        connector._id = payload["id"];
+        connector._owner = payload["owner"];
+        connector._stationId = payload["stationId"];
+        connector._plugTypes = ToolKit.fromPlugMask(payload["plugMask"]);
+        connector._available = payload["available"];
+        return connector;
     }
-
-    static fromPlugMask(mask: number): PlugType[] {
-        let plugs: PlugType[] = [];
-        for (let bit = 0; bit < 16; bit++) {
-            let flag = (mask >> bit) & 0x01;
-            if (flag) {
-                plugs.push(flag << bit);
-            }
-        }
-        return plugs;
-    }
-
 }

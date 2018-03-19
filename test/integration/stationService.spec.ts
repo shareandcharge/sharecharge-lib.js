@@ -20,7 +20,7 @@ describe('StationService', function () {
     const gasPrice = 18000000000;
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
 
-    let stationEventHandler, stationService, contract, wallet, coinbase, web3;
+    let stationEventHandler, stationService, contract, wallet, web3;
 
     before(async () => {
         web3 = new Web3(provider);
@@ -31,13 +31,13 @@ describe('StationService', function () {
 
     beforeEach(async () => {
         const address = await TestHelper.deployContract(web3, stationStorage);
-        contract = new Contract(wallet, web3, {
+        contract = new Contract(web3, {
             abi: stationStorage.abi,
             address: address,
             gasPrice
         });
 
-        stationService = new StationService(contract);
+        stationService = new StationService(contract, wallet);
     });
 
     afterEach(async () => {
@@ -114,7 +114,7 @@ describe('StationService', function () {
             const result = await stationService.getStation(station.id);
             result.latitude = 50;
 
-            await stationService.updateStation(result)
+            await stationService.updateStation(result);
 
             await EventPollerService.instance.poll();
 

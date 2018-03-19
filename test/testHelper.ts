@@ -16,14 +16,14 @@ export class TestHelper {
         }
     }
 
-    static async deployContract(web3: any, config: { abi: any, bytecode: any }, gas: number = 2000000) {
+    static async deployContract(web3: any, config: { abi: any, bytecode: any }, args: any[] = [], gas: number = 2000000) {
         const coinbase = await web3.eth.getCoinbase();
-        const contract = new web3.eth.Contract(config.abi, null, {
+        const contract = new web3.eth.Contract(config.abi, {
             from: coinbase,
             data: config.bytecode,
             gas
         });
-        const receipt = await contract.deploy().send({ from: coinbase });
+        const receipt = await contract.deploy({ arguments: args }).send({ from: coinbase });
         return receipt.options.address;
     }
 
