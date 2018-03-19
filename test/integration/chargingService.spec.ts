@@ -1,3 +1,4 @@
+import { WithWallet } from './../../src/services/stationService';
 import * as sinon from 'sinon';
 import * as mocha from 'mocha';
 import { expect } from 'chai';
@@ -90,7 +91,7 @@ describe('ChargingService', function () {
                 controllerAddress = controller;
             });
 
-            await chargingService.requestStart(mspWallet, connector, 240);
+            await chargingService.useWallet(mspWallet).requestStart(connector, 240);
 
             await EventPollerService.instance.poll();
 

@@ -11,20 +11,20 @@ export class ChargingService {
 
     useWallet(wallet: Wallet) {
         return {
-            requestStart: async (connector: Connector, secondsToRent: number): Promise<any> => {
-                this.contract.send("requestStart", wallet, connector.id, secondsToRent);
+            requestStart: async (connector: Connector, secondsToRent: number) => {
+                await this.contract.send("requestStart", wallet, connector.id, secondsToRent);
             },
             confirmStart: async (connector: Connector, controller: string) => {
-                this.contract.send("confirmStart", wallet, connector.id, controller);
+                await this.contract.send("confirmStart", wallet, connector.id, controller);
             },
             requestStop: async (connector: Connector) => {
-                this.contract.send("requestStop", wallet, connector.id, wallet.address);
+                await this.contract.send("requestStop", wallet, connector.id, wallet.address);
             },
             confirmStop: async (connector: Connector, controller: string) => {
-                this.contract.send("confirmStop", wallet, connector.id, controller);
+                await this.contract.send("confirmStop", wallet, connector.id, controller);
             },
             error: async (connector: Connector, controller: string, errorCode: number) => {
-                this.contract.send("logError", wallet, connector.id, controller, errorCode);
+                await this.contract.send("logError", wallet, connector.id, controller, errorCode);
             }
         }
     }

@@ -53,7 +53,7 @@ describe('ConnectorService', function () {
                 .build();
 
             // add it to connectors
-            await connectorService.create(connector, wallet);
+            await connectorService.useWallet(wallet).create(connector);
 
             // get
             const result: Connector = await connectorService.getById(connector.id);
@@ -71,7 +71,7 @@ describe('ConnectorService', function () {
             const connector = new ConnectorBuilder()
                 .build();
 
-            await connectorService.create(connector, wallet);
+            await connectorService.useWallet(wallet).create(connector);
 
             const result: Connector = await connectorService.getById(connector.id);
             expect(result.id).to.equal(connector.id);
