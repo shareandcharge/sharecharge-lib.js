@@ -19,10 +19,7 @@ import { ChargingEventHandler } from '../../src/services/chargingEventHandler';
 describe('ChargingService', function () {
 
     const provider = "http://localhost:8545";
-    const config = require(process.env["HOME"] + '/.sharecharge/contract-defs.development.json');
-    const stationStorage = config['StationStorage'];
-    const connectorStorage = config['ConnectorStorage'];
-    const charging = config['Charging'];
+    const contractDefs = require(process.env["HOME"] + '/.sharecharge/contract-defs.development.json');
     const gasPrice = 18000000000;
     const seed1 = 'filter march urge naive sauce distance under copy payment slow just cool';
     const seed2 = 'filter march urge naive sauce distance under copy payment slow just warm';
@@ -30,7 +27,6 @@ describe('ChargingService', function () {
     let chargingEventHandler, stationService, cpoChargingService, chargingService, stationStorageContract, connectorService, connectorStorageContract, chargingContract, cpoWallet, mspWallet, web3;
 
     before(async () => {
-
         web3 = new Web3(provider);
         cpoWallet = new Wallet(seed1);
         mspWallet = new Wallet(seed2);
@@ -40,23 +36,26 @@ describe('ChargingService', function () {
     });
 
     beforeEach(async () => {
-        const stationStorageaddress = await TestHelper.deployContract(web3, stationStorage);
+        const stationStorageDef = contractDefs['StationStorage'];
+        const stationStorageaddress = await TestHelper.deployContract(web3, stationStorageDef);
         stationStorageContract = new Contract(web3, {
-            abi: stationStorage.abi,
+            abi: stationStorageDef.abi,
             address: stationStorageaddress,
             gasPrice
         });
 
-        const connectorStorageaddress = await TestHelper.deployContract(web3, connectorStorage);
+        const connectorStorageDef = contractDefs['ConnectorStorage'];
+        const connectorStorageaddress = await TestHelper.deployContract(web3, connectorStorageDef);
         connectorStorageContract = new Contract(web3, {
-            abi: connectorStorage.abi,
+            abi: connectorStorageDef.abi,
             address: connectorStorageaddress,
             gasPrice
         });
 
-        const chargingAddress = await TestHelper.deployContract(web3, charging, [connectorStorageaddress]);
+        const chargingDef = contractDefs['Charging'];
+        const chargingAddress = await TestHelper.deployContract(web3, chargingDef, [connectorStorageaddress]);
         chargingContract = new Contract(web3, {
-            abi: charging.abi,
+            abi: chargingDef.abi,
             address: chargingAddress,
             gasPrice
         });

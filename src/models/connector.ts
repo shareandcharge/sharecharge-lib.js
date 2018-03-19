@@ -4,12 +4,12 @@ import { ToolKit } from '../utils/toolKit';
 
 export class Connector {
 
-    private readonly tracker: ChangeTracker;
+    public readonly tracker: ChangeTracker;
 
     private _id: string = ToolKit.randomBytes32String();
     private _owner: string = "0x0000000000000000000000000000000000000000";
     private _stationId: string = "0x0000000000000000000000000000000000000000";
-    private _plugTypes: PlugType[] = [];
+    private _plugMask: number = 0;
     private _available: boolean = false;
 
     constructor() {
@@ -40,11 +40,11 @@ export class Connector {
     }
 
     get plugTypes(): PlugType[] {
-        return this._plugTypes;
+        return ToolKit.fromPlugMask(this._plugMask);
     }
 
     set plugTypes(value: PlugType[]) {
-        this.tracker.setProperty("plugTypes", value);
+        this.tracker.setProperty("plugMask", ToolKit.toPlugMask(value));
     }
 
     get available(): boolean {
@@ -60,7 +60,7 @@ export class Connector {
         connector._id = payload["id"];
         connector._owner = payload["owner"];
         connector._stationId = payload["stationId"];
-        connector._plugTypes = ToolKit.fromPlugMask(payload["plugMask"]);
+        connector._plugMask = payload["plugMask"];
         connector._available = payload["available"];
         return connector;
     }

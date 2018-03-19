@@ -6,8 +6,7 @@ import { Wallet } from '../models/wallet';
 
 export class ConnectorService {
 
-    constructor(private contract: Contract) {
-    }
+    constructor(public readonly contract: Contract) { }
 
     async getById(id: string): Promise<Connector> {
         const result = await this.contract.call("getConnector", id);
@@ -34,7 +33,15 @@ export class ConnectorService {
                 await this.contract.send("addConnector", wallet, id, owner, stationId, plugMask, available);
             },
             update: async (connector: Connector) => {
-
+                if (await this.contract.call("getIndexById", connector.id) >= 0) {
+                    await Promise.all(connector.tracker.getProperties().map(async name => {
+                        if (connector.tracker.didPropertyChange(name)) {
+                            const funcName = "set" + name.charAt(0).toUpperCase() + name.substr(1);
+                            return await this.contract.send(funcName, wallet, connector.id, connector[name]);
+                        }
+                    }));
+                    connector.tracker.resetProperties();
+                }
             }
         }
     }

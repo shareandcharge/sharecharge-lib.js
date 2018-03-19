@@ -1,4 +1,3 @@
-import { EventPollerService, PollerService } from './../services/eventPollerService';
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
 import { Wallet } from "./wallet";
@@ -17,6 +16,11 @@ export class Contract {
 
     get native() {
         return this.contract;
+    }
+
+    async getBlockNumber(): Promise<number> {
+        const blockNumber = await this.web3.eth.getBlockNumber();
+        return blockNumber;
     }
 
     async call(method: string, ...args: any[]): Promise<any> {
@@ -39,7 +43,7 @@ export class Contract {
             from: wallet.address,
             to: this.address,
             gasPrice: this.gasPrice,
-            gas,
+            gas: gas * 2,
             value: 0,
             data
         };

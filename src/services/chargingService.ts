@@ -1,9 +1,6 @@
-import { ConnectorService } from "./connectorService";
 import { Connector } from "../models/connector";
 import { Contract } from "../models/contract";
 import { Wallet } from "../models/wallet";
-import { EventPollerService } from "./eventPollerService";
-import { connect } from "tls";
 
 export class ChargingService {
 

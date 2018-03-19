@@ -6,7 +6,7 @@ import { Wallet } from '../models/wallet';
 
 export class StationService {
 
-    constructor(private contract: Contract) {}
+    constructor(public readonly contract: Contract) {}
 
     async getAll(): Promise<Station[]> {
         const stations: Station[] = [];
