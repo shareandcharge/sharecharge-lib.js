@@ -27,8 +27,11 @@ describe('ChargingService', function () {
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
     const seed2 = 'filter march urge naive sauce distance under copy payment slow just warm';
 
-    let chargingEventHandler, stationService, cpoChargingService, mspChargingService, stationStorageContract,
-        connectorService, connectorStorageContract, chargingContract, cpoWallet, mspWallet, web3;
+    let chargingEventHandler: ChargingEventHandler, stationService: StationService,
+        cpoChargingService: ChargingService, mspChargingService: ChargingService,
+        connectorService: ConnectorService,
+        connectorStorageContract: Contract, chargingContract: Contract, stationStorageContract: Contract,
+        cpoWallet: Wallet, mspWallet: Wallet, web3;
 
     before(async () => {
 
@@ -96,7 +99,7 @@ describe('ChargingService', function () {
 
             await connectorService.create(connector, cpoWallet);
 
-            chargingEventHandler.on(ChargingEvents.StartRequested, (id, controller) => {
+            chargingEventHandler.on(ChargingEvents.StartRequested, (id: string, controller: string) => {
                 connectorId = id;
                 controllerAddress = controller;
             });

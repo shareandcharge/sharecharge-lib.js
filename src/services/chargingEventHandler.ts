@@ -16,7 +16,7 @@ export class ChargingEventHandler {
         }));
     }
 
-    on(event: ChargingEvents, callback: (id: string, controller: string) => {}) {
+    on(event: ChargingEvents, callback: (id: string, controller: string) => void) {
         this.eventDispatcher.addEventListener(event, callback);
     }
 

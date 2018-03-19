@@ -21,7 +21,7 @@ describe('ConnectorService', function () {
     const gasPrice = 18000000000;
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
 
-    let connectorService, contract, wallet, web3;
+    let connectorService: ConnectorService, connectorStorageContract: Contract, wallet: Wallet, web3;
 
     before(async () => {
         web3 = new Web3(provider);
@@ -32,13 +32,13 @@ describe('ConnectorService', function () {
 
     beforeEach(async () => {
         const address = await TestHelper.deployContract(web3, connectorStorage);
-        contract = new Contract(web3, {
+        connectorStorageContract = new Contract(web3, {
             abi: connectorStorage.abi,
             address: address,
             gasPrice
         });
 
-        connectorService = new ConnectorService(contract);
+        connectorService = new ConnectorService(connectorStorageContract);
     });
 
     afterEach(async () => {
