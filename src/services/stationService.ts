@@ -8,7 +8,7 @@ export class StationService {
 
     constructor(private contract: Contract, private wallet: Wallet) {}
 
-    async getAllStations(): Promise<Station[]> {
+    async getAll(): Promise<Station[]> {
         const stations: Station[] = [];
         const quantity = await this.contract.call("getNumberOfStations");
         for (let i = 0; i < quantity; i++) {
@@ -19,12 +19,12 @@ export class StationService {
         return stations;
     }
 
-    async getStation(stationId: string): Promise<Station> {
-        const result = await this.contract.call("getStation", stationId);
+    async getById(id: string): Promise<Station> {
+        const result = await this.contract.call("getStation", id);
         return Station.deserialize(result);
     }
 
-    async createStation(station: Station) {
+    async create(station: Station) {
         const id = station.id;
         const owner = station.owner;
         const lat = station.latitude * 1000000 << 0;
@@ -34,7 +34,7 @@ export class StationService {
         await this.contract.send("addStation", this.wallet, id, owner, lat, lng, hours, available);
     }
 
-    async updateStation(station: Station) {
+    async update(station: Station) {
         await Promise.all(station.tracker.getProperties().map(async name => {
             if (station.tracker.didPropertyChange(name)) {
                 const contractName = "set" + name.charAt(0).toUpperCase() + name.substr(1);

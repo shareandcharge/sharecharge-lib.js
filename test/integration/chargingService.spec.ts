@@ -77,7 +77,7 @@ describe('ChargingService', function () {
             let controllerAddress = "";
 
             const station = new StationBuilder().withOwner(wallet.address).build();
-            await stationService.createStation(station);
+            await stationService.create(station);
 
             const connector = new ConnectorBuilder().withStation(station).build();
             await connectorService.create(connector);
@@ -92,7 +92,7 @@ describe('ChargingService', function () {
             await EventPollerService.instance.poll();
 
             expect(connectorId).to.equal(connector.id);
-            expect(controllerAddress).to.equal(controllerWallet.address);
+            expect(controllerAddress).to.equal(wallet.address);
         });
     });
 
