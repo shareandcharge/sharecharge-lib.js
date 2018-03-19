@@ -31,7 +31,7 @@ describe('StationService', function () {
 
     beforeEach(async () => {
         const address = await TestHelper.deployContract(web3, stationStorage);
-        contract = new Contract(wallet, web3, EventPollerService.instance, stationEventHandler, {
+        contract = new Contract(wallet, web3, {
             abi: stationStorage.abi,
             address: address,
             gasPrice

@@ -1,8 +1,6 @@
-import { EventHandler } from './../services/eventHandler';
 import { EventPollerService, PollerService } from './../services/eventPollerService';
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
-import { Request } from "../models/request";
 import { Wallet } from "./wallet";
 
 export class Contract {
@@ -11,8 +9,8 @@ export class Contract {
     private address: string;
     private gasPrice: number;
 
-    constructor(private wallet: Wallet, private web3: any, private eventPoller: PollerService,
-                eventHandler: EventHandler, private config: { abi: any, address: string, gasPrice: number }) {
+    constructor(private wallet: Wallet, private web3: any,
+                private config: { abi: any, address: string, gasPrice: number }) {
         this.address = config.address;
         this.gasPrice = config.gasPrice;
         this.contract = new this.web3.eth.Contract(config.abi, config.address);
