@@ -6,7 +6,7 @@ import { Wallet } from '../models/wallet';
 
 export class ConnectorService {
 
-    constructor(private contract: Contract, private wallet: Wallet) {
+    constructor(private contract: Contract) {
     }
 
     async getById(id: string): Promise<Connector> {
@@ -18,16 +18,16 @@ export class ConnectorService {
         return Promise.resolve([]);
     }
 
-    async create(connector: Connector) {
+    async create(connector: Connector, wallet: Wallet) {
         const id = connector.id;
         const owner = connector.owner;
         const stationId = connector.stationId;
         const plugMask = ToolKit.toPlugMask(connector.plugTypes);
         const available = connector.available;
-        await this.contract.send("addConnector", this.wallet, id, owner, stationId, plugMask, available);
+        await this.contract.send("addConnector", wallet, id, owner, stationId, plugMask, available);
     }
 
-    async update(connector: Connector) {
+    async update(connector: Connector, wallet: Wallet) {
     }
 
 }
