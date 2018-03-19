@@ -6,7 +6,7 @@ import { Wallet } from '../models/wallet';
 
 export class StationService {
 
-    constructor(private contract: Contract, private wallet: Wallet) {}
+    constructor(private contract: Contract) {}
 
     async getAll(): Promise<Station[]> {
         const stations: Station[] = [];
@@ -24,21 +24,21 @@ export class StationService {
         return Station.deserialize(result);
     }
 
-    async create(station: Station) {
+    async create(station: Station, wallet: Wallet) {
         const id = station.id;
-        const owner = station.owner;
+        // const owner = station.owner;
         const lat = station.latitude * 1000000 << 0;
         const lng = station.longitude * 1000000 << 0;
         const hours = ToolKit.asciiToHex(station.openingHours);
         const available = station.available;
-        await this.contract.send("addStation", this.wallet, id, owner, lat, lng, hours, available);
+        await this.contract.send("addStation", wallet, id, wallet.address, lat, lng, hours, available);
     }
 
-    async update(station: Station) {
+    async update(station: Station, wallet: Wallet) {
         await Promise.all(station.tracker.getProperties().map(async name => {
             if (station.tracker.didPropertyChange(name)) {
                 const contractName = "set" + name.charAt(0).toUpperCase() + name.substr(1);
-                return await this.contract.send(contractName, this.wallet, station.id, station[name]);
+                return await this.contract.send(contractName, wallet, station.id, station[name]);
             }
         }));
         station.tracker.resetProperties();

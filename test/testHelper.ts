@@ -10,7 +10,7 @@ export class TestHelper {
         const balance = await web3.eth.getBalance(wallet.address);
         const coinbase = await web3.eth.getCoinbase();
         const receiver = wallet.address;
-        const amount = web3.utils.toWei("1", "ether");
+        const amount = web3.utils.toWei("10", "ether");
         if (balance < 1000000) {
             web3.eth.sendTransaction({ from: coinbase, to: receiver, value: amount });
         }

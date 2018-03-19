@@ -9,11 +9,8 @@ export class ChargingService {
 
     }
 
-    async requestStart(connector: Connector, secondsToRent: number): Promise<any>  {
-        let result = await this.contract.send("requestStart", this.wallet, connector.id, secondsToRent);
-
-        // start(connector).then(() => {}).error(() => {});
-        return Promise.resolve();
+    requestStart(connector: Connector, secondsToRent: number)  {
+        this.contract.send("requestStart", this.wallet, connector.id, secondsToRent);
     }
 
     confirmStart(connector: Connector) {

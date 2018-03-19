@@ -26,14 +26,16 @@ describe('ChargingService', function () {
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
     const seed2 = 'filter march urge naive sauce distance under copy payment slow just warm';
 
-    let chargingEventHandler, stationService, chargingService, stationStorageContract, connectorService, connectorStorageContract, chargingContract, wallet, web3, controllerWallet;
+    let chargingEventHandler, stationService, cpoChargingService, mspChargingService, stationStorageContract, connectorService, connectorStorageContract, chargingContract, cpoWallet, mspWallet, web3;
 
     before(async () => {
         web3 = new Web3(provider);
-        wallet = new Wallet(seed);
-        controllerWallet = new Wallet(seed2);
+        cpoWallet = new Wallet(seed);
+        mspWallet = new Wallet(seed2);
 
-        TestHelper.ensureFunds(web3, wallet);
+        TestHelper.ensureFunds(web3, cpoWallet);
+        TestHelper.ensureFunds(web3, mspWallet);
+
     });
 
     beforeEach(async () => {
@@ -60,9 +62,13 @@ describe('ChargingService', function () {
 
         chargingEventHandler = new ChargingEventHandler(EventPollerService.instance, chargingContract);
 
-        stationService = new StationService(stationStorageContract, wallet);
-        connectorService = new ConnectorService(connectorStorageContract, wallet);
-        chargingService = new ChargingService(chargingContract, wallet, connectorService);
+
+        stationService = new StationService(stationStorageContract);
+        connectorService = new ConnectorService(connectorStorageContract);
+
+        mspChargingService = new ChargingService(chargingContract, mspWallet, connectorService);
+        cpoChargingService = new ChargingService(chargingContract, cpoWallet, connectorService);
+
     });
 
     afterEach(async () => {
@@ -76,23 +82,23 @@ describe('ChargingService', function () {
             let connectorId = "";
             let controllerAddress = "";
 
-            const station = new StationBuilder().withOwner(wallet.address).build();
-            await stationService.create(station);
+            const station = new StationBuilder().withOwner(cpoWallet.address).build();
+            await stationService.create(station, cpoWallet);
 
             const connector = new ConnectorBuilder().withStation(station).build();
-            await connectorService.create(connector);
+            await connectorService.create(connector, cpoWallet);
 
             chargingEventHandler.on(ChargingEvents.StartRequested, (id, controller) => {
                 connectorId = id;
                 controllerAddress = controller;
             });
 
-            await chargingService.requestStart(connector, 240);
+            await mspChargingService.requestStart(connector, 240);
 
             await EventPollerService.instance.poll();
 
             expect(connectorId).to.equal(connector.id);
-            expect(controllerAddress).to.equal(wallet.address);
+            expect(controllerAddress.toLowerCase()).to.equal(mspWallet.address);
         });
     });
 

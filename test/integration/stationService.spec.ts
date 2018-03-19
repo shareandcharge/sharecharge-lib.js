@@ -37,7 +37,7 @@ describe('StationService', function () {
             gasPrice
         });
 
-        stationService = new StationService(contract, wallet);
+        stationService = new StationService(contract);
     });
 
     afterEach(async () => {
@@ -53,7 +53,7 @@ describe('StationService', function () {
                 .isAvailable(true)
                 .build();
 
-            await stationService.create(station);
+            await stationService.create(station, wallet);
 
             const result = await stationService.getById(station.id);
 
@@ -70,9 +70,9 @@ describe('StationService', function () {
         it('return all stations', async function () {
             const station = new StationBuilder().withOwner(wallet.address).build();
 
-            await stationService.create(station);
-            await stationService.create(station);
-            await stationService.create(station);
+            await stationService.create(station, wallet);
+            await stationService.create(station, wallet);
+            await stationService.create(station, wallet);
 
             const result = await stationService.getAll();
             expect(result.length).to.equal(3);
@@ -83,7 +83,7 @@ describe('StationService', function () {
         it('should return true for persisted stations', async function () {
             const station = new StationBuilder().withOwner(wallet.address).build();
 
-            await stationService.create(station);
+            await stationService.create(station, wallet);
 
             const result = await stationService.isPersisted(station);
 
@@ -109,12 +109,12 @@ describe('StationService', function () {
             stationEventHandler.on(StationEvents.Updated, id => updatedId = id);
 
             const station = new StationBuilder().withOwner(wallet.address).build();
-            await stationService.create(station);
+            await stationService.create(station, wallet);
 
             const result = await stationService.getById(station.id);
             result.latitude = 50;
 
-            await stationService.update(result);
+            await stationService.update(result, wallet);
 
             await EventPollerService.instance.poll();
 
