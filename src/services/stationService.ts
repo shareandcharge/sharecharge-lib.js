@@ -24,29 +24,33 @@ export class StationService {
         return Station.deserialize(result);
     }
 
-    async create(station: Station, wallet: Wallet) {
-        const id = station.id;
-        // const owner = station.owner;
-        const lat = station.latitude * 1000000 << 0;
-        const lng = station.longitude * 1000000 << 0;
-        const hours = ToolKit.asciiToHex(station.openingHours);
-        const available = station.available;
-        await this.contract.send("addStation", wallet, id, wallet.address, lat, lng, hours, available);
-    }
-
-    async update(station: Station, wallet: Wallet) {
-        await Promise.all(station.tracker.getProperties().map(async name => {
-            if (station.tracker.didPropertyChange(name)) {
-                const contractName = "set" + name.charAt(0).toUpperCase() + name.substr(1);
-                return await this.contract.send(contractName, wallet, station.id, station[name]);
-            }
-        }));
-        station.tracker.resetProperties();
-    }
-
     async isPersisted(station: Station): Promise<boolean> {
         const result = await this.contract.call("getIndexById", station.id);
         return result >= 0;
     }
 
+    useWallet(wallet: Wallet) {
+        return {
+            create: async (station: Station) => {
+                const id = station.id;
+                const lat = station.latitude * 1000000 << 0;
+                const lng = station.longitude * 1000000 << 0;
+                const hours = ToolKit.asciiToHex(station.openingHours);
+                const available = station.available;
+                await this.contract.send("addStation", wallet, id, wallet.address, lat, lng, hours, available);
+                station.tracker.resetProperties();
+            },
+            update: async (station: Station) => {
+                if (await this.contract.call("getIndexById", station.id) >= 0) {
+                    await Promise.all(station.tracker.getProperties().map(async name => {
+                        if (station.tracker.didPropertyChange(name)) {
+                            const contractName = "set" + name.charAt(0).toUpperCase() + name.substr(1);
+                            return await this.contract.send(contractName, wallet, station.id, station[name]);
+                        }
+                    }));
+                    station.tracker.resetProperties();
+                }
+            }
+        }
+    }
 }

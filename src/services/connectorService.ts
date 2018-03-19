@@ -18,19 +18,24 @@ export class ConnectorService {
         return Promise.resolve([]);
     }
 
-    async create(connector: Connector, wallet: Wallet) {
-        const id = connector.id;
-        const owner = connector.owner;
-        const stationId = connector.stationId;
-        const plugMask = ToolKit.toPlugMask(connector.plugTypes);
-        const available = connector.available;
-        await this.contract.send("addConnector", wallet, id, owner, stationId, plugMask, available);
+    async isPersisted(connector: Connector): Promise<boolean> {
+        const result = await this.contract.call("getIndexById", connector.id);
+        return result >= 0;
     }
 
-    async update(connector: Connector, wallet: Wallet) {
-    }
+    useWallet(wallet: Wallet) {
+        return {
+            create: async (connector: Connector) => {
+                const id = connector.id;
+                const owner = connector.owner;
+                const stationId = connector.stationId;
+                const plugMask = ToolKit.toPlugMask(connector.plugTypes);
+                const available = connector.available;
+                await this.contract.send("addConnector", wallet, id, owner, stationId, plugMask, available);
+            },
+            update: async (connector: Connector) => {
 
-    async delete(connector: Connector, wallet: Wallet) {
+            }
+        }
     }
-
 }

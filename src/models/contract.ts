@@ -36,7 +36,7 @@ export class Contract {
         const nonce = await this.web3.eth.getTransactionCount(wallet.address);
         return {
             nonce,
-            // from: wallet.address,
+            from: wallet.address,
             to: this.address,
             gasPrice: this.gasPrice,
             gas,

@@ -4,7 +4,7 @@ import { ToolKit } from '../utils/toolKit';
 
 export class Connector {
 
-    public readonly tracker: ChangeTracker;
+    private readonly tracker: ChangeTracker;
 
     private _id: string = ToolKit.randomBytes32String();
     private _owner: string = "0x0000000000000000000000000000000000000000";

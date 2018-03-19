@@ -1,3 +1,4 @@
+import { Wallet } from './../../src/models/wallet';
 import * as sinon from 'sinon';
 import * as mocha from 'mocha';
 import { expect } from 'chai';
@@ -53,7 +54,7 @@ describe('StationService', function () {
                 .isAvailable(true)
                 .build();
 
-            await stationService.create(station, wallet);
+            await stationService.useWallet(wallet).create(station);
 
             const result = await stationService.getById(station.id);
 
@@ -70,9 +71,9 @@ describe('StationService', function () {
         it('return all stations', async function () {
             const station = new StationBuilder().withOwner(wallet.address).build();
 
-            await stationService.create(station, wallet);
-            await stationService.create(station, wallet);
-            await stationService.create(station, wallet);
+            await stationService.useWallet(wallet).create(station);
+            await stationService.useWallet(wallet).create(station);
+            await stationService.useWallet(wallet).create(station);
 
             const result = await stationService.getAll();
             expect(result.length).to.equal(3);
@@ -83,7 +84,7 @@ describe('StationService', function () {
         it('should return true for persisted stations', async function () {
             const station = new StationBuilder().withOwner(wallet.address).build();
 
-            await stationService.create(station, wallet);
+            await stationService.useWallet(wallet).create(station);
 
             const result = await stationService.isPersisted(station);
 
@@ -109,12 +110,12 @@ describe('StationService', function () {
             stationEventHandler.on(StationEvents.Updated, id => updatedId = id);
 
             const station = new StationBuilder().withOwner(wallet.address).build();
-            await stationService.create(station, wallet);
+            await stationService.useWallet(wallet).create(station);
 
             const result = await stationService.getById(station.id);
             result.latitude = 50;
 
-            await stationService.update(result, wallet);
+            await stationService.useWallet(wallet).update(result);
 
             await EventPollerService.instance.poll();
 
