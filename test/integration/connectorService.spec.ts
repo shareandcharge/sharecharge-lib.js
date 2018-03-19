@@ -11,6 +11,7 @@ import { Contract } from '../../src/models/contract';
 import { Connector } from '../../src/models/connector';
 import { EventPollerService } from '../../src/services/eventPollerService';
 import { ConnectorService } from '../../src/services/connectorService';
+import { ConnectorBuilder } from "../connectorBuilder";
 
 describe('ConnectorService', function () {
 
@@ -47,10 +48,10 @@ describe('ConnectorService', function () {
     context('#create()', () => {
         it('should create an connector with the given parameters', async () => {
 
-            // forge connector
-            const connector = new Connector();
-            connector.owner = "0x123456";
-            connector.available = true;
+            const connector = new ConnectorBuilder()
+                .withOwner("0x123456")
+                .withIsAvailable(true)
+                .build();
 
             // add it to connectors
             await connectorService.create(connector, wallet);
@@ -68,7 +69,9 @@ describe('ConnectorService', function () {
     context('#getById()', () => {
         it('should get Connector by Id', async () => {
 
-            const connector = new Connector();
+            const connector = new ConnectorBuilder()
+                .build();
+
             await connectorService.create(connector, wallet);
 
             const result: Connector = await connectorService.getById(connector.id);

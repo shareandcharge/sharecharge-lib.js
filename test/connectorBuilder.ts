@@ -13,6 +13,10 @@ export class ConnectorBuilder {
         this.owner = val; return this;
     }
 
+    withIsAvailable(val: boolean): ConnectorBuilder {
+        this.available = val; return this;
+    }
+
     withStation(station: Station): ConnectorBuilder {
         this.stationId = station.id; return this;
     }
