@@ -17,6 +17,7 @@
     "deploy": "rm -rf dist && npm run build && npm pack",
     "dts-gen": "dts-gen",
     "test": "mocha -r ts-node/register test/**/*.spec.ts --exit",
+    "test-watch": "mocha --watch --watch-extensions ts,js -r ts-node/register test/**/*.spec.ts --exit",
     "unit-test": "mocha -r ts-node/register test/unit/**/*.spec.ts --exit",
     "integration-test": "mocha -r ts-node/register test/integration/**/*.spec.ts --exit",
     "build-ts": "tsc",
