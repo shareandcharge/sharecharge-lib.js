@@ -7,12 +7,13 @@ export class TestHelper {
     }
 
     static async ensureFunds(web3: any, wallet: Wallet) {
-        const balance = await web3.eth.getBalance(wallet.address);
+        const destBalance = 5;
+        const balance = web3.utils.fromWei(await web3.eth.getBalance(wallet.address), "ether");
         const coinbase = await web3.eth.getCoinbase();
         const receiver = wallet.address;
-        const amount = web3.utils.toWei("10", "ether");
-        if (balance < 1000000) {
-            web3.eth.sendTransaction({ from: coinbase, to: receiver, value: amount });
+        const amount = web3.utils.toWei(destBalance.toString(), "ether");
+        if (balance < destBalance) {
+            await web3.eth.sendTransaction({from: coinbase, to: receiver, value: amount});
         }
     }
 
@@ -23,7 +24,7 @@ export class TestHelper {
             data: config.bytecode,
             gas
         });
-        const receipt = await contract.deploy({ arguments: args }).send({ from: coinbase });
+        const receipt = await contract.deploy({arguments: args}).send({from: coinbase});
         return receipt.options.address;
     }
 
