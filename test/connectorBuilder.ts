@@ -1,6 +1,6 @@
-import { Connector } from '../models/connector';
-import { PlugType } from '../models/plugType';
-import { Station } from '../models/station';
+import { Connector } from '../src/models/connector';
+import { PlugType } from '../src/models/plugType';
+import { Station } from '../src/models/station';
 
 export class ConnectorBuilder {
 

@@ -4,8 +4,8 @@ import { expect } from 'chai';
 
 const Web3 = require('web3');
 
-import { StationBuilder } from '../../src/utils/stationBuilder';
-import { ConnectorBuilder } from '../../src/utils/connectorBuilder';
+import { StationBuilder } from '../stationBuilder';
+import { ConnectorBuilder } from '../connectorBuilder';
 import { TestHelper } from '../testHelper';
 import { Wallet } from '../../src/models/wallet';
 import { Contract } from '../../src/models/contract';

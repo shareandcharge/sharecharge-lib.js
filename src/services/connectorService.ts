@@ -24,7 +24,7 @@ export class ConnectorService {
         const stationId = connector.stationId;
         const plugMask = ToolKit.toPlugMask(connector.plugTypes);
         const available = connector.available;
-        await this.contract.send("addConnector", wallet, id, owner, stationId, plugMask, available);
+        return await this.contract.send("addConnector", wallet, id, owner, stationId, plugMask, available);
     }
 
     async update(connector: Connector, wallet: Wallet) {
@@ -34,3 +34,21 @@ export class ConnectorService {
     }
 
 }
+
+const Web3 = require('web3');
+const config = require(process.env["HOME"] + '/.sharecharge/config.json');
+
+const init = () => {
+
+    const web3 = new Web3("http://localhost:8545");
+    const connectorStorage = config['ConnectorStorage'];
+
+    console.log(connectorStorage.address);
+
+    return new Contract(web3, {
+        abi: connectorStorage.abi,
+        address: connectorStorage.address
+    });
+};
+
+export const ConnectorServiceInstance: ConnectorService = new ConnectorService(init());

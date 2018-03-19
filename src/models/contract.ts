@@ -7,9 +7,9 @@ export class Contract {
 
     private contract: any;
     private address: string;
-    private gasPrice: number;
+    private gasPrice: number | undefined;
 
-    constructor(private web3: any, private config: { abi: any, address: string, gasPrice: number }) {
+    constructor(private web3: any, private config: { abi: any, address: string, gasPrice?: number }) {
         this.address = config.address;
         this.gasPrice = config.gasPrice;
         this.contract = new this.web3.eth.Contract(config.abi, config.address);

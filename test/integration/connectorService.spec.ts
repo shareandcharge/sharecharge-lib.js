@@ -10,7 +10,7 @@ import { Contract } from '../../src/models/contract';
 import { Connector } from '../../src/models/connector';
 import { EventPollerService } from '../../src/services/eventPollerService';
 import { ConnectorService } from '../../src/services/connectorService';
-import { ConnectorBuilder } from "../../src/utils/connectorBuilder";
+import { ConnectorBuilder } from "../connectorBuilder";
 
 describe('ConnectorService', function () {
 
