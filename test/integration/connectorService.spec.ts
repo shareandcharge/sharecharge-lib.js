@@ -4,14 +4,13 @@ import { expect } from 'chai';
 
 const Web3 = require('web3');
 
-import { StationBuilder } from '../stationBuilder';
 import { TestHelper } from '../testHelper';
 import { Wallet } from '../../src/models/wallet';
 import { Contract } from '../../src/models/contract';
 import { Connector } from '../../src/models/connector';
 import { EventPollerService } from '../../src/services/eventPollerService';
 import { ConnectorService } from '../../src/services/connectorService';
-import { ConnectorBuilder } from "../connectorBuilder";
+import { ConnectorBuilder } from "../../src/utils/connectorBuilder";
 
 describe('ConnectorService', function () {
 

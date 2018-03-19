@@ -1,4 +1,4 @@
-import { Station } from './../src/models/station';
+import { Station } from '../models/station';
 
 export class StationBuilder {
 

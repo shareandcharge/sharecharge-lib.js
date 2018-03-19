@@ -1,15 +1,19 @@
 import { Connector } from './models/connector';
-import { Wallet } from './models/wallet';
-import { StationEvents } from './models/stationEvents';
-import { Station } from './models/station';
+import { ConnectorBuilder } from './utils/connectorBuilder';
 import { ConnectorService } from './services/connectorService';
+import { Station } from './models/station';
+import { StationBuilder } from './utils/stationBuilder';
 import { StationService } from './services/stationService';
+import { StationEvents } from './models/stationEvents';
+import { Wallet } from './models/wallet';
 
 export {
     Connector,
-    Station,
-    StationEvents,
+    ConnectorBuilder,
     ConnectorService,
+    Station,
+    StationBuilder,
     StationService,
+    StationEvents,
     Wallet
 };

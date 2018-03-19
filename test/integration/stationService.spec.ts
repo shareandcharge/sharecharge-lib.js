@@ -3,7 +3,7 @@ import * as mocha from 'mocha';
 import { expect } from 'chai';
 const Web3 = require('web3');
 
-import { StationBuilder } from '../stationBuilder';
+import { StationBuilder } from '../../src/utils/stationBuilder';
 import { TestHelper } from '../testHelper';
 import { Wallet } from '../../src/models/wallet';
 import { Contract } from '../../src/models/contract';
