@@ -17,7 +17,7 @@ import { loadContractDefs } from "../../src/utils/defsLoader";
 describe('StationService', function () {
 
     const provider = "http://localhost:8545";
-    const contractDefs = loadContractDefs("development");
+    const contractDefs = loadContractDefs("local");
     const stationStorage = contractDefs['StationStorage'];
     const gasPrice = 18000000000;
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';

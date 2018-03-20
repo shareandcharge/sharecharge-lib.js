@@ -1,13 +1,15 @@
 import * as fs from "fs";
 import * as path from "path";
 
-export const loadContractDefs = (stage): any => {
+export const loadContractDefs = (stage: string, verbose: boolean = false): any => {
 
     let defs = null;
 
     let globalPath = process.env["HOME"] + `/.sharecharge/contract.defs.${stage}.json`;
 
-    console.log("global", globalPath);
+    if (verbose) {
+        console.log("global", globalPath);
+    }
 
     if (fs.existsSync(globalPath)) {
         defs = JSON.parse(fs.readFileSync(globalPath, "utf8"));
@@ -17,7 +19,9 @@ export const loadContractDefs = (stage): any => {
 
         const localPath = path.join(__dirname, `../../node_modules/sharecharge-contracts/contract.defs.${stage}.json`);
 
-        console.log("local", localPath);
+        if (verbose) {
+            console.log("local", localPath);
+        }
 
         if (fs.existsSync(localPath)) {
             defs = JSON.parse(fs.readFileSync(localPath, "utf8"));
