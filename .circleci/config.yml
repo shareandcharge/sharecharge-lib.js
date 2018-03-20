@@ -27,18 +27,19 @@ jobs:
             npm install
             npm install ganache-cli
 
-      # run rpc
-      - run:
-          name: Run test-rpc
-          background: true
-          command: |
-            ./node_modules/.bin/ganache-cli
-
       # update cache if needed
       - save_cache:
           key: v1-dependencies-{{ checksum "package.json" }}
           paths:
             - node_modules
+
+      # run rpc
+      - run:
+          name: Run test-rpc
+          background: true
+          command: |
+            echo ganache!
+            ./node_modules/.bin/ganache-cli
 
       # run tests
       - run:
