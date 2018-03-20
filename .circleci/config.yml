@@ -36,6 +36,7 @@ jobs:
       # run rpc
       - run:
           name: Run test-rpc
+          background: "true"
           command: |
             ./node_modules/.bin/ganache-cli &
 
