@@ -13,11 +13,11 @@ import { StationService } from '../../src/services/stationService';
 import { StationEventHandler } from '../../src/services/stationEventHandler';
 import { StationEvents } from '../../src/models/stationEvents';
 import { loadContractDefs } from "../../src/utils/defsLoader";
+import { config } from "../../src/utils/config";
 
 describe('StationService', function () {
 
-    const provider = "http://localhost:8545";
-    const contractDefs = loadContractDefs("local");
+    const contractDefs = loadContractDefs(config.stage);
     const stationStorage = contractDefs['StationStorage'];
     const gasPrice = 18000000000;
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
@@ -25,7 +25,7 @@ describe('StationService', function () {
     let stationEventHandler, stationService, contract, wallet, web3;
 
     before(async () => {
-        web3 = new Web3(provider);
+        web3 = new Web3(config.provider);
         wallet = new Wallet(seed);
 
         TestHelper.ensureFunds(web3, wallet);

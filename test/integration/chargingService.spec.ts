@@ -16,11 +16,11 @@ import { StationService } from '../../src/services/stationService';
 import { ChargingEvents } from '../../src/models/chargingEvents';
 import { ChargingEventHandler } from '../../src/services/chargingEventHandler';
 import { loadContractDefs } from "../../src/utils/defsLoader";
+import { config } from "../../src/utils/config";
 
 describe('ChargingService', function () {
 
-    const provider = "http://localhost:8545";
-    const contractDefs = loadContractDefs("local");
+    const contractDefs = loadContractDefs(config.stage);
     const gasPrice = 18000000000;
     const seed1 = 'filter march urge naive sauce distance under copy payment slow just cool';
     const seed2 = 'filter march urge naive sauce distance under copy payment slow just warm';
@@ -29,7 +29,7 @@ describe('ChargingService', function () {
         connectorService, connectorStorageContract, chargingContract, cpoWallet, mspWallet, web3;
 
     before(async () => {
-        web3 = new Web3(provider);
+        web3 = new Web3(config.provider);
         cpoWallet = new Wallet(seed1);
         mspWallet = new Wallet(seed2);
 

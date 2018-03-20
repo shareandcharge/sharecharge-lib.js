@@ -12,11 +12,11 @@ import { EventPollerService } from '../../src/services/eventPollerService';
 import { ConnectorService } from '../../src/services/connectorService';
 import { ConnectorBuilder } from "../connectorBuilder";
 import { loadContractDefs } from "../../src/utils/defsLoader";
+import { config } from "../../src/utils/config";
 
 describe('ConnectorService', function () {
 
-    const provider = "http://localhost:8545";
-    const contractDefs = loadContractDefs("local");
+    const contractDefs = loadContractDefs(config.stage);
     const connectorStorage = contractDefs['ConnectorStorage'];
     const gasPrice = 18000000000;
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
@@ -24,7 +24,7 @@ describe('ConnectorService', function () {
     let connectorService: ConnectorService, connectorStorageContract: Contract, wallet: Wallet, web3;
 
     before(async () => {
-        web3 = new Web3(provider);
+        web3 = new Web3(config.provider);
         wallet = new Wallet(seed);
 
         TestHelper.ensureFunds(web3, wallet);
