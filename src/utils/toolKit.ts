@@ -29,9 +29,9 @@ export class ToolKit {
     }
 
     static fromPlugMask(mask: number): PlugType[] {
-        let plugs: PlugType[] = [];
+        const plugs: PlugType[] = [];
         for (let bit = 0; bit < 16; bit++) {
-            let flag = (mask >> bit) & 0x01;
+            const flag = (mask >> bit) & 0x01;
             if (flag) {
                 plugs.push(flag << bit);
             }

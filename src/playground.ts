@@ -5,7 +5,7 @@ import { Connector } from './models/connector';
 
 export class PlayGround {
 
-    private sc = new ShareCharge(null, null);
+    private sc = new ShareCharge(undefined, undefined);
     private wallet = new Wallet("seeds");
 
     async station() {

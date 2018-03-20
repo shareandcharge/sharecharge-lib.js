@@ -1,4 +1,4 @@
-import { expect } from 'chai'; 
+import { expect } from 'chai';
 import { EventDispatcher } from '../../src/models/eventDispatcher';
 
 describe('EventDispatcher', function () {

@@ -16,5 +16,4 @@ export class EventDispatcher<TEvent> {
             this.eventHandlers.get(theEvent).forEach(element => element(...args));
         }
     }
-
 }
