@@ -1,5 +1,4 @@
-import { expect } from 'chai';
-import { StationEvents } from '../../src/models/stationEvents';
+import { expect } from 'chai'; 
 import { EventDispatcher } from '../../src/models/eventDispatcher';
 
 describe('EventDispatcher', function () {
@@ -7,16 +6,16 @@ describe('EventDispatcher', function () {
     let eventDispatcher;
 
     beforeEach(async () => {
-        eventDispatcher = new EventDispatcher<StationEvents>();
+        eventDispatcher = new EventDispatcher<string>();
     });
 
     context('#addEventListener()', () => {
         it('should add a single listener', () => {
             let actual = "";
 
-            eventDispatcher.addEventListener(StationEvents.Created, result => actual = result);
+            eventDispatcher.addEventListener('StationCreated', result => actual = result);
 
-            eventDispatcher.dispatchAll(StationEvents.Created, "0x1923829329");
+            eventDispatcher.dispatchAll('StationCreated', "0x1923829329");
 
             expect(actual).to.equal("0x1923829329");
         });
@@ -26,12 +25,12 @@ describe('EventDispatcher', function () {
         it('should remove all listeners for the given event type', () => {
             let actual = 0;
 
-            eventDispatcher.addEventListener(StationEvents.Updated, result => actual++);
-            eventDispatcher.addEventListener(StationEvents.Updated, result => actual++);
+            eventDispatcher.addEventListener('StationUpdated', result => actual++);
+            eventDispatcher.addEventListener('StationUpdated', result => actual++);
 
-            eventDispatcher.removeAllListeners(StationEvents.Updated);
+            eventDispatcher.removeAllListeners('StationUpdated');
 
-            eventDispatcher.dispatchAll(StationEvents.Updated);
+            eventDispatcher.dispatchAll('StationUpdated');
 
             expect(actual).to.equal(0);
         });
@@ -40,13 +39,13 @@ describe('EventDispatcher', function () {
             let createdCalled = false;
             let updatedCalled = false;
 
-            eventDispatcher.addEventListener(StationEvents.Created, result => createdCalled = true);
-            eventDispatcher.addEventListener(StationEvents.Updated, result => updatedCalled = true);
+            eventDispatcher.addEventListener('StationCreated', result => createdCalled = true);
+            eventDispatcher.addEventListener('StationUpdated', result => updatedCalled = true);
 
-            eventDispatcher.removeAllListeners(StationEvents.Updated);
+            eventDispatcher.removeAllListeners('StationUpdated');
 
-            eventDispatcher.dispatchAll(StationEvents.Created);
-            eventDispatcher.dispatchAll(StationEvents.Updated);
+            eventDispatcher.dispatchAll('StationCreated');
+            eventDispatcher.dispatchAll('StationUpdated');
 
             expect(createdCalled).to.equal(true);
             expect(updatedCalled).to.equal(false);
@@ -58,10 +57,10 @@ describe('EventDispatcher', function () {
         it('should dispatch only events for given event type', () => {
             let actual = 0;
 
-            eventDispatcher.addEventListener(StationEvents.Created, result => actual++);
-            eventDispatcher.addEventListener(StationEvents.Updated, result => actual++);
+            eventDispatcher.addEventListener('StationCreated', result => actual++);
+            eventDispatcher.addEventListener('StationUpdated', result => actual++);
 
-            eventDispatcher.dispatchAll(StationEvents.Updated);
+            eventDispatcher.dispatchAll('StationUpdated');
 
             expect(actual).to.equal(1);
         });
@@ -69,10 +68,10 @@ describe('EventDispatcher', function () {
         it('should dispatch all events for given event type', () => {
             let actual = 0;
 
-            eventDispatcher.addEventListener(StationEvents.Created, result => actual++);
-            eventDispatcher.addEventListener(StationEvents.Created, result => actual++);
+            eventDispatcher.addEventListener('StationCreated', result => actual++);
+            eventDispatcher.addEventListener('StationCreated', result => actual++);
 
-            eventDispatcher.dispatchAll(StationEvents.Created);
+            eventDispatcher.dispatchAll('StationCreated');
 
             expect(actual).to.equal(2);
         });

@@ -4,23 +4,23 @@ export class Uhr {
     private toIndex = 96;
 
     get from(): string {
-        let hours = (this.fromIndex * 15) / 60 << 0;
-        let minutes = (this.fromIndex * 15) % 60;
+        const hours = (this.fromIndex * 15) / 60 << 0;
+        const minutes = (this.fromIndex * 15) % 60;
         return this.pad(hours) + ':' + this.pad(minutes);
     }
 
     get to(): string {
-        let hours = (this.toIndex * 15) / 60 << 0;
-        let minutes = (this.toIndex * 15) % 60;
+        const hours = (this.toIndex * 15) / 60 << 0;
+        const minutes = (this.toIndex * 15) % 60;
         return this.pad(hours) + ':' + this.pad(minutes);
     }
 
     set(from: string, to: string) {
-        let [fromHour, fromMinutes] = from.split(':').map(x => Number.parseInt(x));
-        this.fromIndex = fromHour * 4 + fromMinutes / 15
+        const [fromHour, fromMinutes] = from.split(':').map(x => Number.parseInt(x));
+        this.fromIndex = fromHour * 4 + fromMinutes / 15;
 
-        let [toHour, toMinutes] = to.split(':').map(x => Number.parseInt(x));
-        this.toIndex = toHour * 4 + toMinutes / 15
+        const [toHour, toMinutes] = to.split(':').map(x => Number.parseInt(x));
+        this.toIndex = toHour * 4 + toMinutes / 15;
 
         if (this.fromIndex > this.toIndex) {
             this.fromIndex = this.toIndex;
@@ -83,7 +83,7 @@ export class OpeningHours {
     }
 
     static deserialize(val: string): OpeningHours {
-        let result = new OpeningHours();
+        const result = new OpeningHours();
         if (val.length === 28) {
             for (let i = 0; i < 7; i++) {
                 if (!result.data[i].decode(val.substr(i * 4, 4))) {

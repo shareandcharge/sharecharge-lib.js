@@ -3,9 +3,9 @@ import * as path from "path";
 
 export const loadContractDefs = (stage: string, verbose: boolean = false): any => {
 
-    let defs = null;
+    let defs;
 
-    let globalPath = process.env["HOME"] + `/.sharecharge/contract.defs.${stage}.json`;
+    const globalPath = process.env["HOME"] + `/.sharecharge/contract.defs.${stage}.json`;
 
     if (verbose) {
         console.log("global", globalPath);

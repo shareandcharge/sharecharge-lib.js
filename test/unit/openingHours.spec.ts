@@ -8,12 +8,12 @@ function formatHours(val) {
 describe('OpeningHours', function () {
 
     it('should create a default opening hours', () => {
-        let result = new OpeningHours().toString();
+        const result = new OpeningHours().toString();
         expect(result).to.equal('0096009600960096009600960096');
     });
 
     it('should correctly set hours across week days', () => {
-        let openingHours = new OpeningHours();
+        const openingHours = new OpeningHours();
         openingHours.monday.set('08:15', '17:30');
         openingHours.tuesday.set('01:00', '02:00');
         openingHours.wednesday.set('04:30', '05:30');
@@ -25,7 +25,7 @@ describe('OpeningHours', function () {
     });
 
     it('should not allow a to opening hour before a from opening hour', () => {
-        let openingHours = new OpeningHours();
+        const openingHours = new OpeningHours();
         openingHours.monday.set('08:15', '04:30');
         expect(openingHours.monday.from).to.equal('04:30');
         expect(openingHours.monday.to).to.equal('04:30');
@@ -33,22 +33,22 @@ describe('OpeningHours', function () {
 
     context('#deserialize', () => {
         it('should handle empty strings', () => {
-            let openingHours = OpeningHours.deserialize('');
+            const openingHours = OpeningHours.deserialize('');
             expect(openingHours.toString()).to.equal('0096009600960096009600960096');
         });
 
         it('should handle incorrect strings lengths', () => {
-            let openingHours = OpeningHours.deserialize('1234567');
+            const openingHours = OpeningHours.deserialize('1234567');
             expect(openingHours.toString()).to.equal('0096009600960096009600960096');
         });
 
         it('should handle completely invalid strings', () => {
-            let openingHours = OpeningHours.deserialize('ahfuriwowkdjfkirjeiwijwlpqk2');
+            const openingHours = OpeningHours.deserialize('ahfuriwowkdjfkirjeiwijwlpqk2');
             expect(openingHours.toString()).to.equal('0096009600960096009600960096');
         });
 
         it('should correctly deserialize a valid string', () => {
-            let openingHours = OpeningHours.deserialize('3370040818226096288448480095');
+            const openingHours = OpeningHours.deserialize('3370040818226096288448480095');
             expect(formatHours(openingHours.monday)).to.equal('08:15 to 17:30');
             expect(formatHours(openingHours.tuesday)).to.equal('01:00 to 02:00');
             expect(formatHours(openingHours.wednesday)).to.equal('04:30 to 05:30');

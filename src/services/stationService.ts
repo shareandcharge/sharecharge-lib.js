@@ -51,6 +51,6 @@ export class StationService {
                     station.tracker.resetProperties();
                 }
             }
-        }
+        };
     }
 }

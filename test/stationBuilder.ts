@@ -29,7 +29,7 @@ export class StationBuilder {
     }
 
     build(): Station {
-        let station = new Station();
+        const station = new Station();
         station.owner = this.owner;
         station.latitude = this.latitude;
         station.longitude = this.longitude;

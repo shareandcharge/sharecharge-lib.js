@@ -10,8 +10,6 @@ import { Wallet } from '../../src/models/wallet';
 import { Contract } from '../../src/models/contract';
 import { EventPollerService } from '../../src/services/eventPollerService';
 import { StationService } from '../../src/services/stationService';
-import { StationEventHandler } from '../../src/services/stationEventHandler';
-import { StationEvents } from '../../src/models/stationEvents';
 import { loadContractDefs } from "../../src/utils/defsLoader";
 import { config } from "../../src/utils/config";
 
@@ -24,7 +22,7 @@ describe('StationService', function () {
     const gasPrice = 18000000000;
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
 
-    let stationEventHandler, stationService, contract, wallet, web3;
+    let stationService, contract, wallet, web3;
 
     before(async () => {
         web3 = new Web3(config.provider);
@@ -101,32 +99,6 @@ describe('StationService', function () {
 
             expect(result).to.equal(false);
         });
-    });
-
-    context('#on', () => {
-        it('should listen to events', async () => {
-            let createdId = "";
-            let updatedId = "";
-
-            stationEventHandler = new StationEventHandler(EventPollerService.instance, contract);
-            stationEventHandler.on(StationEvents.Created, id => createdId = id);
-            stationEventHandler.on(StationEvents.Updated, id => updatedId = id);
-
-            const station = new StationBuilder().withOwner(wallet.address).build();
-            await stationService.useWallet(wallet).create(station);
-
-            const result = await stationService.getById(station.id);
-            result.latitude = 50;
-
-            await stationService.useWallet(wallet).update(result);
-
-            await EventPollerService.instance.poll();
-
-            expect(createdId).to.equal(station.id);
-            expect(updatedId).to.equal(station.id);
-
-        });
-
     });
 
 });

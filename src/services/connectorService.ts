@@ -6,8 +6,7 @@ import { Wallet } from '../models/wallet';
 
 export class ConnectorService {
 
-    constructor(public readonly contract: Contract) {
-    }
+    constructor(public readonly contract: Contract) {}
 
     async getById(id: string): Promise<Connector> {
         const result = await this.contract.call("getConnector", id);
@@ -44,6 +43,6 @@ export class ConnectorService {
                     connector.tracker.resetProperties();
                 }
             }
-        }
+        };
     }
 }

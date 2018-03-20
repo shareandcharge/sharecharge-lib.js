@@ -6,27 +6,27 @@ describe('Station', function () {
     context('owner', () => {
 
         it('should allow a valid address string', () => {
-            let station = new Station();
-            let owner = '0xc1912fee45d61c87cc5ea59dae31190fffff232d';
+            const station = new Station();
+            const owner = '0xc1912fee45d61c87cc5ea59dae31190fffff232d';
             station.owner = owner;
             expect(station.owner).to.equal(owner.toLowerCase());
         });
 
         it('should handle mixed case address strings', () => {
-            let station = new Station();
-            let owner = '0xc1912fee45d61c87cc5ea59dAE31190fffff232d';
+            const station = new Station();
+            const owner = '0xc1912fee45d61c87cc5ea59dAE31190fffff232d';
             station.owner = owner;
             expect(station.owner).to.equal(owner.toLowerCase());
         });
 
         it('should not set an invalid address strings', () => {
-            let station = new Station();
+            const station = new Station();
             station.owner = '0xc1912fee45d61c87cc5';
             expect(station.owner).to.not.equal('0xc1912fee45d61c87cc5');
         });
 
         it('should not allow non address strings', () => {
-            let station = new Station();
+            const station = new Station();
             station.owner = 'hello world';
             expect(station.owner).to.not.equal('hello world');
         });
@@ -34,7 +34,7 @@ describe('Station', function () {
 
     context('latitude', () => {
         it('should not allow values less then -90', () => {
-            let station = new Station();
+            const station = new Station();
             station.latitude = -90;
             station.latitude = -91;
             expect(station.latitude).to.not.equal(-91);
@@ -42,7 +42,7 @@ describe('Station', function () {
         });
 
         it('should not allow values greater then 90', () => {
-            let station = new Station();
+            const station = new Station();
             station.latitude = 90;
             station.latitude = 91;
             expect(station.latitude).to.not.equal(91);
@@ -52,7 +52,7 @@ describe('Station', function () {
 
     context('longitude', () => {
         it('should not allow values less then -180', () => {
-            let station = new Station();
+            const station = new Station();
             station.longitude = -180;
             station.longitude = -181;
             expect(station.longitude).to.not.equal(-181);
@@ -60,7 +60,7 @@ describe('Station', function () {
         });
 
         it('should not allow values greater then 180', () => {
-            let station = new Station();
+            const station = new Station();
             station.longitude = 180;
             station.longitude = 181;
             expect(station.longitude).to.not.equal(181);
@@ -69,7 +69,7 @@ describe('Station', function () {
     });
 
     it('should deserialize a station', () => {
-        let payload = {
+        const payload = {
             id: '0xd65a96b1d16c4fca52fc1fd845b63ac5a86f8b8c0fe1970420ec02fc154af884',
             owner: '0xBD422974a93966C37bb740daF4d248dEE88C7ca1',
             latitude: '51345000',
@@ -78,7 +78,7 @@ describe('Station', function () {
             available: true
         };
 
-        let station = Station.deserialize(payload);
+        const station = Station.deserialize(payload);
 
         expect(station.id).to.equal('0xd65a96b1d16c4fca52fc1fd845b63ac5a86f8b8c0fe1970420ec02fc154af884');
         expect(station.owner).to.equal('0xBD422974a93966C37bb740daF4d248dEE88C7ca1');

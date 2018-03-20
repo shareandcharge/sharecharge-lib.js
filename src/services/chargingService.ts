@@ -23,6 +23,6 @@ export class ChargingService {
             error: async (connector: Connector, controller: string, errorCode: number) => {
                 await this.contract.send("logError", wallet, connector.id, controller, errorCode);
             }
-        }
+        };
     }
 }
