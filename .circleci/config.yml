@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/node:9.0
+      - image: circleci/node
       
     working_directory: ~/lib
 
@@ -39,5 +39,8 @@ jobs:
           command: |
             ./node_modules/.bin/ganache-cli
 
-      # run tests!
-      - run: npm test
+      # run tests
+      - run:
+          name: Run test
+          command: |
+            npm test
