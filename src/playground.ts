@@ -2,10 +2,11 @@ import { Station } from './models/station';
 import { Wallet } from './models/wallet';
 import { ShareCharge } from './shareCharge';
 import { Connector } from './models/connector';
+import { config } from "./utils/config";
 
 export class PlayGround {
 
-    private sc = new ShareCharge(undefined, undefined);
+    private sc = new ShareCharge(config, require('~/.sharecharge/contract.defs.local.json'));;
     private wallet = new Wallet("seeds");
 
     async station() {
