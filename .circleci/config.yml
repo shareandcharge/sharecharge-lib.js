@@ -38,7 +38,7 @@ jobs:
           name: Run test-rpc
           background: true
           command: |
-            ./node_modules/.bin/ganache-cli --noVMErrorsOnRPCResponse --hostname 0.0.0.0
+            ./node_modules/.bin/ganache-cli --debug
 
       # run tests
       - run:
