@@ -63,7 +63,7 @@ describe('ConnectorService', function () {
 
             // compare
             expect(result.id).to.equal(connector.id);
-            expect(result.owner).to.equal(connector.owner);
+            expect(result.owner.toLowerCase()).to.equal(wallet.address);
             expect(result.available).to.equal(connector.available);
         });
     });

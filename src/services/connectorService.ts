@@ -26,7 +26,7 @@ export class ConnectorService {
         return {
             create: async (connector: Connector) => {
                 const id = connector.id;
-                const owner = connector.owner;
+                const owner = wallet.address;
                 const stationId = connector.stationId;
                 const plugMask = ToolKit.toPlugMask(connector.plugTypes);
                 const available = connector.available;
