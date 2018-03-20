@@ -1,9 +1,9 @@
 import * as fs from "fs";
 import * as path from "path";
 
-export const loadContractDefs = (stage) => {
+export const loadContractDefs = (stage): any => {
 
-    let defs = {};
+    let defs = null;
 
     const localPath = path.join(__dirname, `../../node_modules/sharecharge-contracts/contract.defs.${stage}.json`);
 

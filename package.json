@@ -32,7 +32,7 @@
     "ethereumjs-tx": "^1.3.4",
     "ethereumjs-wallet": "^0.6.0",
     "rxjs": "^5.5.7",
-    "sharecharge-contracts": "ssh+git://git@github.com:motionwerkGmbH/sharecharge-contracts.git#domain",
+    "sharecharge-contracts": "git+ssh://git@github.com/motionwerkGmbH/sharecharge-contracts.git#domain",
     "sinon": "^4.4.3",
     "web3": "^1.0.0-beta.30"
   },
