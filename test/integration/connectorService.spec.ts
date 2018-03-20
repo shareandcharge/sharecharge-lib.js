@@ -1,3 +1,4 @@
+import { Station } from './../../src/models/station';
 import * as sinon from 'sinon';
 import * as mocha from 'mocha';
 import { expect } from 'chai';
@@ -70,14 +71,39 @@ describe('ConnectorService', function () {
 
     context('#getById()', () => {
         it('should get Connector by Id', async () => {
-
-            const connector = new ConnectorBuilder()
-                .build();
+            const connector = new ConnectorBuilder().build();
 
             await connectorService.useWallet(wallet).create(connector);
 
-            const result: Connector = await connectorService.getById(connector.id);
+            const result = await connectorService.getById(connector.id);
             expect(result.id).to.equal(connector.id);
+        });
+    });
+
+    context('#areConnectorsAvailable', () => {
+        it('should report false if all connectors on a station are in use', async () => {
+            const station = new Station();
+            const builder = new ConnectorBuilder().withStation(station).withIsAvailable(false);
+            await connectorService.useWallet(wallet).create(builder.build());
+            await connectorService.useWallet(wallet).create(builder.build());
+            await connectorService.useWallet(wallet).create(builder.build());
+
+            const result = await connectorService.anyFree(station);
+            expect(result).to.equal(false);
+        });
+
+        it('should report true if any connectors on a station are free', async () => {
+            const station = new Station();
+
+            let builder = new ConnectorBuilder().withStation(station).withIsAvailable(false);
+            await connectorService.useWallet(wallet).create(builder.build());
+            await connectorService.useWallet(wallet).create(builder.build());
+
+            builder = builder.withIsAvailable(true);
+            await connectorService.useWallet(wallet).create(builder.build());
+
+            const result = await connectorService.anyFree(station);
+            expect(result).to.equal(true);
         });
     });
 });

@@ -23,6 +23,11 @@ export class ConnectorService {
         return connectors;
     }
 
+    async anyFree(station: Station): Promise<boolean> {
+        const result = await this.contract.call("getStationAvailability", station.id);
+        return result;
+    }
+
     async isPersisted(connector: Connector): Promise<boolean> {
         const result = await this.contract.call("getIndexById", connector.id);
         return result >= 0;
