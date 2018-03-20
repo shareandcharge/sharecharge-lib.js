@@ -20,7 +20,7 @@ import { loadContractDefs } from "../../src/utils/defsLoader";
 describe('ChargingService', function () {
 
     const provider = "http://localhost:8545";
-    const contractDefs = loadContractDefs("test");
+    const contractDefs = loadContractDefs("development");
     const gasPrice = 18000000000;
     const seed1 = 'filter march urge naive sauce distance under copy payment slow just cool';
     const seed2 = 'filter march urge naive sauce distance under copy payment slow just warm';
