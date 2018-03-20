@@ -3,21 +3,26 @@ import * as path from "path";
 
 export const loadContractDefs = (stage) => {
 
+    let defs = {};
+
     const localPath = path.join(__dirname, `../../node_modules/sharecharge-contracts/contract.defs.${stage}.json`);
 
     console.log("local", localPath);
 
     if (fs.existsSync(localPath)) {
-        return JSON.parse(fs.readFileSync(localPath, "utf8"));
+        defs = JSON.parse(fs.readFileSync(localPath, "utf8"));
     }
 
-    let globalPath = process.env["HOME"] + `/.sharecharge/contract.defs.${stage}.json`;
+    if (!defs) {
 
-    console.log("global", globalPath);
+        let globalPath = process.env["HOME"] + `/.sharecharge/contract.defs.${stage}.json`;
 
-    if (fs.existsSync(globalPath)) {
-        return JSON.parse(fs.readFileSync(globalPath, "utf8"));
+        console.log("global", globalPath);
+
+        if (fs.existsSync(globalPath)) {
+            defs = JSON.parse(fs.readFileSync(globalPath, "utf8"));
+        }
     }
 
-    return null;
+    return defs;
 };
