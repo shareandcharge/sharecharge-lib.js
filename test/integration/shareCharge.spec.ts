@@ -50,7 +50,96 @@ describe('ShareCharge', function () {
     });
 
     context('#stations', async () => {
-        it('should broadcast charge stop requested', async () => {
+
+        it('should broadcast start confirmed to msp', async () => {
+            const shareCharge = resolve();
+
+            const connector = new ConnectorBuilder().build();
+            await shareCharge.connectors.useWallet(cpoWallet).create(connector);
+
+            let connectorId = "";
+            let controller = "";
+
+            await shareCharge.on("StartConfirmed", async (result) => {
+                if (result.connectorId === connector.id
+                    && result.controller.toLowerCase() === mspWallet.address) {
+
+                    connectorId = result.connectorId;
+                    controller = result.controller;
+                }
+            });
+
+            await shareCharge.charging.useWallet(mspWallet).requestStart(connector, 60);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStart(connector, mspWallet.address);
+
+            await EventPollerService.instance.poll();
+
+            expect(connectorId).to.equal(connector.id);
+            expect(controller.toLowerCase()).to.equal(mspWallet.address);
+
+        });
+
+        it('should broadcast stop confirmed to msp', async () => {
+            const shareCharge = resolve();
+
+            const connector = new ConnectorBuilder().build();
+            await shareCharge.connectors.useWallet(cpoWallet).create(connector);
+
+            let connectorId = "";
+            let controller = "";
+
+            await shareCharge.on("StopConfirmed", async (result) => {
+                if (result.connectorId === connector.id
+                    && result.controller.toLowerCase() === mspWallet.address) {
+
+                    connectorId = result.connectorId;
+                    controller = result.controller;
+                }
+            });
+
+            await shareCharge.charging.useWallet(mspWallet).requestStart(connector, 60);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStart(connector, mspWallet.address);
+            await shareCharge.charging.useWallet(mspWallet).requestStop(connector);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStop(connector, mspWallet.address);
+
+            await EventPollerService.instance.poll();
+
+            expect(connectorId).to.equal(connector.id);
+            expect(controller.toLowerCase()).to.equal(mspWallet.address);
+
+        });
+
+        it('should broadcast error to msp', async () => {
+            const shareCharge = resolve();
+
+            const connector = new ConnectorBuilder().build();
+            await shareCharge.connectors.useWallet(cpoWallet).create(connector);
+
+            let connectorId = "";
+            let controller = "";
+            let errorCode = -1;
+
+            await shareCharge.on("Error", async (result) => {
+                if (result.connectorId === connector.id
+                    && result.controller.toLowerCase() === mspWallet.address) {
+                    connectorId = result.connectorId;
+                    controller = result.controller;
+                    errorCode = parseInt(result.errorCode);
+                }
+            });
+
+            await shareCharge.charging.useWallet(cpoWallet).error(connector, mspWallet.address, 0);
+
+            await EventPollerService.instance.poll();
+
+            expect(connectorId).to.equal(connector.id);
+            expect(controller.toLowerCase()).to.equal(mspWallet.address);
+            expect(errorCode).to.equal(0);
+
+        });
+
+
+        it('should broadcast charge stop requested to cpo', async () => {
             const shareCharge = resolve();
 
             const connector = new ConnectorBuilder().build();
@@ -60,9 +149,6 @@ describe('ShareCharge', function () {
 
             await shareCharge.on("StopRequested", async (result) => {
                 if (result.connectorId == connector.id) {
-                    // let cpoConnector = await shareCharge.connectors.getById(result.connectorId);
-                    // await shareCharge.charging.useWallet(cpoWallet).confirmStart(cpoConnector, result.controller);
-                    // await EventPollerService.instance.poll();
                     connectorId = result.connectorId;
                 }
             });
@@ -76,7 +162,7 @@ describe('ShareCharge', function () {
             expect(connectorId).to.equal(connector.id);
         });
 
-        it('should broadcast charge start requested', async () => {
+        it('should broadcast charge start requested to cpo', async () => {
             const shareCharge = resolve();
 
             const connector = new ConnectorBuilder().build();
