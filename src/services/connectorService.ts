@@ -14,7 +14,13 @@ export class ConnectorService {
     }
 
     async getByStation(station: Station): Promise<Connector[]> {
-        return Promise.resolve([]);
+        const connectors: Connector[] = [];
+        const connectorIds = await this.contract.call("getStationConnectors", station.id);
+        for (const id of connectorIds) {
+            const connector = await this.contract.call("getConnector", id);
+            connectors.push(Connector.deserialize(connector));
+        }
+        return connectors;
     }
 
     async isPersisted(connector: Connector): Promise<boolean> {
