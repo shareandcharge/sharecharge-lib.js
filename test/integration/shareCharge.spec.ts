@@ -79,6 +79,9 @@ describe('ShareCharge', function () {
             gasPrice: config.gasPrice
         });
 
+        const coinbase = await web3.eth.getCoinbase();
+        await connectorStorageContract.native.methods["setAccess"](chargingAddress).send({from: coinbase});
+
         chargingService = new ChargingService(chargingContract);
     });
 
@@ -96,6 +99,7 @@ describe('ShareCharge', function () {
 
             const connector = new ConnectorBuilder()
                 .withOwner(cpoWallet.address)
+                .withIsAvailable(true)
                 .build();
 
             await shareCharge.connectors.useWallet(cpoWallet).create(connector);
