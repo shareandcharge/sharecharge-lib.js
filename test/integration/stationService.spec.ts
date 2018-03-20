@@ -15,11 +15,10 @@ import { config } from "../../src/utils/config";
 
 describe('StationService', function () {
 
-    this.timeout(5 * 1000);
+    this.timeout(10 * 1000);
 
     const contractDefs = loadContractDefs(config.stage);
     const stationStorage = contractDefs['StationStorage'];
-    const gasPrice = 18000000000;
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
 
     let stationService, contract, wallet, web3;
@@ -28,7 +27,7 @@ describe('StationService', function () {
         web3 = new Web3(config.provider);
         wallet = new Wallet(seed);
 
-        TestHelper.ensureFunds(web3, wallet);
+        await TestHelper.ensureFunds(web3, wallet);
     });
 
     beforeEach(async () => {
@@ -36,7 +35,7 @@ describe('StationService', function () {
         contract = new Contract(web3, {
             abi: stationStorage.abi,
             address: address,
-            gasPrice
+            gasPrice: config.gasPrice
         });
 
         stationService = new StationService(contract);

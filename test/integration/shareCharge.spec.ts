@@ -28,20 +28,58 @@ describe('ShareCharge', function () {
     const seed1 = 'filter march urge naive sauce distance under copy payment slow just cool';
     const seed2 = 'filter march urge naive sauce distance under copy payment slow just warm';
 
-    let cpoWallet, mspWallet, web3;
+    let cpoWallet: Wallet, mspWallet: Wallet, web3;
+    let stationService: StationService, chargingService: ChargingService, connectorService: ConnectorService;
+
+    const stationStorage = contractDefs['StationStorage'];
+    const charging = contractDefs['Charging'];
+    const connectorStorage = contractDefs['ConnectorStorage'];
 
     function resolve() {
-        return new ShareCharge(config, contractDefs);
+        return new ShareCharge(config, contractDefs, {
+            StationService: stationService,
+            ChargingService: chargingService,
+            ConnectorService: connectorService
+        });
     }
 
     before(async () => {
+
         web3 = new Web3(config.provider);
 
         cpoWallet = new Wallet(seed1);
         mspWallet = new Wallet(seed2);
 
-        TestHelper.ensureFunds(web3, cpoWallet);
-        TestHelper.ensureFunds(web3, mspWallet);
+        await TestHelper.ensureFunds(web3, cpoWallet);
+        await TestHelper.ensureFunds(web3, mspWallet);
+
+        const stationStorageAddress = await TestHelper.deployContract(web3, stationStorage);
+        let stationServiceContract = new Contract(web3, {
+            abi: stationStorage.abi,
+            address: stationStorageAddress,
+            gasPrice: config.gasPrice
+        });
+
+        stationService = new StationService(stationServiceContract);
+
+        const connectorStorageAddress = await TestHelper.deployContract(web3, connectorStorage);
+        const connectorStorageContract = new Contract(web3, {
+            abi: connectorStorage.abi,
+            address: connectorStorageAddress,
+            gasPrice: config.gasPrice
+        });
+
+        connectorService = new ConnectorService(connectorStorageContract);
+
+        const chargingAddress = await TestHelper.deployContract(web3, charging, [connectorStorageAddress]);
+
+        const chargingContract = new Contract(web3, {
+            abi: charging.abi,
+            address: chargingAddress,
+            gasPrice: config.gasPrice
+        });
+
+        chargingService = new ChargingService(chargingContract);
     });
 
     beforeEach(async () => {
@@ -56,7 +94,10 @@ describe('ShareCharge', function () {
         it('should broadcast start confirmed to msp', async () => {
             const shareCharge = resolve();
 
-            const connector = new ConnectorBuilder().build();
+            const connector = new ConnectorBuilder()
+                .withOwner(cpoWallet.address)
+                .build();
+
             await shareCharge.connectors.useWallet(cpoWallet).create(connector);
 
             let connectorId = "";

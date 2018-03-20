@@ -29,7 +29,7 @@ describe('ConnectorService', function () {
         web3 = new Web3(config.provider);
         wallet = new Wallet(seed);
 
-        TestHelper.ensureFunds(web3, wallet);
+        await TestHelper.ensureFunds(web3, wallet);
     });
 
     beforeEach(async () => {

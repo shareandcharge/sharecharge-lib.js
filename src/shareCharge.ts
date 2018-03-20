@@ -18,12 +18,12 @@ export class ShareCharge {
 
     private web3;
 
-    constructor(private config, private contractDefs) {
+    constructor(private config, private contractDefs, services: { StationService: StationService, ConnectorService: ConnectorService, ChargingService: ChargingService }) {
         this.web3 = new Web3(config.provider);
 
-        this.stations = new StationService(this.getContractInstance('StationStorage'));
-        this.connectors = new ConnectorService(this.getContractInstance('ConnectorStorage'));
-        this.charging = new ChargingService(this.getContractInstance('Charging'));
+        this.stations = services.StationService || new StationService(this.getContractInstance('StationStorage'));
+        this.connectors = services.ConnectorService || new ConnectorService(this.getContractInstance('ConnectorStorage'));
+        this.charging = services.ChargingService || new ChargingService(this.getContractInstance('Charging'));
 
         EventPollerService.instance.add(this.stations.contract, events => this.handleNewEvents(events));
         EventPollerService.instance.add(this.connectors.contract, events => this.handleNewEvents(events));
