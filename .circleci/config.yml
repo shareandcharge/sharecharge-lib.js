@@ -40,4 +40,4 @@ jobs:
             ./node_modules/.bin/ganache-cli
 
       # run tests!
-      - run: npm run unit-test
+      - run: npm test
