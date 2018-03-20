@@ -84,8 +84,7 @@ describe('Station', function () {
         expect(station.owner).to.equal('0xBD422974a93966C37bb740daF4d248dEE88C7ca1');
         expect(station.latitude).to.equal(51.345000);
         expect(station.longitude).to.equal(-9.2332000);
-        expect(station.openingHours).to.equal('0000000000000000000000000000');
-        expect(station.available).to.equal(true);
+        expect(station.openingHours).to.equal('0000000000000000000000000000'); 
     });
 
 });

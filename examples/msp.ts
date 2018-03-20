@@ -35,10 +35,11 @@ async function main() {
         }
     });
 
-    const connectorId = await findAvailableConnector();
-    // const stations = await sc.stations.getAll();
+    // const connectorId = await findAvailableConnector();
+    const stations = await sc.stations.getAll();
 
-    // const connectors = await sc.connectors.getByStation(stations[3]);
+    const connectors = await sc.connectors.getByStation(stations[0]);
+    const connectorId = connectors[0].id;
 
     const connector = await sc.connectors.getById(connectorId);
     selectedConnectorId = connector.id;

@@ -10,7 +10,6 @@ export class Station {
     private _latitude: number = 0;
     private _longitude: number = 0;
     private _openingHours: string = "0000000000000000000000000000";
-    private _available: boolean = true;
 
     constructor() {
         this.tracker = new ChangeTracker(this);
@@ -59,22 +58,13 @@ export class Station {
         this.tracker.setProperty("openingHours", value);
     }
 
-    get available(): boolean {
-        return this._available;
-    }
-
-    set available(value: boolean) {
-        this.tracker.setProperty("available", value);
-    }
-
     static deserialize(payload: any): Station {
         const station = new Station();
         station._id = payload["id"];
         station._owner = payload["owner"];
         station._latitude = payload["latitude"] / 1000000;
         station._longitude = payload["longitude"] / 1000000;
-        station._openingHours = ToolKit.hexToString(payload["openingHours"]);
-        station._available = payload["available"];
+        station._openingHours = ToolKit.hexToString(payload["openingHours"]); 
         return station;
     }
 }

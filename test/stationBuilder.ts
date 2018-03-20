@@ -6,7 +6,6 @@ export class StationBuilder {
     private latitude: number = 52.51667;
     private longitude: number = 13.38333;
     private openingHours: string = "0000000000000000000000000000";
-    private available: boolean = true;
 
     withOwner(val: string): StationBuilder {
         this.owner = val; return this;
@@ -24,17 +23,12 @@ export class StationBuilder {
         this.openingHours = val; return this;
     }
 
-    isAvailable(val: boolean): StationBuilder {
-        this.available = val; return this;
-    }
-
     build(): Station {
         const station = new Station();
         station.owner = this.owner;
         station.latitude = this.latitude;
         station.longitude = this.longitude;
         station.openingHours = this.openingHours;
-        station.available = this.available;
         return station;
     }
 }

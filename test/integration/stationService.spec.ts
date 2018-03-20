@@ -51,7 +51,6 @@ describe('StationService', function () {
                 .withOwner(wallet.address)
                 .withLatitude(51.345)
                 .withLongitude(-0.92332)
-                .isAvailable(true)
                 .build();
 
             await stationService.useWallet(wallet).create(station);
@@ -63,7 +62,6 @@ describe('StationService', function () {
             expect(result.latitude).to.equal(station.latitude);
             expect(result.longitude).to.equal(station.longitude);
             expect(result.openingHours).to.equal(station.openingHours);
-            expect(result.available).to.equal(station.available);
         });
     });
 
