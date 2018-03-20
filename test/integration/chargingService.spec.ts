@@ -15,16 +15,18 @@ import { ConnectorService } from '../../src/services/connectorService';
 import { StationService } from '../../src/services/stationService';
 import { ChargingEvents } from '../../src/models/chargingEvents';
 import { ChargingEventHandler } from '../../src/services/chargingEventHandler';
+import { loadContractDefs } from "../../src/utils/defsLoader";
 
 describe('ChargingService', function () {
 
     const provider = "http://localhost:8545";
-    const contractDefs = require(process.env["HOME"] + '/.sharecharge/contract.defs.development.json');
+    const contractDefs = loadContractDefs("test");
     const gasPrice = 18000000000;
     const seed1 = 'filter march urge naive sauce distance under copy payment slow just cool';
     const seed2 = 'filter march urge naive sauce distance under copy payment slow just warm';
 
-    let chargingEventHandler, stationService, cpoChargingService, chargingService, stationStorageContract, connectorService, connectorStorageContract, chargingContract, cpoWallet, mspWallet, web3;
+    let chargingEventHandler, stationService, cpoChargingService, chargingService, stationStorageContract,
+        connectorService, connectorStorageContract, chargingContract, cpoWallet, mspWallet, web3;
 
     before(async () => {
         web3 = new Web3(provider);

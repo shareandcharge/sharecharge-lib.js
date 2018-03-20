@@ -11,12 +11,13 @@ import { Connector } from '../../src/models/connector';
 import { EventPollerService } from '../../src/services/eventPollerService';
 import { ConnectorService } from '../../src/services/connectorService';
 import { ConnectorBuilder } from "../connectorBuilder";
+import { loadContractDefs } from "../../src/utils/defsLoader";
 
 describe('ConnectorService', function () {
 
     const provider = "http://localhost:8545";
-    const config = require(process.env["HOME"] + '/.sharecharge/contract.defs.development.json');
-    const connectorStorage = config['ConnectorStorage'];
+    const contractDefs = loadContractDefs("test");
+    const connectorStorage = contractDefs['ConnectorStorage'];
     const gasPrice = 18000000000;
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
 

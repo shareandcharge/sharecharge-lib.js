@@ -16,6 +16,7 @@ import { ChargingService } from '../../src/services/chargingService';
 import { ConnectorService } from '../../src/services/connectorService';
 import { StationService } from '../../src/services/stationService';
 import { Station } from '../../src/models/station';
+import { loadContractDefs } from "../../src/utils/defsLoader";
 
 describe('ShareCharge', function () {
 
@@ -23,7 +24,8 @@ describe('ShareCharge', function () {
         provider: "http://localhost:8545",
         gasPrice: 18000000000
     };
-    const contractDefs = require(process.env["HOME"] + '/.sharecharge/contract.defs.development.json');
+
+    const contractDefs = loadContractDefs("test");
     const seed1 = 'filter march urge naive sauce distance under copy payment slow just cool';
     const seed2 = 'filter march urge naive sauce distance under copy payment slow just warm';
 

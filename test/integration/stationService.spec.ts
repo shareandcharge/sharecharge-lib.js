@@ -1,6 +1,7 @@
 import * as sinon from 'sinon';
 import * as mocha from 'mocha';
 import { expect } from 'chai';
+
 const Web3 = require('web3');
 
 import { StationBuilder } from '../stationBuilder';
@@ -11,12 +12,13 @@ import { EventPollerService } from '../../src/services/eventPollerService';
 import { StationService } from '../../src/services/stationService';
 import { StationEventHandler } from '../../src/services/stationEventHandler';
 import { StationEvents } from '../../src/models/stationEvents';
+import { loadContractDefs } from "../../src/utils/defsLoader";
 
 describe('StationService', function () {
 
     const provider = "http://localhost:8545";
-    const config = require(process.env["HOME"] + '/.sharecharge/contract.defs.development.json');
-    const stationStorage = config['StationStorage'];
+    const contractDefs = loadContractDefs("test");
+    const stationStorage = contractDefs['StationStorage'];
     const gasPrice = 18000000000;
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
 
