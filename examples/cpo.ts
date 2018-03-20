@@ -15,7 +15,7 @@ async function main() {
 
     const wallet = new Wallet('filter march urge naive sauce distance under copy payment slow just warm');
 
-    const sc = new ShareCharge(config, defs);
+    const sc = new ShareCharge(config, defs, {});
 
     const station = new Station();
     await sc.stations.useWallet(wallet).create(station);

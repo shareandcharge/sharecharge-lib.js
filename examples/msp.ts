@@ -11,14 +11,14 @@ const config = {
 const defs = require(process.env["HOME"] + `/.sharecharge/contract.defs.${config.stage}.json`);
 
 async function findAvailableConnector() {
-    
+    return '';
 }
 
 async function main() {
 
     const wallet = new Wallet('filter march urge naive sauce distance under copy payment slow just cool');
 
-    const sc = new ShareCharge(config, defs);
+    const sc = new ShareCharge(config, defs, {});
 
     let selectedConnectorId = '';
 
