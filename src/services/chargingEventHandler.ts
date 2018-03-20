@@ -8,7 +8,7 @@ export class ChargingEventHandler {
     private eventDispatcher = new EventDispatcher<ChargingEvents>();
 
     constructor(pollerService: PollerService, contract: Contract) {
-        pollerService.add(contract.native, events => events.forEach(item => {
+        pollerService.add(contract, events => events.forEach(item => {
             const eventName: string = item.event;
             const connectorId: string = item.returnValues.connectorId;
             const controller: string = item.returnValues.controller;

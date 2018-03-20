@@ -15,7 +15,7 @@ import { StationEvents } from '../../src/models/stationEvents';
 describe('StationService', function () {
 
     const provider = "http://localhost:8545";
-    const config = require(process.env["HOME"] + '/.sharecharge/config.json');
+    const config = require(process.env["HOME"] + '/.sharecharge/contract-defs.development.json');
     const stationStorage = config['StationStorage'];
     const gasPrice = 18000000000;
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
@@ -53,7 +53,7 @@ describe('StationService', function () {
                 .isAvailable(true)
                 .build();
 
-            await stationService.create(station, wallet);
+            await stationService.useWallet(wallet).create(station);
 
             const result = await stationService.getById(station.id);
 
@@ -70,9 +70,9 @@ describe('StationService', function () {
         it('return all stations', async function () {
             const station = new StationBuilder().withOwner(wallet.address).build();
 
-            await stationService.create(station, wallet);
-            await stationService.create(station, wallet);
-            await stationService.create(station, wallet);
+            await stationService.useWallet(wallet).create(station);
+            await stationService.useWallet(wallet).create(station);
+            await stationService.useWallet(wallet).create(station);
 
             const result = await stationService.getAll();
             expect(result.length).to.equal(3);
@@ -83,7 +83,7 @@ describe('StationService', function () {
         it('should return true for persisted stations', async function () {
             const station = new StationBuilder().withOwner(wallet.address).build();
 
-            await stationService.create(station, wallet);
+            await stationService.useWallet(wallet).create(station);
 
             const result = await stationService.isPersisted(station);
 
@@ -109,12 +109,12 @@ describe('StationService', function () {
             stationEventHandler.on(StationEvents.Updated, id => updatedId = id);
 
             const station = new StationBuilder().withOwner(wallet.address).build();
-            await stationService.create(station, wallet);
+            await stationService.useWallet(wallet).create(station);
 
             const result = await stationService.getById(station.id);
             result.latitude = 50;
 
-            await stationService.update(result, wallet);
+            await stationService.useWallet(wallet).update(result);
 
             await EventPollerService.instance.poll();
 

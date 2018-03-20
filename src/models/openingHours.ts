@@ -1,5 +1,3 @@
-import { range } from '../utils/range';
-
 export class Uhr {
 
     private fromIndex = 0;
@@ -87,11 +85,11 @@ export class OpeningHours {
     static deserialize(val: string): OpeningHours {
         let result = new OpeningHours();
         if (val.length === 28) {
-            range(7).map(i => {
+            for (let i = 0; i < 7; i++) {
                 if (!result.data[i].decode(val.substr(i * 4, 4))) {
                     result.data[i].set('00:00', '24:00');
                 }
-            });
+            }
         }
         return result;
     }

@@ -1,5 +1,7 @@
+import { Contract } from "../models/contract";
+
 interface ContractTracker {
-    contract: any;
+    contract: Contract;
     callback: (events: any) => void;
     fromBlock: number;
 }
@@ -11,9 +13,9 @@ export interface PollerService {
 
     poll();
 
-    add(contract: any, callback: (events: any) => void);
+    add(contract: Contract, callback: (events: any) => void);
 
-    remove(contract: any);
+    remove(contract: Contract);
 
     removeAll();
 }
@@ -51,22 +53,24 @@ export class EventPollerService implements PollerService {
     async poll() {
         const promises: any[] = [];
         this.callbacks.forEach((tracker: ContractTracker) => {
-            promises.push(tracker.contract.getPastEvents({ fromBlock: tracker.fromBlock }).then(pastEvents => {
-                if (pastEvents.length > 0) {
-                    tracker.fromBlock = pastEvents[pastEvents.length - 1].blockNumber + 1;
-                    tracker.callback(pastEvents);
-                }
-            }));
+            promises.push(tracker.contract.native.getPastEvents({ fromBlock: tracker.fromBlock })
+                .then(pastEvents => {
+                    if (pastEvents.length > 0) {
+                        tracker.fromBlock = pastEvents[pastEvents.length - 1].blockNumber + 1;
+                        tracker.callback(pastEvents);
+                    }
+                }));
         });
         return Promise.all(promises);
     }
 
-    add(contract: any, callback: (events: any) => void) {
-        this.callbacks.set(contract.options.address, { contract, callback, fromBlock: 1 });
+    async add(contract: Contract, callback: (events: any) => void) {
+        let block = await contract.getBlockNumber();
+        this.callbacks.set(contract.native.options.address, { contract, callback, fromBlock: block });
     }
 
-    remove(contract: any) {
-        this.callbacks.delete(contract.options.address);
+    remove(contract: Contract) {
+        this.callbacks.delete(contract.native.options.address);
     }
 
     removeAll() {

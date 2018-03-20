@@ -2,8 +2,7 @@ export class ChangeTracker {
 
     private changes = {};
 
-    constructor(private source: any) {
-    }
+    constructor(private source: any) { }
 
     setProperty(name: string, value: any) {
         const fieldName = '_' + name;
@@ -14,7 +13,7 @@ export class ChangeTracker {
     }
 
     didPropertyChange(propertyName: string): boolean {
-        return this.changes[propertyName];
+        return this.changes[propertyName] || false;
     }
 
     getProperties() {

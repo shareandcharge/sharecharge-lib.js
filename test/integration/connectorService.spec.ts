@@ -15,7 +15,7 @@ import { ConnectorBuilder } from "../connectorBuilder";
 describe('ConnectorService', function () {
 
     const provider = "http://localhost:8545";
-    const config = require(process.env["HOME"] + '/.sharecharge/config.json');
+    const config = require(process.env["HOME"] + '/.sharecharge/contract-defs.development.json');
     const connectorStorage = config['ConnectorStorage'];
     const gasPrice = 18000000000;
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
@@ -53,7 +53,7 @@ describe('ConnectorService', function () {
                 .build();
 
             // add it to connectors
-            await connectorService.create(connector, wallet);
+            await connectorService.useWallet(wallet).create(connector);
 
             // get
             const result: Connector = await connectorService.getById(connector.id);
@@ -71,7 +71,7 @@ describe('ConnectorService', function () {
             const connector = new ConnectorBuilder()
                 .build();
 
-            await connectorService.create(connector, wallet);
+            await connectorService.useWallet(wallet).create(connector);
 
             const result: Connector = await connectorService.getById(connector.id);
             expect(result.id).to.equal(connector.id);

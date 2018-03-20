@@ -8,7 +8,7 @@ export class StationEventHandler {
     private eventDispatcher = new EventDispatcher<StationEvents>();
 
     constructor(pollerService: PollerService, contract: Contract) {
-        pollerService.add(contract.native, events => events.forEach(item => {
+        pollerService.add(contract, events => events.forEach(item => {
             const eventName: string = item.event.substring('Station'.length);
             const stationId: string = item.returnValues.stationId;
             this.eventDispatcher.dispatchAll(StationEvents[eventName], stationId);
