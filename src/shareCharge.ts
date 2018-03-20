@@ -18,7 +18,7 @@ export class ShareCharge {
 
     private web3;
 
-    constructor(private config, private contractDefs, services: { StationService: StationService, ConnectorService: ConnectorService, ChargingService: ChargingService }) {
+    constructor(private config, private contractDefs, services: { StationService?: StationService, ConnectorService?: ConnectorService, ChargingService?: ChargingService }) {
         this.web3 = new Web3(config.provider);
 
         this.stations = services.StationService || new StationService(this.getContractInstance('StationStorage'));

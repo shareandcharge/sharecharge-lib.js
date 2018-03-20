@@ -6,7 +6,7 @@ import { config } from "./utils/config";
 
 export class PlayGround {
 
-    private sc = new ShareCharge(config, require('~/.sharecharge/contract.defs.local.json'));;
+    private sc = new ShareCharge(config, require('~/.sharecharge/contract.defs.local.json'), {});
     private wallet = new Wallet("seeds");
 
     async station() {
@@ -59,15 +59,18 @@ export class PlayGround {
 
         // we receive all StartConfirmed events, therefore we
         // must filter the events by the connector id used during request start
-        this.sc.on("StartConfirmed", async (connectorId, controller) => { });
+        this.sc.on("StartConfirmed", async (connectorId, controller) => {
+        });
 
         // we receive all StopConfirmed events, therefore we
         // must filter the events by the connector id used during request start
-        this.sc.on("StopConfirmed", async (connectorId, controller) => { });
+        this.sc.on("StopConfirmed", async (connectorId, controller) => {
+        });
 
         // we receive all Error events, therefore we
         // must filter the events by the connector id used during request start
-        this.sc.on("Error", async (connectorId, controller, errorCode) => { });
+        this.sc.on("Error", async (connectorId, controller, errorCode) => {
+        });
 
         this.sc.charging.useWallet(this.wallet).requestStart(connector, 1440);
 
