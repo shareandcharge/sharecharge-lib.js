@@ -11,7 +11,13 @@ export const loadContractDefs = (stage) => {
         return JSON.parse(fs.readFileSync(localPath, "utf8"));
     }
 
-    const globalPath = process.env["HOME"] + `/.sharecharge/contract.defs.${stage}.json`;
+    let globalPath = process.env["HOME"] + `/.sharecharge/contract.defs.${stage}.json`;
+
+    if (fs.existsSync(globalPath)) {
+        return JSON.parse(fs.readFileSync(globalPath, "utf8"));
+    }
+
+    globalPath = process.env["HOME"] + `/.sharecharge/contract.defs.development.json`;
 
     if (fs.existsSync(globalPath)) {
         return JSON.parse(fs.readFileSync(globalPath, "utf8"));
