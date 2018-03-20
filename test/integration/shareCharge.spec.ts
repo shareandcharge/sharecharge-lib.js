@@ -31,6 +31,10 @@ describe('ShareCharge', function () {
 
     let connectorService, stationService, chargingService, cpoWallet, mspWallet, web3;
 
+    function resolve() {
+        return new ShareCharge(config, contractDefs);
+    }
+
     before(async () => {
         web3 = new Web3(config.provider);
 
@@ -49,8 +53,31 @@ describe('ShareCharge', function () {
     });
 
     context('#stations', async () => {
+        it('should broadcast charge start confirmation', async () => {
+            let shareCharge = resolve();
+
+            let connector = new ConnectorBuilder().build();
+            await shareCharge.connectors.useWallet(cpoWallet).create(connector);
+
+            let connectorId = "";
+            let controller = "";
+
+            shareCharge.on("StartConfirmed", (id, address) => {
+                connectorId = id;
+                controller = address;
+            });
+
+            await shareCharge.charging.useWallet(mspWallet).requestStart(connector, 60);
+
+            await EventPollerService.instance.poll();
+
+            // expect(connectorId).to.equal(connector.id);
+            // expect(controller).to.equal(connector.controller);
+
+        });
+
         it('should broadcast connector created and updated events', async () => {
-            let shareCharge = new ShareCharge(config, contractDefs);
+            let shareCharge = resolve();
 
             let connectorCreatedId = "";
             let connectorUpdatedId = "";
@@ -74,11 +101,10 @@ describe('ShareCharge', function () {
 
             expect(connectorCreatedId).to.equal(connector.id);
             expect(connectorUpdatedId).to.equal(connector.id);
-
         });
 
         it('should broadcast station created and updated events', async () => {
-            let shareCharge = new ShareCharge(config, contractDefs);
+            let shareCharge = resolve();
 
             let stationCreatedId = "";
             let stationUpdatedId = "";
@@ -101,7 +127,6 @@ describe('ShareCharge', function () {
 
             expect(stationCreatedId).to.equal(station.id);
             expect(stationUpdatedId).to.equal(station.id);
-
         });
     });
 
