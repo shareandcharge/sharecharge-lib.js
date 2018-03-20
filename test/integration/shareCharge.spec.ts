@@ -6,8 +6,8 @@ import { expect } from 'chai';
 
 const Web3 = require('web3');
 
-import { StationBuilder } from '../../src/utils/stationBuilder';
-import { ConnectorBuilder } from '../../src/utils/connectorBuilder';
+import { StationBuilder } from '../stationBuilder';
+import { ConnectorBuilder } from '../connectorBuilder';
 import { TestHelper } from '../testHelper';
 import { Wallet } from '../../src/models/wallet';
 import { Contract } from '../../src/models/contract';
@@ -23,7 +23,7 @@ describe('ShareCharge', function () {
         provider: "http://localhost:8545",
         gasPrice: 18000000000
     };
-    const contractDefs = require(process.env["HOME"] + '/.sharecharge/contract-defs.development.json');
+    const contractDefs = require(process.env["HOME"] + '/.sharecharge/contract.defs.development.json');
     const seed1 = 'filter march urge naive sauce distance under copy payment slow just cool';
     const seed2 = 'filter march urge naive sauce distance under copy payment slow just warm';
 
@@ -39,7 +39,8 @@ describe('ShareCharge', function () {
         TestHelper.ensureFunds(web3, mspWallet);
     });
 
-    beforeEach(async () => { });
+    beforeEach(async () => {
+    });
 
     afterEach(async () => {
         EventPollerService.instance.removeAll();

@@ -6,7 +6,8 @@ import { Wallet } from '../models/wallet';
 
 export class ConnectorService {
 
-    constructor(public readonly contract: Contract) { }
+    constructor(public readonly contract: Contract) {
+    }
 
     async getById(id: string): Promise<Connector> {
         const result = await this.contract.call("getConnector", id);
@@ -46,21 +47,3 @@ export class ConnectorService {
         }
     }
 }
-
-const Web3 = require('web3');
-const config = require(process.env["HOME"] + '/.sharecharge/config.json');
-
-const init = () => {
-
-    const web3 = new Web3("http://localhost:8545");
-    const connectorStorage = config['ConnectorStorage'];
-
-    console.log(connectorStorage.address);
-
-    return new Contract(web3, {
-        abi: connectorStorage.abi,
-        address: connectorStorage.address
-    });
-};
-
-export const ConnectorServiceInstance: ConnectorService = new ConnectorService(init());

@@ -15,7 +15,7 @@ import { StationEvents } from '../../src/models/stationEvents';
 describe('StationService', function () {
 
     const provider = "http://localhost:8545";
-    const config = require(process.env["HOME"] + '/.sharecharge/contract-defs.development.json');
+    const config = require(process.env["HOME"] + '/.sharecharge/contract.defs.development.json');
     const stationStorage = config['StationStorage'];
     const gasPrice = 18000000000;
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';

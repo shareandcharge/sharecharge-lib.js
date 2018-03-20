@@ -19,7 +19,7 @@ import { ChargingEventHandler } from '../../src/services/chargingEventHandler';
 describe('ChargingService', function () {
 
     const provider = "http://localhost:8545";
-    const contractDefs = require(process.env["HOME"] + '/.sharecharge/contract-defs.development.json');
+    const contractDefs = require(process.env["HOME"] + '/.sharecharge/contract.defs.development.json');
     const gasPrice = 18000000000;
     const seed1 = 'filter march urge naive sauce distance under copy payment slow just cool';
     const seed2 = 'filter march urge naive sauce distance under copy payment slow just warm';
