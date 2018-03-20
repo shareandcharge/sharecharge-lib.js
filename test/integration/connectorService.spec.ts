@@ -16,6 +16,8 @@ import { config } from "../../src/utils/config";
 
 describe('ConnectorService', function () {
 
+    this.timeout(3 * 1000);
+
     const contractDefs = loadContractDefs(config.stage);
     const connectorStorage = contractDefs['ConnectorStorage'];
     const gasPrice = 18000000000;

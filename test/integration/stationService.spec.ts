@@ -17,6 +17,8 @@ import { config } from "../../src/utils/config";
 
 describe('StationService', function () {
 
+    this.timeout(5 * 1000);
+
     const contractDefs = loadContractDefs(config.stage);
     const stationStorage = contractDefs['StationStorage'];
     const gasPrice = 18000000000;

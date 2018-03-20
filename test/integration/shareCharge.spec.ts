@@ -21,6 +21,8 @@ import { config } from "../../src/utils/config";
 
 describe('ShareCharge', function () {
 
+    this.timeout(10 * 1000);
+
     const contractDefs = loadContractDefs(config.stage);
 
     const seed1 = 'filter march urge naive sauce distance under copy payment slow just cool';

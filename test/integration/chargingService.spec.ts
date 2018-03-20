@@ -20,13 +20,16 @@ import { config } from "../../src/utils/config";
 
 describe('ChargingService', function () {
 
+    this.timeout(10 * 1000);
+
     const contractDefs = loadContractDefs(config.stage);
-    const gasPrice = 18000000000;
     const seed1 = 'filter march urge naive sauce distance under copy payment slow just cool';
     const seed2 = 'filter march urge naive sauce distance under copy payment slow just warm';
 
-    let chargingEventHandler, stationService, cpoChargingService, chargingService, stationStorageContract,
-        connectorService, connectorStorageContract, chargingContract, cpoWallet, mspWallet, web3;
+    let chargingEventHandler: ChargingEventHandler, stationService: StationService, chargingService: ChargingService,
+        stationStorageContract: Contract, connectorService: ConnectorService, connectorStorageContract: Contract,
+        chargingContract: Contract, cpoWallet: Wallet, mspWallet: Wallet,
+        web3;
 
     before(async () => {
         web3 = new Web3(config.provider);
@@ -38,12 +41,13 @@ describe('ChargingService', function () {
     });
 
     beforeEach(async () => {
+
         const stationStorageDef = contractDefs['StationStorage'];
         const stationStorageaddress = await TestHelper.deployContract(web3, stationStorageDef);
         stationStorageContract = new Contract(web3, {
             abi: stationStorageDef.abi,
             address: stationStorageaddress,
-            gasPrice
+            gasPrice: config.gasPrice
         });
 
         const connectorStorageDef = contractDefs['ConnectorStorage'];
@@ -51,7 +55,7 @@ describe('ChargingService', function () {
         connectorStorageContract = new Contract(web3, {
             abi: connectorStorageDef.abi,
             address: connectorStorageaddress,
-            gasPrice
+            gasPrice: config.gasPrice
         });
 
         const chargingDef = contractDefs['Charging'];
@@ -59,7 +63,7 @@ describe('ChargingService', function () {
         chargingContract = new Contract(web3, {
             abi: chargingDef.abi,
             address: chargingAddress,
-            gasPrice
+            gasPrice: config.gasPrice
         });
 
         chargingEventHandler = new ChargingEventHandler(EventPollerService.instance, chargingContract);
