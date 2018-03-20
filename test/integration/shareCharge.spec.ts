@@ -26,7 +26,7 @@ describe('ShareCharge', function () {
     const seed1 = 'filter march urge naive sauce distance under copy payment slow just cool';
     const seed2 = 'filter march urge naive sauce distance under copy payment slow just warm';
 
-    let connectorService, stationService, chargingService, cpoWallet, mspWallet, web3;
+    let cpoWallet, mspWallet, web3;
 
     function resolve() {
         return new ShareCharge(config, contractDefs);
@@ -50,31 +50,58 @@ describe('ShareCharge', function () {
     });
 
     context('#stations', async () => {
-        it('should broadcast charge start confirmation', async () => {
-            let shareCharge = resolve();
+        it('should broadcast charge stop requested', async () => {
+            const shareCharge = resolve();
 
-            let connector = new ConnectorBuilder().build();
+            const connector = new ConnectorBuilder().build();
+            await shareCharge.connectors.useWallet(cpoWallet).create(connector);
+
+            let connectorId = "";
+
+            await shareCharge.on("StopRequested", async (result) => {
+                if (result.connectorId == connector.id) {
+                    // let cpoConnector = await shareCharge.connectors.getById(result.connectorId);
+                    // await shareCharge.charging.useWallet(cpoWallet).confirmStart(cpoConnector, result.controller);
+                    // await EventPollerService.instance.poll();
+                    connectorId = result.connectorId;
+                }
+            });
+
+            await shareCharge.charging.useWallet(mspWallet).requestStart(connector, 60);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStart(connector, mspWallet.address);
+            await shareCharge.charging.useWallet(mspWallet).requestStop(connector);
+
+            await EventPollerService.instance.poll();
+
+            expect(connectorId).to.equal(connector.id);
+        });
+
+        it('should broadcast charge start requested', async () => {
+            const shareCharge = resolve();
+
+            const connector = new ConnectorBuilder().build();
             await shareCharge.connectors.useWallet(cpoWallet).create(connector);
 
             let connectorId = "";
             let controller = "";
 
-            shareCharge.on("StartConfirmed", (id, address) => {
-                connectorId = id;
-                controller = address;
+            await shareCharge.on("StartRequested", async (result) => {
+                if (result.connectorId == connector.id) {
+                    connectorId = result.connectorId;
+                    controller = result.controller;
+                }
             });
 
             await shareCharge.charging.useWallet(mspWallet).requestStart(connector, 60);
 
             await EventPollerService.instance.poll();
 
-            // expect(connectorId).to.equal(connector.id);
-            // expect(controller).to.equal(connector.controller);
-
+            expect(connectorId).to.equal(connector.id);
+            expect(controller.toLowerCase()).to.equal(mspWallet.address);
         });
 
         it('should broadcast connector created and updated events', async () => {
-            let shareCharge = resolve();
+            const shareCharge = resolve();
 
             let connectorCreatedId = "";
             let connectorUpdatedId = "";
@@ -87,7 +114,7 @@ describe('ShareCharge', function () {
                 connectorUpdatedId = result.connectorId;
             });
 
-            let connector = new ConnectorBuilder().build();
+            const connector = new ConnectorBuilder().build();
 
             await shareCharge.connectors.useWallet(cpoWallet).create(connector);
 
@@ -101,7 +128,7 @@ describe('ShareCharge', function () {
         });
 
         it('should broadcast station created and updated events', async () => {
-            let shareCharge = resolve();
+            const shareCharge = resolve();
 
             let stationCreatedId = "";
             let stationUpdatedId = "";
@@ -114,7 +141,7 @@ describe('ShareCharge', function () {
                 stationUpdatedId = result.stationId;
             });
 
-            let station = new StationBuilder().build();
+            const station = new StationBuilder().build();
             await shareCharge.stations.useWallet(cpoWallet).create(station);
 
             station.latitude = station.latitude - 1;

@@ -27,7 +27,7 @@ export class ShareCharge {
 
         EventPollerService.instance.add(this.stations.contract, events => this.handleNewEvents(events));
         EventPollerService.instance.add(this.connectors.contract, events => this.handleNewEvents(events));
-        // EventPollerService.instance.add(chargingContract, events => this.handleNewEvents(events));
+        EventPollerService.instance.add(this.charging.contract, events => this.handleNewEvents(events));
     }
 
     on(eventName: string, callback: (...args) => void) {

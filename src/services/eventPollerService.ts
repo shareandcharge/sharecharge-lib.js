@@ -65,7 +65,7 @@ export class EventPollerService implements PollerService {
     }
 
     async add(contract: Contract, callback: (events: any) => void) {
-        let block = await contract.getBlockNumber();
+        let block = await contract.getBlockNumber() + 1;
         this.callbacks.set(contract.native.options.address, { contract, callback, fromBlock: block });
     }
 

@@ -4,7 +4,7 @@ import { Wallet } from "../models/wallet";
 
 export class ChargingService {
 
-    constructor(private contract: Contract) { }
+    constructor(public readonly contract: Contract) { }
 
     useWallet(wallet: Wallet) {
         return {
@@ -15,7 +15,7 @@ export class ChargingService {
                 await this.contract.send("confirmStart", wallet, connector.id, controller);
             },
             requestStop: async (connector: Connector) => {
-                await this.contract.send("requestStop", wallet, connector.id, wallet.address);
+                await this.contract.send("requestStop", wallet, connector.id);
             },
             confirmStop: async (connector: Connector, controller: string) => {
                 await this.contract.send("confirmStop", wallet, connector.id, controller);
