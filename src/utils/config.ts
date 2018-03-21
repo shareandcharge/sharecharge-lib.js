@@ -1,9 +1,5 @@
-import { IConfig } from "../interfaces/iConfig";
+const stage = process.env.sc_stage || "local";
 
-export const config = <IConfig>{
-    stage: process.env.sc_stage || "local",
-    provider: process.env.sc_provider || 'http://localhost:8545',
-    gasPrice: 18000000000
-};
+export const config = require(`../../config/${stage}.json`);
 
 console.log("Running on stage:", config.stage);

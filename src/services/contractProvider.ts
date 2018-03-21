@@ -8,14 +8,14 @@ export interface IContractProvider {
 
 export class ContractProvider implements IContractProvider {
 
-    private defs;
+    private definitions;
 
     constructor(private web3, private config) {
-        this.defs = ToolKit.contractDefsForStage(config.stage);
+        this.definitions = ToolKit.contractDefsForStage(config.stage);
     }
 
     async obtain(key: string): Promise<Contract> {
-        const contractDef = this.defs[key];
+        const contractDef = this.definitions[key];
         return new Contract(this.web3, {
             abi: contractDef.abi,
             address: contractDef.address,
