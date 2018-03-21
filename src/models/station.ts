@@ -61,11 +61,11 @@ export class Station {
 
     serialize() {
         return {
-            id: this._id,
-            owner: this._owner,
-            latitude: this._latitude,
-            longitude: this._longitude,
-            openingHours: this._openingHours
+            id: this.id,
+            owner: this.owner,
+            latitude: this.latitude,
+            longitude: this.longitude,
+            openingHours: this.openingHours
         };
     }
 
