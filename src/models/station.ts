@@ -58,6 +58,16 @@ export class Station {
         this.tracker.setProperty("openingHours", value);
     }
 
+    serialize() {
+        return {
+            id: this._id,
+            owner: this._owner,
+            latitude: this._latitude,
+            longitude: this._longitude,
+            openingHours: this._openingHours
+        };
+    }
+
     static deserialize(payload: any): Station {
         const station = new Station();
         station._id = payload["id"];
