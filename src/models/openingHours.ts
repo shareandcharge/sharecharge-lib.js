@@ -78,11 +78,11 @@ export class OpeningHours {
         return this.data[6];
     }
 
-    toString(): string {
-        return this.data.map(x => x.encode()).reduce((prev, curr) => prev + curr, "");
+    static encode(val: OpeningHours): string {
+        return val.data.map(x => x.encode()).reduce((prev, curr) => prev + curr, "");
     }
 
-    static deserialize(val: string): OpeningHours {
+    static decode(val: string): OpeningHours {
         const result = new OpeningHours();
         if (val.length === 28) {
             for (let i = 0; i < 7; i++) {

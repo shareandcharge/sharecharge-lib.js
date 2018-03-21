@@ -1,6 +1,6 @@
 import { ToolKit } from '../utils/toolKit';
 import { ChangeTracker } from './changeTracker';
-import { OpeningHours } from '..';
+import { OpeningHours } from './openingHours';
 
 export class Station {
 
@@ -52,20 +52,20 @@ export class Station {
     }
 
     get openingHours(): OpeningHours {
-        return OpeningHours.deserialize(this._openingHours);
+        return OpeningHours.decode(this._openingHours);
     }
 
     set openingHours(value: OpeningHours) {
         this.tracker.setProperty("openingHours", value.toString());
     }
 
-    serialize() {
+    static serialize(station: Station) {
         return {
-            id: this.id,
-            owner: this.owner,
-            latitude: this.latitude,
-            longitude: this.longitude,
-            openingHours: this.openingHours
+            id: station.id,
+            owner: station.owner,
+            latitude: station.latitude,
+            longitude: station.longitude,
+            openingHours: station.openingHours
         };
     }
 
@@ -79,6 +79,3 @@ export class Station {
         return station;
     }
 }
-
-
-
