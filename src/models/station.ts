@@ -1,5 +1,6 @@
 import { ToolKit } from '../utils/toolKit';
 import { ChangeTracker } from './changeTracker';
+import { OpeningHours } from '..';
 
 export class Station {
 
@@ -50,12 +51,12 @@ export class Station {
         }
     }
 
-    get openingHours(): string {
-        return this._openingHours;
+    get openingHours(): OpeningHours {
+        return OpeningHours.deserialize(this._openingHours);
     }
 
-    set openingHours(value: string) {
-        this.tracker.setProperty("openingHours", value);
+    set openingHours(value: OpeningHours) {
+        this.tracker.setProperty("openingHours", value.toString());
     }
 
     serialize() {

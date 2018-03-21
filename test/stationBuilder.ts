@@ -5,7 +5,7 @@ export class StationBuilder {
     private owner: string = "0x0000000000000000000000000000000000000000";
     private latitude: number = 52.51667;
     private longitude: number = 13.38333;
-    private openingHours: string = "0000000000000000000000000000";
+    private openingHours: string = "0x30303936303039363030393630303936303039363030393630303936";
 
     withOwner(val: string): StationBuilder {
         this.owner = val; return this;

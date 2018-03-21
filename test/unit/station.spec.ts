@@ -1,5 +1,7 @@
 import { expect } from 'chai';
 import { Station } from '../../src/models/station';
+import { OpeningHours} from '../../src/models/openingHours';
+import { ToolKit } from '../../src/utils/toolKit';
 
 describe('Station', function () {
 
@@ -74,7 +76,7 @@ describe('Station', function () {
             owner: '0xBD422974a93966C37bb740daF4d248dEE88C7ca1',
             latitude: '51345000',
             longitude: '-9233200',
-            openingHours: '0x3030303030303030303030303030303030303030303030303030303000000000',
+            openingHours: '0x30303936303039363030393630303936303039363030393630303936',
             available: true
         };
 
@@ -84,7 +86,7 @@ describe('Station', function () {
         expect(station.owner).to.equal('0xBD422974a93966C37bb740daF4d248dEE88C7ca1');
         expect(station.latitude).to.equal(51.345000);
         expect(station.longitude).to.equal(-9.2332000);
-        expect(station.openingHours).to.equal('0000000000000000000000000000');
+        expect(station.openingHours.toString()).to.equal(new OpeningHours().toString());
     });
 
 });

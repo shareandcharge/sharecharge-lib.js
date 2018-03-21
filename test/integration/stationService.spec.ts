@@ -61,7 +61,7 @@ describe('StationService', function () {
             expect(result.owner.toLowerCase()).to.equal(station.owner.toLowerCase());
             expect(result.latitude).to.equal(station.latitude);
             expect(result.longitude).to.equal(station.longitude);
-            expect(result.openingHours).to.equal(station.openingHours);
+            expect(result.openingHours.toString()).to.equal(station.openingHours.toString());
         });
     });
 
