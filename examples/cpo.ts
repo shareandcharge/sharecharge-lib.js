@@ -2,14 +2,10 @@ import { ShareCharge } from '../src/shareCharge';
 import { Connector } from '../src/models/connector';
 import { Wallet } from '../src/models/wallet';
 import { Station } from '../src/models/station';
+import { loadContractDefs } from "../src/utils/defsLoader";
+import { config } from "../src/utils/config";
 
-const config = {
-    stage: process.env.sc_stage || "local",
-    provider: process.env.sc_provider || 'http://localhost:8545',
-    gasPrice: 18000000000
-};
-
-const defs = require(process.env["HOME"] + `/.sharecharge/contract.defs.${config.stage}.json`);
+const defs = loadContractDefs(config.stage);
 
 async function main() {
 

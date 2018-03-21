@@ -3,10 +3,11 @@ import { Wallet } from './models/wallet';
 import { ShareCharge } from './shareCharge';
 import { Connector } from './models/connector';
 import { config } from "./utils/config";
+import { loadContractDefs } from "./utils/defsLoader";
 
 export class PlayGround {
 
-    private sc = new ShareCharge(config, require('~/.sharecharge/contract.defs.local.json'), {});
+    private sc = new ShareCharge(config, loadContractDefs("local"), {});
     private wallet = new Wallet("seeds");
 
     async station() {
