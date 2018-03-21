@@ -1,11 +1,12 @@
 import { Station } from '../src/models/station';
+import { OpeningHours } from '../src';
 
 export class StationBuilder {
 
     private owner: string = "0x0000000000000000000000000000000000000000";
     private latitude: number = 52.51667;
     private longitude: number = 13.38333;
-    private openingHours: string = "0x30303936303039363030393630303936303039363030393630303936";
+    private openingHours: OpeningHours = new OpeningHours();
 
     withOwner(val: string): StationBuilder {
         this.owner = val; return this;
@@ -19,7 +20,7 @@ export class StationBuilder {
         this.longitude = val; return this;
     }
 
-    withOpeningHours(val: string): StationBuilder {
+    withOpeningHours(val: OpeningHours): StationBuilder {
         this.openingHours = val; return this;
     }
 
