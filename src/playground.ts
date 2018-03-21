@@ -7,7 +7,7 @@ import { loadContractDefs } from "./utils/defsLoader";
 
 export class PlayGround {
 
-    private sc = new ShareCharge(config, loadContractDefs("local"), {});
+    private sc = new ShareCharge(config);
     private wallet = new Wallet("seeds");
 
     async station() {

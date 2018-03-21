@@ -2,10 +2,7 @@ import { ShareCharge } from '../src/shareCharge';
 import { Connector } from '../src/models/connector';
 import { Wallet } from '../src/models/wallet';
 import { Station } from '../src/models/station';
-import { loadContractDefs } from "../src/utils/defsLoader";
 import { config } from "../src/utils/config";
-
-const defs = loadContractDefs(config.stage);
 
 async function bulkCreate(wallet, sc: ShareCharge, total) {
     for (let i = 0; i < total; i++) {
@@ -26,7 +23,7 @@ async function main() {
 
     const wallet = new Wallet('filter march urge naive sauce distance under copy payment slow just warm');
 
-    const sc = new ShareCharge(config, defs, {});
+    const sc = new ShareCharge(config);
 
     // how to do this fast?
     // await bulkCreate(wallet, sc, 250);

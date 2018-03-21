@@ -36,7 +36,7 @@ describe('ShareCharge', function () {
     const connectorStorage = contractDefs['ConnectorStorage'];
 
     function resolve() {
-        return new ShareCharge(config, contractDefs, {
+        return new ShareCharge(config, {
             StationService: stationService,
             ChargingService: chargingService,
             ConnectorService: connectorService

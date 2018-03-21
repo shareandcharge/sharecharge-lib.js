@@ -1,18 +1,15 @@
 import { Connector } from './../src/models/connector';
 import { ShareCharge } from '../src/shareCharge';
 import { Wallet } from '../src/models/wallet';
-import { loadContractDefs } from "../src/utils/defsLoader";
 import { config } from "../src/utils/config";
-
-const defs = loadContractDefs(config.stage);
 
 async function findFreeConnector(sc: ShareCharge) {
     const stations = await sc.stations.getAll();
     console.log(stations.length);
-    for (let station of stations) {
+    for (const station of stations) {
         if (await sc.connectors.anyFree(station)) {
             const connectors = await sc.connectors.getByStation(station);
-            for (let connector of connectors) {
+            for (const connector of connectors) {
                 if (connector.available) {
                     return connector.id;
                 }
@@ -26,7 +23,7 @@ async function main() {
 
     const wallet = new Wallet('filter march urge naive sauce distance under copy payment slow just cool');
 
-    const sc = new ShareCharge(config, defs, {});
+    const sc = new ShareCharge(config);
 
     let selectedConnectorId = '';
 

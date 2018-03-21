@@ -1,10 +1,13 @@
 import { ChargingService } from './services/chargingService';
 import { ConnectorService } from './services/connectorService';
 import { StationService } from './services/stationService';
-import { Wallet } from './models/wallet';
 import { Contract } from './models/contract';
 import { EventPollerService } from './services/eventPollerService';
 import { EventDispatcher } from './models/eventDispatcher';
+import { IDefs } from "./interfaces/iDefs";
+import { IServices } from "./interfaces/iServices";
+import { IConfig } from "./interfaces/iConfig";
+import { loadContractDefs } from "./utils/defsLoader";
 
 const Web3 = require('web3');
 
@@ -16,14 +19,26 @@ export class ShareCharge {
     public readonly connectors: ConnectorService;
     public readonly charging: ChargingService;
 
-    private web3;
+    private readonly web3;
 
-    constructor(private config, private contractDefs, services: { StationService?: StationService, ConnectorService?: ConnectorService, ChargingService?: ChargingService }) {
+    constructor(private config: IConfig, preloaded?: IDefs | IServices) {
+
         this.web3 = new Web3(config.provider);
 
-        this.stations = services.StationService || new StationService(this.getContractInstance('StationStorage'));
-        this.connectors = services.ConnectorService || new ConnectorService(this.getContractInstance('ConnectorStorage'));
-        this.charging = services.ChargingService || new ChargingService(this.getContractInstance('Charging'));
+        if ((<IServices>preloaded)) {
+            // we got preloaded services, use them
+            this.stations = (<IServices>preloaded).StationService;
+            this.connectors = (<IServices>preloaded).ConnectorService;
+            this.charging = (<IServices>preloaded).ChargingService;
+        } else {
+            // we didnt get preloaded services, load them from defs
+            // either the preloaded ones or load them from on our own
+            const defs = <IDefs>preloaded ? <IDefs>preloaded : loadContractDefs(config.stage);
+
+            this.stations = new StationService(this.getContractInstance(defs, 'StationStorage'));
+            this.connectors = new ConnectorService(this.getContractInstance(defs, 'ConnectorStorage'));
+            this.charging = new ChargingService(this.getContractInstance(defs, 'Charging'));
+        }
 
         EventPollerService.instance.add(this.stations.contract, events => this.handleNewEvents(events));
         EventPollerService.instance.add(this.connectors.contract, events => this.handleNewEvents(events));
@@ -48,8 +63,8 @@ export class ShareCharge {
         });
     }
 
-    private getContractInstance(name): Contract {
-        const contractDef = this.contractDefs[name];
+    private getContractInstance(defs, name): Contract {
+        const contractDef = defs[name];
         return new Contract(this.web3, {
             abi: contractDef.abi,
             address: contractDef.address,
