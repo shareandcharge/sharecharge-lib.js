@@ -1,4 +1,7 @@
+import { ToolKit } from './../src/utils/toolKit';
+import { Contract } from './../src/models/contract';
 import { Wallet } from '../src/models/wallet';
+import { IContractProvider } from '../src/services/contractProvider';
 
 export class TestHelper {
 
@@ -13,7 +16,7 @@ export class TestHelper {
         const receiver = wallet.address;
         const amount = web3.utils.toWei(destBalance.toString(), "ether");
         if (balance < destBalance) {
-            await web3.eth.sendTransaction({from: coinbase, to: receiver, value: amount});
+            await web3.eth.sendTransaction({ from: coinbase, to: receiver, value: amount });
         }
     }
 
@@ -24,8 +27,21 @@ export class TestHelper {
             data: config.bytecode,
             gas
         });
-        const receipt = await contract.deploy({arguments: args}).send({from: coinbase});
+        const receipt = await contract.deploy({ arguments: args }).send({ from: coinbase });
         return receipt.options.address;
     }
 
+    static getTestContractProvider(web3, config, defs, args?: any[]): IContractProvider {
+        return <IContractProvider>{
+            async obtain(key: string): Promise<Contract> {
+                const contractDef = defs[key];
+                const address = await TestHelper.deployContract(web3, contractDef, args);
+                return new Contract(web3, {
+                    abi: contractDef.abi,
+                    address: address,
+                    gasPrice: config.gasPrice
+                });
+            }
+        };
+    }
 }

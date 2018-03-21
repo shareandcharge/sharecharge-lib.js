@@ -4,18 +4,14 @@ import { Wallet } from "./wallet";
 
 export class Contract {
 
-    private contract: any;
-    private address: string;
-    private gasPrice: number | undefined;
+    public readonly address: string;
+    public readonly gasPrice: number | undefined;
+    public readonly native: any;
 
     constructor(private web3: any, private config: { abi: any, address: string, gasPrice?: number }) {
         this.address = config.address;
         this.gasPrice = config.gasPrice;
-        this.contract = new this.web3.eth.Contract(config.abi, config.address);
-    }
-
-    get native() {
-        return this.contract;
+        this.native = new this.web3.eth.Contract(config.abi, config.address);
     }
 
     async getBlockNumber(): Promise<number> {
@@ -24,7 +20,7 @@ export class Contract {
     }
 
     async call(method: string, ...args: any[]): Promise<any> {
-        return this.contract.methods[method](...args).call();
+        return this.native.methods[method](...args).call();
     }
 
     async send(method: string, wallet: Wallet, ...args: any[]): Promise<any> {
@@ -34,7 +30,7 @@ export class Contract {
     }
 
     private async createTx(method: string, wallet: Wallet, ...args: any[]): Promise<any> {
-        const tx = this.contract.methods[method](...args);
+        const tx = this.native.methods[method](...args);
         const gas = await tx.estimateGas({ from: wallet.address });
         const data = await tx.encodeABI();
         const nonce = await this.web3.eth.getTransactionCount(wallet.address);

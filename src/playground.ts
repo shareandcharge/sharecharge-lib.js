@@ -3,7 +3,6 @@ import { Wallet } from './models/wallet';
 import { ShareCharge } from './shareCharge';
 import { Connector } from './models/connector';
 import { config } from "./utils/config";
-import { loadContractDefs } from "./utils/defsLoader";
 
 export class PlayGround {
 

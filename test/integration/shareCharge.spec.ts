@@ -1,47 +1,37 @@
-import { Connector } from './../../src/models/connector';
-import { ShareCharge } from './../../src/shareCharge';
+import { ToolKit } from './../../src/utils/toolKit';
 import * as sinon from 'sinon';
 import * as mocha from 'mocha';
 import { expect } from 'chai';
 
 const Web3 = require('web3');
 
+import { Connector } from './../../src/models/connector';
+import { ShareCharge } from './../../src/shareCharge';
 import { StationBuilder } from '../stationBuilder';
 import { ConnectorBuilder } from '../connectorBuilder';
 import { TestHelper } from '../testHelper';
 import { Wallet } from '../../src/models/wallet';
 import { Contract } from '../../src/models/contract';
-import { EventPollerService } from '../../src/services/eventPollerService';
+import { EventPoller } from '../../src/services/eventPoller';
 import { ChargingService } from '../../src/services/chargingService';
 import { ConnectorService } from '../../src/services/connectorService';
 import { StationService } from '../../src/services/stationService';
 import { Station } from '../../src/models/station';
-import { loadContractDefs } from "../../src/utils/defsLoader";
 import { config } from "../../src/utils/config";
 
 describe('ShareCharge', function () {
 
     this.timeout(10 * 1000);
 
-    const contractDefs = loadContractDefs(config.stage);
+    const contractDefs = ToolKit.contractDefsForStage(config.stage);
 
     const seed1 = 'filter march urge naive sauce distance under copy payment slow just cool';
     const seed2 = 'filter march urge naive sauce distance under copy payment slow just warm';
 
-    let cpoWallet: Wallet, mspWallet: Wallet, web3;
-    let stationService: StationService, chargingService: ChargingService, connectorService: ConnectorService;
-
-    const stationStorage = contractDefs['StationStorage'];
-    const charging = contractDefs['Charging'];
-    const connectorStorage = contractDefs['ConnectorStorage'];
-
-    function resolve() {
-        return new ShareCharge(config, {
-            StationService: stationService,
-            ChargingService: chargingService,
-            ConnectorService: connectorService
-        });
-    }
+    let shareCharge: ShareCharge, cpoWallet: Wallet, mspWallet: Wallet, web3;
+    let stationService: StationService;
+    let connectorService: ConnectorService;
+    let chargingService: ChargingService;
 
     before(async () => {
 
@@ -53,50 +43,35 @@ describe('ShareCharge', function () {
         await TestHelper.ensureFunds(web3, cpoWallet);
         await TestHelper.ensureFunds(web3, mspWallet);
 
-        const stationStorageAddress = await TestHelper.deployContract(web3, stationStorage);
-        const stationServiceContract = new Contract(web3, {
-            abi: stationStorage.abi,
-            address: stationStorageAddress,
-            gasPrice: config.gasPrice
-        });
+        const testContractProvider = TestHelper.getTestContractProvider(web3, config, contractDefs);
+        stationService = new StationService(testContractProvider);
+        connectorService = new ConnectorService(testContractProvider);
 
-        stationService = new StationService(stationServiceContract);
-
-        const connectorStorageAddress = await TestHelper.deployContract(web3, connectorStorage);
-        const connectorStorageContract = new Contract(web3, {
-            abi: connectorStorage.abi,
-            address: connectorStorageAddress,
-            gasPrice: config.gasPrice
-        });
-
-        connectorService = new ConnectorService(connectorStorageContract);
-
-        const chargingAddress = await TestHelper.deployContract(web3, charging, [connectorStorageAddress]);
-
-        const chargingContract = new Contract(web3, {
-            abi: charging.abi,
-            address: chargingAddress,
-            gasPrice: config.gasPrice
-        });
+        const connectorContract = await connectorService.contract();
+        const testContractProvider2 = TestHelper.getTestContractProvider(web3, config, contractDefs, [connectorContract.address]);
+        chargingService = new ChargingService(testContractProvider2);
 
         const coinbase = await web3.eth.getCoinbase();
-        await connectorStorageContract.native.methods["setAccess"](chargingAddress).send({from: coinbase});
-
-        chargingService = new ChargingService(chargingContract);
+        const chargingContract = await chargingService.contract();
+        await connectorContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
     });
 
     beforeEach(async () => {
+        shareCharge = new ShareCharge(config, {
+            StationService: stationService,
+            ChargingService: chargingService,
+            ConnectorService: connectorService
+        });
+        await shareCharge.hookup();
     });
 
     afterEach(async () => {
-        EventPollerService.instance.removeAll();
+        EventPoller.instance.removeAll();
     });
 
     context('#stations', async () => {
 
         it('should broadcast start confirmed to msp', async () => {
-            const shareCharge = resolve();
-
             const connector = new ConnectorBuilder()
                 .withOwner(cpoWallet.address)
                 .withIsAvailable(true)
@@ -119,7 +94,7 @@ describe('ShareCharge', function () {
             await shareCharge.charging.useWallet(mspWallet).requestStart(connector, 60);
             await shareCharge.charging.useWallet(cpoWallet).confirmStart(connector, mspWallet.address);
 
-            await EventPollerService.instance.poll();
+            await EventPoller.instance.poll();
 
             expect(connectorId).to.equal(connector.id);
             expect(controller.toLowerCase()).to.equal(mspWallet.address);
@@ -127,8 +102,6 @@ describe('ShareCharge', function () {
         });
 
         it('should broadcast stop confirmed to msp', async () => {
-            const shareCharge = resolve();
-
             const connector = new ConnectorBuilder().build();
             await shareCharge.connectors.useWallet(cpoWallet).create(connector);
 
@@ -149,7 +122,7 @@ describe('ShareCharge', function () {
             await shareCharge.charging.useWallet(mspWallet).requestStop(connector);
             await shareCharge.charging.useWallet(cpoWallet).confirmStop(connector, mspWallet.address);
 
-            await EventPollerService.instance.poll();
+            await EventPoller.instance.poll();
 
             expect(connectorId).to.equal(connector.id);
             expect(controller.toLowerCase()).to.equal(mspWallet.address);
@@ -157,8 +130,6 @@ describe('ShareCharge', function () {
         });
 
         it('should broadcast error to msp', async () => {
-            const shareCharge = resolve();
-
             const connector = new ConnectorBuilder().build();
             await shareCharge.connectors.useWallet(cpoWallet).create(connector);
 
@@ -177,7 +148,7 @@ describe('ShareCharge', function () {
 
             await shareCharge.charging.useWallet(cpoWallet).error(connector, mspWallet.address, 0);
 
-            await EventPollerService.instance.poll();
+            await EventPoller.instance.poll();
 
             expect(connectorId).to.equal(connector.id);
             expect(controller.toLowerCase()).to.equal(mspWallet.address);
@@ -187,8 +158,6 @@ describe('ShareCharge', function () {
 
 
         it('should broadcast charge stop requested to cpo', async () => {
-            const shareCharge = resolve();
-
             const connector = new ConnectorBuilder().build();
             await shareCharge.connectors.useWallet(cpoWallet).create(connector);
 
@@ -204,14 +173,12 @@ describe('ShareCharge', function () {
             await shareCharge.charging.useWallet(cpoWallet).confirmStart(connector, mspWallet.address);
             await shareCharge.charging.useWallet(mspWallet).requestStop(connector);
 
-            await EventPollerService.instance.poll();
+            await EventPoller.instance.poll();
 
             expect(connectorId).to.equal(connector.id);
         });
 
         it('should broadcast charge start requested to cpo', async () => {
-            const shareCharge = resolve();
-
             const connector = new ConnectorBuilder().build();
             await shareCharge.connectors.useWallet(cpoWallet).create(connector);
 
@@ -227,15 +194,13 @@ describe('ShareCharge', function () {
 
             await shareCharge.charging.useWallet(mspWallet).requestStart(connector, 60);
 
-            await EventPollerService.instance.poll();
+            await EventPoller.instance.poll();
 
             expect(connectorId).to.equal(connector.id);
             expect(controller.toLowerCase()).to.equal(mspWallet.address);
         });
 
         it('should broadcast connector created and updated events', async () => {
-            const shareCharge = resolve();
-
             let connectorCreatedId = "";
             let connectorUpdatedId = "";
 
@@ -254,15 +219,13 @@ describe('ShareCharge', function () {
             connector.available = !connector.available;
             await shareCharge.connectors.useWallet(cpoWallet).update(connector);
 
-            await EventPollerService.instance.poll();
+            await EventPoller.instance.poll();
 
             expect(connectorCreatedId).to.equal(connector.id);
             expect(connectorUpdatedId).to.equal(connector.id);
         });
 
         it('should broadcast station created and updated events', async () => {
-            const shareCharge = resolve();
-
             let stationCreatedId = "";
             let stationUpdatedId = "";
 
@@ -280,7 +243,7 @@ describe('ShareCharge', function () {
             station.latitude = station.latitude - 1;
             await shareCharge.stations.useWallet(cpoWallet).update(station);
 
-            await EventPollerService.instance.poll();
+            await EventPoller.instance.poll();
 
             expect(stationCreatedId).to.equal(station.id);
             expect(stationUpdatedId).to.equal(station.id);

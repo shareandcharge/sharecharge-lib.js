@@ -8,20 +8,20 @@ import { StationBuilder } from '../stationBuilder';
 import { TestHelper } from '../testHelper';
 import { Wallet } from '../../src/models/wallet';
 import { Contract } from '../../src/models/contract';
-import { EventPollerService } from '../../src/services/eventPollerService';
+import { EventPoller } from '../../src/services/eventPoller';
 import { StationService } from '../../src/services/stationService';
-import { loadContractDefs } from "../../src/utils/defsLoader";
 import { config } from "../../src/utils/config";
+import { ToolKit } from './../../src/utils/toolKit';
+import { IContractProvider } from './../../src/services/contractProvider';
 
 describe('StationService', function () {
 
     this.timeout(10 * 1000);
 
-    const contractDefs = loadContractDefs(config.stage);
-    const stationStorage = contractDefs['StationStorage'];
+    const defs = ToolKit.contractDefsForStage(config.stage);
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
 
-    let stationService, contract, wallet, web3;
+    let stationService: StationService, wallet: Wallet, web3;
 
     before(async () => {
         web3 = new Web3(config.provider);
@@ -31,18 +31,12 @@ describe('StationService', function () {
     });
 
     beforeEach(async () => {
-        const address = await TestHelper.deployContract(web3, stationStorage);
-        contract = new Contract(web3, {
-            abi: stationStorage.abi,
-            address: address,
-            gasPrice: config.gasPrice
-        });
-
-        stationService = new StationService(contract);
+        const testContractProvider = TestHelper.getTestContractProvider(web3, config, defs);
+        stationService = new StationService(testContractProvider);
     });
 
     afterEach(async () => {
-        EventPollerService.instance.removeAll();
+        EventPoller.instance.removeAll();
     });
 
     context('#create()', () => {

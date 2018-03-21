@@ -1,4 +1,3 @@
-import { Station } from './../../src/models/station';
 import * as sinon from 'sinon';
 import * as mocha from 'mocha';
 import { expect } from 'chai';
@@ -9,22 +8,21 @@ import { TestHelper } from '../testHelper';
 import { Wallet } from '../../src/models/wallet';
 import { Contract } from '../../src/models/contract';
 import { Connector } from '../../src/models/connector';
-import { EventPollerService } from '../../src/services/eventPollerService';
+import { EventPoller } from '../../src/services/eventPoller';
 import { ConnectorService } from '../../src/services/connectorService';
 import { ConnectorBuilder } from "../connectorBuilder";
-import { loadContractDefs } from "../../src/utils/defsLoader";
 import { config } from "../../src/utils/config";
+import { ToolKit } from './../../src/utils/toolKit';
+import { Station } from './../../src/models/station';
 
 describe('ConnectorService', function () {
 
     this.timeout(3 * 1000);
 
-    const contractDefs = loadContractDefs(config.stage);
-    const connectorStorage = contractDefs['ConnectorStorage'];
-    const gasPrice = 18000000000;
+    const defs = ToolKit.contractDefsForStage(config.stage);
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
 
-    let connectorService: ConnectorService, connectorStorageContract: Contract, wallet: Wallet, web3;
+    let connectorService: ConnectorService, wallet: Wallet, web3;
 
     before(async () => {
         web3 = new Web3(config.provider);
@@ -34,23 +32,16 @@ describe('ConnectorService', function () {
     });
 
     beforeEach(async () => {
-        const address = await TestHelper.deployContract(web3, connectorStorage);
-        connectorStorageContract = new Contract(web3, {
-            abi: connectorStorage.abi,
-            address: address,
-            gasPrice
-        });
-
-        connectorService = new ConnectorService(connectorStorageContract);
+        const testContractProvider = TestHelper.getTestContractProvider(web3, config, defs);
+        connectorService = new ConnectorService(testContractProvider);
     });
 
     afterEach(async () => {
-        EventPollerService.instance.removeAll();
+        EventPoller.instance.removeAll();
     });
 
     context('#create()', () => {
         it('should create an connector with the given parameters', async () => {
-
             const connector = new ConnectorBuilder()
                 .withOwner("0x123456")
                 .withIsAvailable(true)

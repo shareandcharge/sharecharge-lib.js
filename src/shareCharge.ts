@@ -2,12 +2,12 @@ import { ChargingService } from './services/chargingService';
 import { ConnectorService } from './services/connectorService';
 import { StationService } from './services/stationService';
 import { Contract } from './models/contract';
-import { EventPollerService } from './services/eventPollerService';
+import { EventPoller } from './services/eventPoller';
 import { EventDispatcher } from './models/eventDispatcher';
 import { IDefs } from "./interfaces/iDefs";
 import { IServices } from "./interfaces/iServices";
 import { IConfig } from "./interfaces/iConfig";
-import { loadContractDefs } from "./utils/defsLoader";
+import { IContractProvider, ContractProvider } from './services/contractProvider';
 
 const Web3 = require('web3');
 
@@ -22,7 +22,6 @@ export class ShareCharge {
     private readonly web3;
 
     constructor(private config: IConfig, preloaded?: IDefs | IServices) {
-
         this.web3 = new Web3(config.provider);
 
         if ((<IServices>preloaded)) {
@@ -33,16 +32,17 @@ export class ShareCharge {
         } else {
             // we didnt get preloaded services, load them from defs
             // either the preloaded ones or load them from on our own
-            const defs = <IDefs>preloaded ? <IDefs>preloaded : loadContractDefs(config.stage);
-
-            this.stations = new StationService(this.getContractInstance(defs, 'StationStorage'));
-            this.connectors = new ConnectorService(this.getContractInstance(defs, 'ConnectorStorage'));
-            this.charging = new ChargingService(this.getContractInstance(defs, 'Charging'));
+            const contractProvider = new ContractProvider(this.web3, config);
+            this.stations = new StationService(contractProvider);
+            this.connectors = new ConnectorService(contractProvider);
+            this.charging = new ChargingService(contractProvider);
         }
+    }
 
-        EventPollerService.instance.add(this.stations.contract, events => this.handleNewEvents(events));
-        EventPollerService.instance.add(this.connectors.contract, events => this.handleNewEvents(events));
-        EventPollerService.instance.add(this.charging.contract, events => this.handleNewEvents(events));
+    async hookup() {
+        EventPoller.instance.add(await this.stations.contract(), events => this.handleNewEvents(events));
+        EventPoller.instance.add(await this.connectors.contract(), events => this.handleNewEvents(events));
+        EventPoller.instance.add(await this.charging.contract(), events => this.handleNewEvents(events));
     }
 
     on(eventName: string, callback: (...args) => void) {
@@ -50,11 +50,11 @@ export class ShareCharge {
     }
 
     startListening() {
-        EventPollerService.instance.start();
+        EventPoller.instance.start();
     }
 
     stopListening() {
-        EventPollerService.instance.stop();
+        EventPoller.instance.stop();
     }
 
     private handleNewEvents(events: any) {

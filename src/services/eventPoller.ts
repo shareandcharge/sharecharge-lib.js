@@ -6,7 +6,7 @@ interface ContractTracker {
     fromBlock: number;
 }
 
-export interface PollerService {
+export interface Poller {
     start();
 
     stop();
@@ -20,7 +20,7 @@ export interface PollerService {
     removeAll();
 }
 
-export class EventPollerService implements PollerService {
+export class EventPoller implements Poller {
 
     private static singleton;
 
@@ -30,11 +30,11 @@ export class EventPollerService implements PollerService {
     private constructor(private interval: number) {
     }
 
-    static get instance(): EventPollerService {
-        if (!this.singleton) {
-            this.singleton = new EventPollerService(1000);
+    static get instance(): EventPoller {
+        if (!EventPoller.singleton) {
+            EventPoller.singleton = new EventPoller(1000);
         }
-        return this.singleton;
+        return EventPoller.singleton;
     }
 
     start() {
@@ -66,11 +66,11 @@ export class EventPollerService implements PollerService {
 
     async add(contract: Contract, callback: (events: any) => void) {
         const block = await contract.getBlockNumber() + 1;
-        this.callbacks.set(contract.native.options.address, { contract, callback, fromBlock: block });
+        this.callbacks.set(contract.address, { contract, callback, fromBlock: block });
     }
 
     remove(contract: Contract) {
-        this.callbacks.delete(contract.native.options.address);
+        this.callbacks.delete(contract.address);
     }
 
     removeAll() {
