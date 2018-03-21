@@ -7,11 +7,29 @@ import { config } from "../src/utils/config";
 
 const defs = loadContractDefs(config.stage);
 
+async function bulkCreate(wallet, sc: ShareCharge, total) {
+    for (let i = 0; i < total; i++) {
+        const station = new Station();
+        await sc.stations.useWallet(wallet).create(station);
+        console.log(`Created new station with id: ${station.id}`);
+
+        const connector = new Connector();
+        connector.stationId = station.id;
+        connector.available = true;
+        const connectorId = connector.id;
+        await sc.connectors.useWallet(wallet).create(connector);
+        console.log(`Created new connector with id: ${connectorId}`);
+    }
+}
+
 async function main() {
 
     const wallet = new Wallet('filter march urge naive sauce distance under copy payment slow just warm');
 
     const sc = new ShareCharge(config, defs, {});
+
+    // how to do this fast?
+    // await bulkCreate(wallet, sc, 250);
 
     const station = new Station();
     await sc.stations.useWallet(wallet).create(station);
