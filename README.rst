@@ -42,7 +42,7 @@ This should output the definitions of the contracts to ``$HOME/.sharecharge/cont
     npm install
     npm test
 
-Assuming the tests passed, the library is now ready to interact with the Share & Charge EV Network. 
+Assuming the tests passed, the library is now ready to interact with the Share & Charge EV Network.
 
 ----
 
@@ -188,6 +188,8 @@ The module requires a configuration object which lets the library know how to in
         }
     
     });
+
+Further usage examples can be found `here <https://github.com/motionwerkGmbH/sharecharge-lib/tree/domain/examples>`__.
 
 ----
 
