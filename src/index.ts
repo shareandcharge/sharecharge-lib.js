@@ -6,6 +6,7 @@ import { Wallet } from './models/wallet';
 import { ToolKit } from './utils/toolKit';
 import { ShareCharge } from "./shareCharge";
 import { IConfig } from './interfaces/iConfig';
+import { OpeningHours } from './models/openingHours';
 
 export {
     Connector,
@@ -15,5 +16,6 @@ export {
     Wallet,
     ShareCharge,
     IConfig,
-    ToolKit
+    ToolKit,
+    OpeningHours
 };
