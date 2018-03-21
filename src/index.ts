@@ -1,8 +1,9 @@
-import { Connector } from './models/connector';
-import { ConnectorService } from './services/connectorService';
-import { Station } from './models/station';
 import { StationService } from './services/stationService';
+import { ConnectorService } from './services/connectorService';
+import { Connector } from './models/connector';
+import { Station } from './models/station';
 import { Wallet } from './models/wallet';
+import { ToolKit } from './utils/toolKit';
 import { ShareCharge } from "./shareCharge";
 
 export {
@@ -11,5 +12,6 @@ export {
     Station,
     StationService,
     Wallet,
-    ShareCharge
+    ShareCharge,
+    ToolKit
 };

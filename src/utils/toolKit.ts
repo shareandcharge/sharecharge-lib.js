@@ -1,6 +1,7 @@
 const web3Utils = require('web3').utils;
 import * as crypto from 'crypto';
 import { PlugType } from '../models/plugType';
+import { loadContractDefs } from './defsLoader';
 
 export class ToolKit {
 
@@ -37,5 +38,9 @@ export class ToolKit {
             }
         }
         return plugs;
+    }
+
+    static contractDefsForStage(stage: string, verbose: boolean = false) {
+        return loadContractDefs(stage, verbose);
     }
 }
