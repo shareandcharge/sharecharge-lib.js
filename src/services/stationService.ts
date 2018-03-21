@@ -35,7 +35,7 @@ export class StationService {
                 const id = station.id;
                 const lat = station.latitude * 1000000 << 0;
                 const lng = station.longitude * 1000000 << 0;
-                const hours = ToolKit.asciiToHex(station.openingHours); 
+                const hours = ToolKit.asciiToHex(station.openingHours);
                 await this.contract.send("addStation", wallet, id, wallet.address, lat, lng, hours);
                 station.tracker.resetProperties();
             },

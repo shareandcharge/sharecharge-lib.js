@@ -1,5 +1,5 @@
+import { Connector } from './../src/models/connector';
 import { ShareCharge } from '../src/shareCharge';
-import { Connector } from '../src/models/connector';
 import { Wallet } from '../src/models/wallet';
 
 const config = {
@@ -10,8 +10,20 @@ const config = {
 
 const defs = require(process.env["HOME"] + `/.sharecharge/contract.defs.${config.stage}.json`);
 
-async function findAvailableConnector() {
-    return '';
+async function findFreeConnector(sc: ShareCharge) {
+    const stations = await sc.stations.getAll();
+    console.log(stations.length);
+    for (let station of stations) {
+        if (await sc.connectors.anyFree(station)) {
+            const connectors = await sc.connectors.getByStation(station);
+            for (let connector of connectors) {
+                if (connector.available) {
+                    return connector.id;
+                }
+            }
+        }
+    }
+    return "";
 }
 
 async function main() {
@@ -24,32 +36,32 @@ async function main() {
 
     sc.on("StartConfirmed", async (result) => {
         if (result.connectorId === selectedConnectorId && result.controller.toLowerCase() === wallet.address) {
-            console.log('Started', result);
+            console.log('Started', result.connectorId);
         }
     });
 
     sc.on("StopConfirmed", async (result) => {
         if (result.connectorId === selectedConnectorId && result.controller.toLowerCase() === wallet.address) {
-            console.log('Stopped', result);
+            console.log('Stopped', result.connectorId);
             sc.stopListening(); // for this demo, app shutdown should call stop listening!
         }
     });
 
-    // const connectorId = await findAvailableConnector();
-    const stations = await sc.stations.getAll();
+    const connectorId = await findFreeConnector(sc);
+    if (connectorId != '') {
+        sc.startListening();
 
-    const connectors = await sc.connectors.getByStation(stations[0]);
-    const connectorId = connectors[0].id;
+        const connector = await sc.connectors.getById(connectorId);
+        selectedConnectorId = connector.id;
+        console.log(selectedConnectorId);
 
-    const connector = await sc.connectors.getById(connectorId);
-    selectedConnectorId = connector.id;
+        await sc.charging.useWallet(wallet).requestStart(connector, 5);
 
-    await sc.charging.useWallet(wallet).requestStart(connector, 5);
-    sc.startListening();
+        setTimeout(() => sc.charging.useWallet(wallet).requestStop(connector), 2000);
 
-    setTimeout(() => {
-        sc.charging.useWallet(wallet).requestStop(connector);
-    }, 5000);
+    } else {
+        console.log('Unable to find station with free connectors!');
+    }
 }
 
 main();
