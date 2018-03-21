@@ -21,7 +21,7 @@ An Ethereum client should be running in the background. A popular choice for dev
 
 **sharecharge-contracts**
 
-The Share & Charge library depends on `sharecharge-contracts <https://github.com/motionwerkGmbH/sharecharge-contracts>`__. These are Ethereum smart contracts which enable the storing of Charing Poles on the Share & Charge network as well as interacting with them, for example, initiating charging sessions. This repository also provides a configuration for the aforementioned ``geth`` in development mode which can be run using ``npm run geth-dev``. The setup instructions for the smart contracts are as follows:
+The Share & Charge library depends on `sharecharge-contracts <https://github.com/motionwerkGmbH/sharecharge-contracts>`__. These are Ethereum smart contracts which enable the storing of Charing Poles on the Share & Charge EV network as well as interacting with them, for example, initiating charging sessions. This repository also provides a configuration for the aforementioned ``geth`` in development mode which can be run using ``npm run geth-dev``. The setup instructions for the smart contracts are as follows:
 
 ::
 
@@ -31,7 +31,7 @@ The Share & Charge library depends on `sharecharge-contracts <https://github.com
     truffle migrate
 
 
-This should output the definitions of the contracts to ``$HOME/.sharecharge/contract.defs.local.json``. This file is necessary to run the library against the correct version of the smart contracts.
+This should output the definitions of the contracts to ``$HOME/.sharecharge/contract.defs.<ENV>.json``. This file is necessary to run the library against the correct version of the smart contracts.
 
 **sharecharge-lib**
 
@@ -55,7 +55,7 @@ To store stations, connectors and request/confirm charging sessions on the netwo
 
 A wallet can be generated using either a new or known 12 word seed phrase. This seed phrase allows a user to regain access to their wallet if they lose it.
 
-*TypeScript Usage*:
+*Example Usage (in TypeScript)*
 
 .. code-block:: typescript
 
