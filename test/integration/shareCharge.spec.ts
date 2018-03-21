@@ -54,7 +54,7 @@ describe('ShareCharge', function () {
         await TestHelper.ensureFunds(web3, mspWallet);
 
         const stationStorageAddress = await TestHelper.deployContract(web3, stationStorage);
-        let stationServiceContract = new Contract(web3, {
+        const stationServiceContract = new Contract(web3, {
             abi: stationStorage.abi,
             address: stationStorageAddress,
             gasPrice: config.gasPrice

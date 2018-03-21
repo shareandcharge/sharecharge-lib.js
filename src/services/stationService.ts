@@ -6,7 +6,8 @@ import { Wallet } from '../models/wallet';
 
 export class StationService {
 
-    constructor(public readonly contract: Contract) {}
+    constructor(public readonly contract: Contract) {
+    }
 
     async getAll(): Promise<Station[]> {
         const stations: Station[] = [];
@@ -35,7 +36,7 @@ export class StationService {
                 const id = station.id;
                 const lat = station.latitude * 1000000 << 0;
                 const lng = station.longitude * 1000000 << 0;
-                const hours = ToolKit.asciiToHex(station.openingHours); 
+                const hours = ToolKit.asciiToHex(station.openingHours);
                 await this.contract.send("addStation", wallet, id, wallet.address, lat, lng, hours);
                 station.tracker.resetProperties();
             },

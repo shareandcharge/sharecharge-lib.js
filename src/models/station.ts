@@ -64,7 +64,7 @@ export class Station {
         station._owner = payload["owner"];
         station._latitude = payload["latitude"] / 1000000;
         station._longitude = payload["longitude"] / 1000000;
-        station._openingHours = ToolKit.hexToString(payload["openingHours"]); 
+        station._openingHours = ToolKit.hexToString(payload["openingHours"]);
         return station;
     }
 }
