@@ -21,8 +21,8 @@ export class Wallet {
         return tx.serialize();
     }
 
-    static generate(): { seed: string, wallet: Wallet } {
+    static generate(): { seed: string, keys: Wallet } {
         const seed: string = bip39.generateMnemonic();
-        return { seed, wallet: new Wallet(seed) };
+        return { seed, keys: new Wallet(seed) };
     }
 }
