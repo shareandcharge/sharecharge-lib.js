@@ -57,17 +57,63 @@ export class ConnectorService {
                 const available = connector.available;
                 await contract.send("addConnector", [id, owner, stationId, plugMask, available], wallet);
             },
+            createBatch: async (...connectors: Connector[]) => {
+                const contract = await this.contract();
+                const batch = contract.newBatch();
+                wallet.nonce = await contract.getNonce(wallet);
+                for (const connector of connectors) {
+                    const parameters = [
+                        connector.id,
+                        wallet.address,
+                        connector.stationId,
+                        ToolKit.toPlugMask(connector.plugTypes),
+                        connector.available
+                    ];
+                    const tx = await contract.request("addConnector", parameters, wallet);
+                    batch.add(tx);
+                    wallet.nonce++;
+                }
+                batch.execute();
+            },
             update: async (connector: Connector) => {
                 const contract = await this.contract();
+
                 if (await contract.call("getIndexById", connector.id) >= 0) {
-                    await Promise.all(connector.tracker.getProperties().map(async name => {
-                        if (connector.tracker.didPropertyChange(name)) {
-                            const funcName = "set" + name.charAt(0).toUpperCase() + name.substr(1);
-                            return await contract.send(funcName, [connector.id, connector[name]], wallet);
+                    const batch = contract.newBatch();
+                    wallet.nonce = await contract.getNonce(wallet);
+
+                    for (const property of connector.tracker.getProperties()) {
+                        if (connector.tracker.didPropertyChange(property)) {
+                            const funcName = "set" + property.charAt(0).toUpperCase() + property.substr(1);
+                            const tx = await contract.request(funcName, [connector.id, connector[property]], wallet);
+                            batch.add(tx);
+                            wallet.nonce++;
                         }
-                    }));
+                    }
+
+                    batch.execute();
                     connector.tracker.resetProperties();
                 }
+            },
+            updateBatch: async (...connectors: Connector[]) => {
+                const contract = await this.contract();
+                const batch = contract.newBatch();
+                wallet.nonce = await contract.getNonce(wallet);
+
+                for (const connector of connectors) {
+                    if (await this.contract.call("getIndexById", connector.id) >= 0) {
+                        for (const property of connector.tracker.getProperties()) {
+                            if (connector.tracker.didPropertyChange(property)) {
+                                const funcName = "set" + property.charAt(0).toUpperCase() + property.substr(1);
+                                const tx = await contract.request(funcName, [connector.id, connector[property]], wallet);
+                                batch.add(tx);
+                                wallet.nonce++;
+                            }
+                        }
+                        connector.tracker.resetProperties();
+                    }
+                }
+                batch.execute();
             }
         };
     }

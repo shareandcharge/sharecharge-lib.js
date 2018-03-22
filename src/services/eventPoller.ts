@@ -8,15 +8,10 @@ interface ContractTracker {
 
 export interface Poller {
     start();
-
     stop();
-
     poll();
-
     add(contract: Contract, callback: (events: any) => void);
-
     remove(contract: Contract);
-
     removeAll();
 }
 
