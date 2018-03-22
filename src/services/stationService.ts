@@ -80,8 +80,8 @@ export class StationService {
                             wallet.nonce++;
                         }
                     }
-                    station.tracker.resetProperties();
                     batch.execute();
+                    station.tracker.resetProperties();
                 }
             },
             updateBatch: async (...stations: Station[]) => {
