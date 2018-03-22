@@ -22,7 +22,7 @@ import { config } from "../../src/utils/config";
 describe('ShareCharge', function () {
 
     this.timeout(20 * 1000);
-    const batchTimeout = 200;
+    const batchTimeout = 500;
 
     const contractDefs = ToolKit.contractDefsForStage(config.stage);
 
