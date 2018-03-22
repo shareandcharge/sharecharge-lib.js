@@ -10,7 +10,7 @@ export class Station {
     private _owner: string = "0x0000000000000000000000000000000000000000";
     private _latitude: number = 0;
     private _longitude: number = 0;
-    private _openingHours: string = "0000000000000000000000000000";
+    private _openingHours: string = "0096009600960096009600960096";
 
     constructor() {
         this.tracker = new ChangeTracker(this);
@@ -56,7 +56,7 @@ export class Station {
     }
 
     set openingHours(value: OpeningHours) {
-        this.tracker.setProperty("openingHours", value.toString());
+        this.tracker.setProperty("openingHours", OpeningHours.encode(value));
     }
 
     static serialize(station: Station) {

@@ -101,7 +101,7 @@ export class ConnectorService {
                 wallet.nonce = await contract.getNonce(wallet);
 
                 for (const connector of connectors) {
-                    if (await this.contract.call("getIndexById", connector.id) >= 0) {
+                    if (await contract.call("getIndexById", connector.id) >= 0) {
                         for (const property of connector.tracker.getProperties()) {
                             if (connector.tracker.didPropertyChange(property)) {
                                 const funcName = "set" + property.charAt(0).toUpperCase() + property.substr(1);
