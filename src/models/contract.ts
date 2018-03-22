@@ -30,7 +30,7 @@ export class Contract {
     private async createTx(method: string, wallet: Wallet, ...args: any[]): Promise<any> {
         const tx = this.native.methods[method](...args);
         const gas = await tx.estimateGas({from: wallet.address}) * 2;
-        //console.log(gas, this.gasPrice);
+        // console.log(gas, this.gasPrice);
         const data = await tx.encodeABI();
         const nonce = await this.web3.eth.getTransactionCount(wallet.address);
         return {
