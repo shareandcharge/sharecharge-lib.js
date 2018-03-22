@@ -48,7 +48,7 @@ export class StationService {
                 const lat = station.latitude * 1000000 << 0;
                 const lng = station.longitude * 1000000 << 0;
                 const hours = ToolKit.asciiToHex(station.openingHours.toString());
-                await contract.send("addStation", wallet, id, wallet.address, lat, lng, hours);
+                await contract.send("addStation", [id, wallet.address, lat, lng, hours], wallet);
                 station.tracker.resetProperties();
             },
             update: async (station: Station) => {
@@ -57,7 +57,7 @@ export class StationService {
                     await Promise.all(station.tracker.getProperties().map(async name => {
                         if (station.tracker.didPropertyChange(name)) {
                             const contractName = "set" + name.charAt(0).toUpperCase() + name.substr(1);
-                            return await contract.send(contractName, wallet, station.id, station[name]);
+                            return await contract.send(contractName, [station.id, station[name]], wallet);
                         }
                     }));
                     station.tracker.resetProperties();

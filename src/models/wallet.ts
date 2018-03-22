@@ -4,6 +4,7 @@ import * as bip39 from 'bip39';
 
 export class Wallet {
 
+    public nonce;
     private ks;
 
     constructor(seedPhrase: string) {

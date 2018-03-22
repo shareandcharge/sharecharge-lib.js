@@ -55,7 +55,7 @@ export class ConnectorService {
                 const stationId = connector.stationId;
                 const plugMask = ToolKit.toPlugMask(connector.plugTypes);
                 const available = connector.available;
-                await contract.send("addConnector", wallet, id, owner, stationId, plugMask, available);
+                await contract.send("addConnector", [id, owner, stationId, plugMask, available], wallet);
             },
             update: async (connector: Connector) => {
                 const contract = await this.contract();
@@ -63,7 +63,7 @@ export class ConnectorService {
                     await Promise.all(connector.tracker.getProperties().map(async name => {
                         if (connector.tracker.didPropertyChange(name)) {
                             const funcName = "set" + name.charAt(0).toUpperCase() + name.substr(1);
-                            return await contract.send(funcName, wallet, connector.id, connector[name]);
+                            return await contract.send(funcName, [connector.id, connector[name]], wallet);
                         }
                     }));
                     connector.tracker.resetProperties();
