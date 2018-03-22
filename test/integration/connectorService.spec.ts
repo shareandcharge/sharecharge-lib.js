@@ -19,7 +19,7 @@ import { StationBuilder } from '../stationBuilder';
 describe('ConnectorService', function () {
 
     this.timeout(10 * 1000);
-    const batchTimeout = 200;
+    const batchTimeout = 500;
 
     const defs = ToolKit.contractDefsForStage(config.stage);
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
