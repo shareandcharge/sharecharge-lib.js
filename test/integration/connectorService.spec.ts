@@ -97,5 +97,25 @@ describe('ConnectorService', function () {
             expect(result).to.equal(true);
         });
     });
+
+    context('#isPersisted()', () => {
+        it('should return true for persisted connectors', async function () {
+            const connector = new ConnectorBuilder().withOwner(wallet.address).build();
+
+            await connectorService.useWallet(wallet).create(connector);
+
+            const result = await connectorService.isPersisted(connector);
+
+            expect(result).to.equal(true);
+        });
+
+        it('should return false for unpersisted stations', async function () {
+            const connector = new ConnectorBuilder().withOwner(wallet.address).build();
+
+            const result = await connectorService.isPersisted(connector);
+
+            expect(result).to.equal(false);
+        });
+    });
 });
 
