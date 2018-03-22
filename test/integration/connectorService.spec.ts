@@ -14,10 +14,12 @@ import { ConnectorBuilder } from "../connectorBuilder";
 import { config } from "../../src/utils/config";
 import { ToolKit } from './../../src/utils/toolKit';
 import { Station } from './../../src/models/station';
+import { StationBuilder } from '../stationBuilder';
 
 describe('ConnectorService', function () {
 
     this.timeout(10 * 1000);
+    const batchTimeout = 200;
 
     const defs = ToolKit.contractDefsForStage(config.stage);
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
@@ -40,8 +42,9 @@ describe('ConnectorService', function () {
         EventPoller.instance.removeAll();
     });
 
-    context('#create()', () => {
-        it('should create an connector with the given parameters', async () => {
+    context('create', () => {
+        it('should create a single connector with the given parameters', async () => {
+
             const connector = new ConnectorBuilder()
                 .withOwner("0x123456")
                 .withIsAvailable(true)
@@ -57,6 +60,85 @@ describe('ConnectorService', function () {
             expect(result.id).to.equal(connector.id);
             expect(result.owner.toLowerCase()).to.equal(wallet.address);
             expect(result.available).to.equal(connector.available);
+        });
+
+        it('should create connectors in bulk', async () => {
+
+            const connectors: Connector[] = [];
+
+            const station = new StationBuilder().build();
+
+            for (let i = 1; i <= 10; i++) {
+                connectors.push(new ConnectorBuilder().withStation(station).build());
+            }
+
+            await connectorService.useWallet(wallet).createBatch(...connectors);
+
+            return new Promise((resolve, reject) => {
+
+                setTimeout(async () => {
+                    const contractConnectors = await connectorService.getByStation(station);
+                    expect(contractConnectors.length).to.equal(10);
+                    resolve();
+                }, batchTimeout);
+
+            });
+
+        });
+    });
+
+    context('update', () => {
+        it('should update a connector with the given parameters', async () => {
+
+            const connector = new ConnectorBuilder()
+                .withOwner("0x123456")
+                .withIsAvailable(true)
+                .build();
+
+            await connectorService.useWallet(wallet).create(connector);
+
+            const result: Connector = await connectorService.getById(connector.id);
+
+            connector.available = false;
+
+            await connectorService.useWallet(wallet).update(connector);
+
+            return new Promise((resolve, reject) => {
+
+                setTimeout(async () => {
+                    const result2: Connector = await connectorService.getById(connector.id);
+                    expect(result2.available).to.equal(false);
+                    resolve();
+                }, batchTimeout);
+            });
+
+        });
+
+        it('should update connectors in bulk', async () => {
+
+            const connectors: Connector[] = [];
+
+            const station = new StationBuilder().build();
+
+            for (let i = 1; i <= 3; i++) {
+                connectors.push(new ConnectorBuilder().withIsAvailable(true).build());
+            }
+
+            await connectorService.useWallet(wallet).createBatch(...connectors);
+
+            connectors.forEach(connector => connector.available = false);
+
+            return new Promise((resolve, reject) => {
+                setTimeout(async () => {
+                    await connectorService.useWallet(wallet).updateBatch(...connectors);
+
+                    setTimeout(async () => {
+                        const contractConnectors = await connectorService.getByStation(station);
+                        expect(contractConnectors.filter(connector => connector.available === true).length).to.equal(0);
+                        resolve();
+                    }, batchTimeout);
+                }, batchTimeout);
+            });
         });
     });
 
@@ -98,4 +180,3 @@ describe('ConnectorService', function () {
         });
     });
 });
-

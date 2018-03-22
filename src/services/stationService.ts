@@ -89,7 +89,7 @@ export class StationService {
                 const batch = contract.newBatch();
                 wallet.nonce = await contract.getNonce(wallet);
                 for (const station of stations) {
-                    if (await this.contract.call("getIndexById", station.id) >= 0) {
+                    if (await contract.call("getIndexById", station.id) >= 0) {
                         const batch = contract.newBatch();
                         wallet.nonce = await contract.getNonce(wallet);
                         for (const property of station.tracker.getProperties()) {
