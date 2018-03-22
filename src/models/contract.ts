@@ -1,5 +1,3 @@
-import { Observable } from "rxjs/Observable";
-import { Subject } from "rxjs/Subject";
 import { Wallet } from "./wallet";
 
 export class Contract {
@@ -31,7 +29,8 @@ export class Contract {
 
     private async createTx(method: string, wallet: Wallet, ...args: any[]): Promise<any> {
         const tx = this.native.methods[method](...args);
-        const gas = await tx.estimateGas({ from: wallet.address });
+        const gas = await tx.estimateGas({from: wallet.address}) * 2;
+        //console.log(gas, this.gasPrice);
         const data = await tx.encodeABI();
         const nonce = await this.web3.eth.getTransactionCount(wallet.address);
         return {
@@ -39,7 +38,7 @@ export class Contract {
             from: wallet.address,
             to: this.address,
             gasPrice: this.gasPrice,
-            gas: gas * 2,
+            gas,
             value: 0,
             data
         };
