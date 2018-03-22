@@ -21,7 +21,7 @@ import { config } from "../../src/utils/config";
 
 describe('ShareCharge', function () {
 
-    this.timeout(10 * 1000);
+    this.timeout(20 * 1000);
 
     const contractDefs = ToolKit.contractDefsForStage(config.stage);
 

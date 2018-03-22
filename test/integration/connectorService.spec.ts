@@ -17,7 +17,7 @@ import { Station } from './../../src/models/station';
 
 describe('ConnectorService', function () {
 
-    this.timeout(3 * 1000);
+    this.timeout(10 * 1000);
 
     const defs = ToolKit.contractDefsForStage(config.stage);
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
