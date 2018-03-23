@@ -1,3 +1,5 @@
+import { IContractProvider } from './../../src/services/contractProvider';
+import { ToolKit } from './../../src/utils/toolKit';
 import { expect } from 'chai';
 
 import { ShareCharge } from '.././../src/shareCharge';
@@ -14,9 +16,10 @@ import { Container, injectable, inject } from "inversify";
 import "reflect-metadata";
 import { PlugType } from '../../src/models/plugType';
 import { EventPoller } from '../../src/services/eventPoller';
-import { IoC } from '../../src';
+import { IoC } from '../../src/ioc';
 import { TestHelper } from '../testHelper';
 import { config } from "../../src/utils/config";
+import { Contract } from '../../src/models/contract';
 
 const Web3 = require('web3');
 
@@ -28,6 +31,33 @@ describe('IoC', function () {
     before(async () => {
         const web3 = new Web3(config.provider);
         await TestHelper.ensureFunds(web3, wallet);
+
+        const contractDefs = ToolKit.contractDefsForStage(config.stage);
+
+        const testContractProvider = TestHelper.getTestContractProvider(web3, config, contractDefs);
+
+        const stationContract = await testContractProvider.obtain("StationStorage");
+        const connectorContract = await testContractProvider.obtain("ConnectorStorage");
+
+        const testContractProvider2 = TestHelper.getTestContractProvider(web3, config, contractDefs, [connectorContract.address]);
+        const chargingContract = await testContractProvider2.obtain("Charging");
+
+        const coinbase = await web3.eth.getCoinbase();
+        await connectorContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
+
+        IoC.getContainer().rebind<IContractProvider>(Symbols.ContractProvider)
+        .toConstantValue(<IContractProvider>{
+            async obtain(key: string): Promise<Contract> {
+                switch (key) {
+                    case "StationStorage":
+                        return stationContract;
+                    case "ConnectorStorage":
+                        return connectorContract;
+                    default:
+                        return chargingContract;
+                }
+            }
+        });
     });
 
     it('should resolve', async () => {
