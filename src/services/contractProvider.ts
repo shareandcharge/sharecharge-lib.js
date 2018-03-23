@@ -1,16 +1,24 @@
+import { ConfigProvider } from './configProvider';
 import { IDefs } from '../interfaces/iDefs';
 import { Contract } from '../models/contract';
 import { ToolKit } from '../utils/toolKit';
+import { Container, injectable, inject } from "inversify";
+import { Symbols } from '../models/symbols';
+import "reflect-metadata";
+const Web3 = require('web3');
 
 export interface IContractProvider {
     obtain(key: string): Promise<Contract>;
 }
 
+@injectable()
 export class ContractProvider implements IContractProvider {
 
+    private web3;
     private definitions;
 
-    constructor(private web3, private config) {
+    constructor(@inject(Symbols.ConfigProvider) private config: ConfigProvider) {
+        this.web3 = new Web3(config.provider);
         this.definitions = ToolKit.contractDefsForStage(config.stage);
     }
 

@@ -2,10 +2,10 @@ import { Connector } from './../src/models/connector';
 import { ShareCharge } from '../src/shareCharge';
 import { Wallet } from '../src/models/wallet';
 import { config } from "../src/utils/config";
+import { IoC } from '../src/ioc';
 
 async function findFreeConnector(sc: ShareCharge) {
     const stations = await sc.stations.getAll();
-    console.log(stations.length);
     for (const station of stations) {
         if (await sc.connectors.anyFree(station)) {
             const connectors = await sc.connectors.getByStation(station);
@@ -23,7 +23,8 @@ async function main() {
 
     const wallet = new Wallet('filter march urge naive sauce distance under copy payment slow just cool');
 
-    const sc = new ShareCharge(config);
+    const sc = await IoC.resolve();
+    sc.hookup();
 
     let selectedConnectorId = '';
 

@@ -3,6 +3,7 @@ import { Connector } from '../src/models/connector';
 import { Wallet } from '../src/models/wallet';
 import { Station } from '../src/models/station';
 import { config } from "../src/utils/config";
+import { IoC } from '../src/ioc';
 
 async function bulkCreate(wallet, sc: ShareCharge, total) {
     for (let i = 0; i < total; i++) {
@@ -22,7 +23,7 @@ async function bulkCreate(wallet, sc: ShareCharge, total) {
 async function main() {
 
     const wallet = new Wallet('filter march urge naive sauce distance under copy payment slow just warm');
-    const sc = new ShareCharge(config);
+    const sc = await IoC.resolve();
     await sc.hookup();
 
     // how to do this fast?
@@ -39,6 +40,7 @@ async function main() {
     console.log(`Created new connector with id: ${connectorId}`);
 
     sc.on("StartRequested", async (result) => {
+        console.log(result);
         if (result.connectorId == connectorId) {
             console.log(`Received start request for connector with id: ${connectorId}`);
 

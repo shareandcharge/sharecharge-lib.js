@@ -2,12 +2,16 @@ import { Connector } from "../models/connector";
 import { Contract } from "../models/contract";
 import { Wallet } from "../models/wallet";
 import { IContractProvider } from "./contractProvider";
+import { Container, injectable, inject } from "inversify";
+import { Symbols } from '../models/symbols';
+import "reflect-metadata";
 
+@injectable()
 export class ChargingService {
 
     private _resolved;
 
-    constructor(private contractProvider: IContractProvider) {
+    constructor(@inject(Symbols.ContractProvider) private contractProvider: IContractProvider) {
     }
 
     async contract(): Promise<Contract> {

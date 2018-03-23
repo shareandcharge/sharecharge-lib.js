@@ -10,7 +10,7 @@ export class Connector {
     private _owner: string = "0x0000000000000000000000000000000000000000";
     private _stationId: string = "0x0000000000000000000000000000000000000000";
     private _plugMask: number = 0;
-    private _available: boolean = false;
+    private _available: boolean = true;
 
     constructor() {
         this.tracker = new ChangeTracker(this);

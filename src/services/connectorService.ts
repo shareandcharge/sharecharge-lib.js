@@ -4,12 +4,16 @@ import { Station } from '../models/station';
 import { ToolKit } from '../utils/toolKit';
 import { Wallet } from '../models/wallet';
 import { IContractProvider } from './contractProvider';
+import { Container, injectable, inject } from "inversify";
+import { Symbols } from '../models/symbols';
+import "reflect-metadata";
 
+@injectable()
 export class ConnectorService {
 
     private _resolved;
 
-    constructor(private contractProvider: IContractProvider) {
+    constructor(@inject(Symbols.ContractProvider) private contractProvider: IContractProvider) {
     }
 
     async contract(): Promise<Contract> {
@@ -51,7 +55,7 @@ export class ConnectorService {
             create: async (connector: Connector) => {
                 const contract = await this.contract();
                 const id = connector.id;
-                const owner = wallet.address;
+                const owner = connector.owner = wallet.address;
                 const stationId = connector.stationId;
                 const plugMask = ToolKit.toPlugMask(connector.plugTypes);
                 const available = connector.available;

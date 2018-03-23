@@ -58,11 +58,7 @@ describe('ShareCharge', function () {
     });
 
     beforeEach(async () => {
-        shareCharge = new ShareCharge(config, {
-            StationService: stationService,
-            ChargingService: chargingService,
-            ConnectorService: connectorService
-        });
+        shareCharge = new ShareCharge(stationService, connectorService, chargingService);
         await shareCharge.hookup();
     });
 
