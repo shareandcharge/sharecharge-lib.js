@@ -2,7 +2,7 @@ import { PlugType } from './plugType';
 import { ChangeTracker } from './changeTracker';
 import { ToolKit } from '../utils/toolKit';
 
-export class Connector {
+export class Evse {
 
     public readonly tracker: ChangeTracker;
 
@@ -55,13 +55,13 @@ export class Connector {
         this.tracker.setProperty("available", value);
     }
 
-    static deserialize(payload: any): Connector {
-        const connector = new Connector();
-        connector._id = payload["id"];
-        connector._owner = payload["owner"];
-        connector._stationId = payload["stationId"];
-        connector._plugMask = payload["plugMask"];
-        connector._available = payload["available"];
-        return connector;
+    static deserialize(payload: any): Evse {
+        const evse = new Evse();
+        evse._id = payload["id"];
+        evse._owner = payload["owner"];
+        evse._stationId = payload["stationId"];
+        evse._plugMask = payload["plugMask"];
+        evse._available = payload["available"];
+        return evse;
     }
 }

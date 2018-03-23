@@ -5,8 +5,8 @@ import { expect } from 'chai';
 import { ShareCharge } from '.././../src/shareCharge';
 import { Station } from '../../src/models/station';
 import { ChargingService } from '../../src/services/chargingService';
-import { Connector } from '../../src/models/connector';
-import { ConnectorService } from '../../src/services/connectorService';
+import { Evse } from '../../src/models/evse';
+import { EvseService } from '../../src/services/evseService';
 import { StationService } from '../../src/services/stationService';
 import { ConfigProvider } from '../../src/services/configProvider';
 import { ContractProvider } from '../../src/services/contractProvider';
@@ -37,13 +37,13 @@ describe('IoC', function () {
         const testContractProvider = TestHelper.getTestContractProvider(web3, config, contractDefs);
 
         const stationContract = await testContractProvider.obtain("StationStorage");
-        const connectorContract = await testContractProvider.obtain("ConnectorStorage");
+        const evseContract = await testContractProvider.obtain("EvseStorage");
 
-        const testContractProvider2 = TestHelper.getTestContractProvider(web3, config, contractDefs, [connectorContract.address]);
+        const testContractProvider2 = TestHelper.getTestContractProvider(web3, config, contractDefs, [evseContract.address]);
         const chargingContract = await testContractProvider2.obtain("Charging");
 
         const coinbase = await web3.eth.getCoinbase();
-        await connectorContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
+        await evseContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
 
         IoC.getContainer().rebind<IContractProvider>(Symbols.ContractProvider)
         .toConstantValue(<IContractProvider>{
@@ -51,8 +51,8 @@ describe('IoC', function () {
                 switch (key) {
                     case "StationStorage":
                         return stationContract;
-                    case "ConnectorStorage":
-                        return connectorContract;
+                    case "EvseStorage":
+                        return evseContract;
                     default:
                         return chargingContract;
                 }
@@ -61,7 +61,7 @@ describe('IoC', function () {
     });
 
     it('should resolve', async () => {
-        const shareCharge = await IoC.resolve();
+        const shareCharge: ShareCharge = await IoC.resolve();
         await shareCharge.hookup();
 
         const station = new Station();
@@ -70,21 +70,21 @@ describe('IoC', function () {
         const station1 = await shareCharge.stations.getById(station.id);
         expect(station1.latitude).to.equal(station.latitude);
 
-        const connector = new Connector();
-        connector.stationId = station.id;
-        connector.plugTypes = [PlugType.CCS];
-        await shareCharge.connectors.useWallet(wallet).create(connector);
+        const evse = new Evse();
+        evse.stationId = station.id;
+        evse.plugTypes = [PlugType.CCS];
+        await shareCharge.evses.useWallet(wallet).create(evse);
 
-        let connectorUpdatedId = "";
-        await shareCharge.on("ConnectorUpdated", async (result) => {
-            connectorUpdatedId = result.connectorId;
+        let evseUpdatedId = "";
+        await shareCharge.on("EvseUpdated", async (result) => {
+            evseUpdatedId = result.evseId;
         });
 
-        await shareCharge.charging.useWallet(wallet).requestStart(connector, 10);
+        await shareCharge.charging.useWallet(wallet).requestStart(evse, 10);
 
         await EventPoller.instance.poll();
 
-        expect(connectorUpdatedId).to.equal(connector.id);
+        expect(evseUpdatedId).to.equal(evse.id);
     });
 
 });

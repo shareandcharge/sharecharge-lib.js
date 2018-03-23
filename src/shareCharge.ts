@@ -1,5 +1,5 @@
 import { ChargingService } from './services/chargingService';
-import { ConnectorService } from './services/connectorService';
+import { EvseService } from './services/evseService';
 import { StationService } from './services/stationService';
 import { Contract } from './models/contract';
 import { EventPoller } from './services/eventPoller';
@@ -22,20 +22,20 @@ export class ShareCharge {
     private eventDispatcher = new EventDispatcher<string>();
 
     public readonly stations: StationService;
-    public readonly connectors: ConnectorService;
+    public readonly evses: EvseService;
     public readonly charging: ChargingService;
 
-    constructor(@inject(Symbols.StationSerivce) stationsService,
-                @inject(Symbols.ConnectorService) connectorsService,
+    constructor(@inject(Symbols.StationSerivce) stationService,
+                @inject(Symbols.EvseService) evseService,
                 @inject(Symbols.ChargingService) chargingService) {
-        this.stations = stationsService;
-        this.connectors = connectorsService;
+        this.stations = stationService;
+        this.evses = evseService;
         this.charging = chargingService;
     }
 
     async hookup() {
         EventPoller.instance.add(await this.stations.contract(), events => this.handleNewEvents(events));
-        EventPoller.instance.add(await this.connectors.contract(), events => this.handleNewEvents(events));
+        EventPoller.instance.add(await this.evses.contract(), events => this.handleNewEvents(events));
         EventPoller.instance.add(await this.charging.contract(), events => this.handleNewEvents(events));
     }
 

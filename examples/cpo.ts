@@ -1,5 +1,5 @@
 import { ShareCharge } from '../src/shareCharge';
-import { Connector } from '../src/models/connector';
+import { Evse } from '../src/models/evse';
 import { Wallet } from '../src/models/wallet';
 import { Station } from '../src/models/station';
 import { config } from "../src/utils/config";
@@ -11,19 +11,19 @@ async function bulkCreate(wallet, sc: ShareCharge, total) {
         await sc.stations.useWallet(wallet).create(station);
         console.log(`Created new station with id: ${station.id}`);
 
-        const connector = new Connector();
-        connector.stationId = station.id;
-        connector.available = true;
-        const connectorId = connector.id;
-        await sc.connectors.useWallet(wallet).create(connector);
-        console.log(`Created new connector with id: ${connectorId}`);
+        const evse = new Evse();
+        evse.stationId = station.id;
+        evse.available = true;
+        const evseId = evse.id;
+        await sc.evses.useWallet(wallet).create(evse);
+        console.log(`Created new evse with id: ${evseId}`);
     }
 }
 
 async function main() {
 
     const wallet = new Wallet('filter march urge naive sauce distance under copy payment slow just warm');
-    const sc = await IoC.resolve();
+    const sc: ShareCharge = await IoC.resolve();
     await sc.hookup();
 
     // how to do this fast?
@@ -32,40 +32,40 @@ async function main() {
     await sc.stations.useWallet(wallet).create(station);
     console.log(`Created new station with id: ${station.id}`);
 
-    const connector = new Connector();
-    connector.stationId = station.id;
-    connector.available = true;
-    const connectorId = connector.id;
-    await sc.connectors.useWallet(wallet).create(connector);
-    console.log(`Created new connector with id: ${connectorId}`);
+    const evse = new Evse();
+    evse.stationId = station.id;
+    evse.available = true;
+    const evseId = evse.id;
+    await sc.evses.useWallet(wallet).create(evse);
+    console.log(`Created new evse with id: ${evseId}`);
 
     sc.on("StartRequested", async (result) => {
         console.log(result);
-        if (result.connectorId == connectorId) {
-            console.log(`Received start request for connector with id: ${connectorId}`);
+        if (result.evseId == evseId) {
+            console.log(`Received start request for evse with id: ${evseId}`);
 
             // send start request to device... we assume success in this example!
             const success = true;
-            const connector = await sc.connectors.getById(connectorId);
+            const evse = await sc.evses.getById(evseId);
             if (success) {
-                sc.charging.useWallet(wallet).confirmStart(connector, result.controller);
+                sc.charging.useWallet(wallet).confirmStart(evse, result.controller);
             } else {
-                sc.charging.useWallet(wallet).error(connector, result.controller, 0x7);
+                sc.charging.useWallet(wallet).error(evse, result.controller, 0x7);
             }
         }
     });
 
     sc.on("StopRequested", async (result) => {
-        if (result.connectorId == connectorId) {
-            console.log(`Received stop request for connector with id: ${connectorId}`);
+        if (result.evseId == evseId) {
+            console.log(`Received stop request for evse with id: ${evseId}`);
 
             // send stop request to device... we assume success in this example!
             const success = true;
-            const connector = await sc.connectors.getById(connectorId);
+            const evse = await sc.evses.getById(evseId);
             if (success) {
-                sc.charging.useWallet(wallet).confirmStop(connector, result.controller);
+                sc.charging.useWallet(wallet).confirmStop(evse, result.controller);
             } else {
-                sc.charging.useWallet(wallet).error(connector, result.controller, 0x3);
+                sc.charging.useWallet(wallet).error(evse, result.controller, 0x3);
             }
         }
     });

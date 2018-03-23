@@ -3,7 +3,7 @@ import "reflect-metadata";
 import { ConfigProvider } from "./services/configProvider";
 import { Symbols } from "./models/symbols";
 import { ContractProvider, IContractProvider } from "./services/contractProvider";
-import { StationService, ConnectorService, ShareCharge } from ".";
+import { StationService, EvseService, ShareCharge } from ".";
 import { ChargingService } from "./services/chargingService";
 
 export class IoC {
@@ -26,7 +26,7 @@ export class IoC {
             container.bind<ConfigProvider>(Symbols.ConfigProvider).to(ConfigProvider).inSingletonScope();
             container.bind<IContractProvider>(Symbols.ContractProvider).to(ContractProvider).inSingletonScope();
             container.bind<StationService>(Symbols.StationSerivce).to(StationService).inSingletonScope();
-            container.bind<ConnectorService>(Symbols.ConnectorService).to(ConnectorService).inSingletonScope();
+            container.bind<EvseService>(Symbols.EvseService).to(EvseService).inSingletonScope();
             container.bind<ChargingService>(Symbols.ChargingService).to(ChargingService).inSingletonScope();
             container.bind<ShareCharge>(Symbols.ShareCharge).to(ShareCharge).inSingletonScope();
             IoC.container = container;

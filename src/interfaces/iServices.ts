@@ -1,9 +1,9 @@
 import { ChargingService } from "../services/chargingService";
 import { StationService } from "../services/stationService";
-import { ConnectorService } from "../services/connectorService";
+import { EvseService } from "../services/evseService";
 
 export interface IServices {
     StationService: StationService;
-    ConnectorService: ConnectorService;
+    EvseService: EvseService;
     ChargingService: ChargingService;
 }

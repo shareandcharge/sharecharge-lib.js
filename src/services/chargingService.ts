@@ -1,4 +1,4 @@
-import { Connector } from "../models/connector";
+import { Evse } from "../models/evse";
 import { Contract } from "../models/contract";
 import { Wallet } from "../models/wallet";
 import { IContractProvider } from "./contractProvider";
@@ -21,25 +21,25 @@ export class ChargingService {
 
     useWallet(wallet: Wallet) {
         return {
-            requestStart: async (connector: Connector, secondsToRent: number) => {
+            requestStart: async (evse: Evse, secondsToRent: number) => {
                 const contract = await this.contract();
-                await contract.send("requestStart", [connector.id, secondsToRent], wallet);
+                await contract.send("requestStart", [evse.id, secondsToRent], wallet);
             },
-            confirmStart: async (connector: Connector, controller: string) => {
+            confirmStart: async (evse: Evse, controller: string) => {
                 const contract = await this.contract();
-                await contract.send("confirmStart", [connector.id, controller], wallet);
+                await contract.send("confirmStart", [evse.id, controller], wallet);
             },
-            requestStop: async (connector: Connector) => {
+            requestStop: async (evse: Evse) => {
                 const contract = await this.contract();
-                await contract.send("requestStop", [connector.id], wallet);
+                await contract.send("requestStop", [evse.id], wallet);
             },
-            confirmStop: async (connector: Connector, controller: string) => {
+            confirmStop: async (evse: Evse, controller: string) => {
                 const contract = await this.contract();
-                await contract.send("confirmStop", [connector.id, controller], wallet);
+                await contract.send("confirmStop", [evse.id, controller], wallet);
             },
-            error: async (connector: Connector, controller: string, errorCode: number) => {
+            error: async (evse: Evse, controller: string, errorCode: number) => {
                 const contract = await this.contract();
-                await contract.send("logError", [connector.id, controller, errorCode], wallet);
+                await contract.send("logError", [evse.id, controller, errorCode], wallet);
             }
         };
     }

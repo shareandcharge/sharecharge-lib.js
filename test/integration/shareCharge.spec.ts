@@ -5,16 +5,16 @@ import { expect } from 'chai';
 
 const Web3 = require('web3');
 
-import { Connector } from './../../src/models/connector';
+import { Evse } from './../../src/models/evse';
 import { ShareCharge } from './../../src/shareCharge';
 import { StationBuilder } from '../stationBuilder';
-import { ConnectorBuilder } from '../connectorBuilder';
+import { EvseBuilder } from '../evseBuilder';
 import { TestHelper } from '../testHelper';
 import { Wallet } from '../../src/models/wallet';
 import { Contract } from '../../src/models/contract';
 import { EventPoller } from '../../src/services/eventPoller';
 import { ChargingService } from '../../src/services/chargingService';
-import { ConnectorService } from '../../src/services/connectorService';
+import { EvseService } from '../../src/services/evseService';
 import { StationService } from '../../src/services/stationService';
 import { Station } from '../../src/models/station';
 import { config } from "../../src/utils/config";
@@ -31,7 +31,7 @@ describe('ShareCharge', function () {
 
     let shareCharge: ShareCharge, cpoWallet: Wallet, mspWallet: Wallet, web3;
     let stationService: StationService;
-    let connectorService: ConnectorService;
+    let evseService: EvseService;
     let chargingService: ChargingService;
 
     before(async () => {
@@ -46,19 +46,19 @@ describe('ShareCharge', function () {
 
         const testContractProvider = TestHelper.getTestContractProvider(web3, config, contractDefs);
         stationService = new StationService(testContractProvider);
-        connectorService = new ConnectorService(testContractProvider);
+        evseService = new EvseService(testContractProvider);
 
-        const connectorContract = await connectorService.contract();
-        const testContractProvider2 = TestHelper.getTestContractProvider(web3, config, contractDefs, [connectorContract.address]);
+        const evseContract = await evseService.contract();
+        const testContractProvider2 = TestHelper.getTestContractProvider(web3, config, contractDefs, [evseContract.address]);
         chargingService = new ChargingService(testContractProvider2);
 
         const coinbase = await web3.eth.getCoinbase();
         const chargingContract = await chargingService.contract();
-        await connectorContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
+        await evseContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
     });
 
     beforeEach(async () => {
-        shareCharge = new ShareCharge(stationService, connectorService, chargingService);
+        shareCharge = new ShareCharge(stationService, evseService, chargingService);
         await shareCharge.hookup();
     });
 
@@ -69,85 +69,85 @@ describe('ShareCharge', function () {
     context('#stations', async () => {
 
         it('should broadcast start confirmed to msp', async () => {
-            const connector = new ConnectorBuilder()
+            const evse = new EvseBuilder()
                 .withOwner(cpoWallet.address)
                 .withIsAvailable(true)
                 .build();
 
-            await shareCharge.connectors.useWallet(cpoWallet).create(connector);
+            await shareCharge.evses.useWallet(cpoWallet).create(evse);
 
-            let connectorId = "";
+            let evseId = "";
             let controller = "";
 
             await shareCharge.on("StartConfirmed", async (result) => {
-                if (result.connectorId === connector.id
+                if (result.evseId === evse.id
                     && result.controller.toLowerCase() === mspWallet.address) {
 
-                    connectorId = result.connectorId;
+                    evseId = result.evseId;
                     controller = result.controller;
                 }
             });
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(connector, 60);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStart(connector, mspWallet.address);
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse, mspWallet.address);
 
             await EventPoller.instance.poll();
 
-            expect(connectorId).to.equal(connector.id);
+            expect(evseId).to.equal(evse.id);
             expect(controller.toLowerCase()).to.equal(mspWallet.address);
 
         });
 
         it('should broadcast stop confirmed to msp', async () => {
-            const connector = new ConnectorBuilder().build();
-            await shareCharge.connectors.useWallet(cpoWallet).create(connector);
+            const evse = new EvseBuilder().build();
+            await shareCharge.evses.useWallet(cpoWallet).create(evse);
 
-            let connectorId = "";
+            let evseId = "";
             let controller = "";
 
             await shareCharge.on("StopConfirmed", async (result) => {
-                if (result.connectorId === connector.id
+                if (result.evseId === evse.id
                     && result.controller.toLowerCase() === mspWallet.address) {
 
-                    connectorId = result.connectorId;
+                    evseId = result.evseId;
                     controller = result.controller;
                 }
             });
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(connector, 60);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStart(connector, mspWallet.address);
-            await shareCharge.charging.useWallet(mspWallet).requestStop(connector);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStop(connector, mspWallet.address);
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse, mspWallet.address);
+            await shareCharge.charging.useWallet(mspWallet).requestStop(evse);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStop(evse, mspWallet.address);
 
             await EventPoller.instance.poll();
 
-            expect(connectorId).to.equal(connector.id);
+            expect(evseId).to.equal(evse.id);
             expect(controller.toLowerCase()).to.equal(mspWallet.address);
 
         });
 
         it('should broadcast error to msp', async () => {
-            const connector = new ConnectorBuilder().build();
-            await shareCharge.connectors.useWallet(cpoWallet).create(connector);
+            const evse = new EvseBuilder().build();
+            await shareCharge.evses.useWallet(cpoWallet).create(evse);
 
-            let connectorId = "";
+            let evseId = "";
             let controller = "";
             let errorCode = -1;
 
             await shareCharge.on("Error", async (result) => {
-                if (result.connectorId === connector.id
+                if (result.evseId === evse.id
                     && result.controller.toLowerCase() === mspWallet.address) {
-                    connectorId = result.connectorId;
+                    evseId = result.evseId;
                     controller = result.controller;
                     errorCode = parseInt(result.errorCode);
                 }
             });
 
-            await shareCharge.charging.useWallet(cpoWallet).error(connector, mspWallet.address, 0);
+            await shareCharge.charging.useWallet(cpoWallet).error(evse, mspWallet.address, 0);
 
             await EventPoller.instance.poll();
 
-            expect(connectorId).to.equal(connector.id);
+            expect(evseId).to.equal(evse.id);
             expect(controller.toLowerCase()).to.equal(mspWallet.address);
             expect(errorCode).to.equal(0);
 
@@ -155,72 +155,72 @@ describe('ShareCharge', function () {
 
 
         it('should broadcast charge stop requested to cpo', async () => {
-            const connector = new ConnectorBuilder().build();
-            await shareCharge.connectors.useWallet(cpoWallet).create(connector);
+            const evse = new EvseBuilder().build();
+            await shareCharge.evses.useWallet(cpoWallet).create(evse);
 
-            let connectorId = "";
+            let evseId = "";
 
             await shareCharge.on("StopRequested", async (result) => {
-                if (result.connectorId == connector.id) {
-                    connectorId = result.connectorId;
+                if (result.evseId == evse.id) {
+                    evseId = result.evseId;
                 }
             });
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(connector, 60);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStart(connector, mspWallet.address);
-            await shareCharge.charging.useWallet(mspWallet).requestStop(connector);
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse, mspWallet.address);
+            await shareCharge.charging.useWallet(mspWallet).requestStop(evse);
 
             await EventPoller.instance.poll();
 
-            expect(connectorId).to.equal(connector.id);
+            expect(evseId).to.equal(evse.id);
         });
 
         it('should broadcast charge start requested to cpo', async () => {
-            const connector = new ConnectorBuilder().build();
-            await shareCharge.connectors.useWallet(cpoWallet).create(connector);
+            const evse = new EvseBuilder().build();
+            await shareCharge.evses.useWallet(cpoWallet).create(evse);
 
-            let connectorId = "";
+            let evseId = "";
             let controller = "";
 
             await shareCharge.on("StartRequested", async (result) => {
-                if (result.connectorId == connector.id) {
-                    connectorId = result.connectorId;
+                if (result.evseId == evse.id) {
+                    evseId = result.evseId;
                     controller = result.controller;
                 }
             });
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(connector, 60);
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60);
 
             await EventPoller.instance.poll();
 
-            expect(connectorId).to.equal(connector.id);
+            expect(evseId).to.equal(evse.id);
             expect(controller.toLowerCase()).to.equal(mspWallet.address);
         });
 
-        it('should broadcast connector created and updated events', async () => {
-            let connectorCreatedId = "";
-            let connectorUpdatedId = "";
+        it('should broadcast evse created and updated events', async () => {
+            let evseCreatedId = "";
+            let evseUpdatedId = "";
 
-            shareCharge.on("ConnectorCreated", (result) => {
-                connectorCreatedId = result.connectorId;
+            shareCharge.on("EvseCreated", (result) => {
+                evseCreatedId = result.evseId;
             });
 
-            shareCharge.on("ConnectorUpdated", (result) => {
-                connectorUpdatedId = result.connectorId;
+            shareCharge.on("EvseUpdated", (result) => {
+                evseUpdatedId = result.evseId;
             });
 
-            const connector = new ConnectorBuilder().build();
+            const evse = new EvseBuilder().build();
 
-            await shareCharge.connectors.useWallet(cpoWallet).create(connector);
+            await shareCharge.evses.useWallet(cpoWallet).create(evse);
 
-            connector.available = !connector.available;
-            await shareCharge.connectors.useWallet(cpoWallet).update(connector);
+            evse.available = !evse.available;
+            await shareCharge.evses.useWallet(cpoWallet).update(evse);
 
             await EventPoller.instance.poll();
 
-            expect(connectorCreatedId).to.equal(connector.id);
+            expect(evseCreatedId).to.equal(evse.id);
 
-            // expect(connectorUpdatedId).to.equal(connector.id);
+            // expect(evseUpdatedId).to.equal(evse.id);
 
             // The next test needs to wait for the update transaction to actually be mined
             // otherwise the nonce for creating a station will be incorrect

@@ -1,7 +1,7 @@
 import { IoC } from './ioc';
 import { StationService } from './services/stationService';
-import { ConnectorService } from './services/connectorService';
-import { Connector } from './models/connector';
+import { EvseService } from './services/evseService';
+import { Evse } from './models/evse';
 import { Station } from './models/station';
 import { Wallet } from './models/wallet';
 import { ToolKit } from './utils/toolKit';
@@ -14,8 +14,8 @@ import { ContractProvider } from './services/contractProvider';
 import { ChargingService } from './services/chargingService';
 
 export {
-    Connector,
-    ConnectorService,
+    Evse,
+    EvseService,
     Station,
     StationService,
     Wallet,

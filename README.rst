@@ -2,7 +2,7 @@
 Share & Charge Library
 ======================
 
-This is the Library for interacting with the Share & Charge EV Network. It can be implemented in a browser or server environment, for example by the Share & Charge CPO Core Client or by an eMobility Service Provider's mobile app. 
+This is the Library for interacting with the Share & Charge EV Network. It can be implemented in a browser or server environment, for example by the Share & Charge CPO Core Client or by an eMobility Service Provider's mobile app.
 
 ----
 
@@ -51,7 +51,7 @@ API description
 
 **Wallet**
 
-To store stations, connectors and request/confirm charging sessions on the network, it is necessary to first create an Ethereum wallet. This wallet needs to be funded with Ether in order to pay the blockchain's transaction fees.
+To store stations, evses and request/confirm charging sessions on the network, it is necessary to first create an Ethereum wallet. This wallet needs to be funded with Ether in order to pay the blockchain's transaction fees.
 
 A wallet can be generated using either a new or known 12 word seed phrase. This seed phrase allows a user to regain access to their wallet if they lose it.
 
@@ -63,7 +63,7 @@ A wallet can be generated using either a new or known 12 word seed phrase. This 
 
     // generate new seed and keypair
     let wallet = Wallet.generate();
-    
+
     { seed: 'make side cargo palm tongue switch blur tuna reform soup shove music',
       keys:
       Wallet {
@@ -86,7 +86,7 @@ A wallet can be generated using either a new or known 12 word seed phrase. This 
 
 **ShareCharge**
 
-The ``ShareCharge`` module is the entry point to the network, allowing the addition of stations and connectors, as well as the requesting and confirming of EV charging sessions.
+The ``ShareCharge`` module is the entry point to the network, allowing the addition of stations and evses, as well as the requesting and confirming of EV charging sessions.
 
 *Construction*
 
@@ -103,60 +103,60 @@ The module requires a configuration object which lets the library know how to in
         gasPrice: 18000000000
     }
 
-*Example Usage - Creating Stations and Connectors*
+*Example Usage - Creating Stations and Evses*
 
 .. code-block:: typescript
 
-    import { ShareCharge, Station, Connector } from 'sharecharge-lib';
+    import { ShareCharge, Station, Evse } from 'sharecharge-lib';
 
     const sc = new ShareCharge(config);
     const wallet = new Wallet('seed');
 
-    
+
     // initialise new station
     const station = new Station();
-    
+
     // set parameters
     station.latitude = 52.6743;
-    
+
     // create the station on the network
     sc.stations.useWallet(wallet).create(station);
 
-    // initialise new connector
-    const connector = new Connector();
-    
-    // link the connector to the station
-    connector.stationId = station.id;
+    // initialise new evse
+    const evse = new Evse();
 
-    // create the connector on the network
-    sc.connectors.useWallet(wallet).create(connector);
+    // link the evse to the station
+    evse.stationId = station.id;
+
+    // create the evse on the network
+    sc.evses.useWallet(wallet).create(evse);
 
 
 *Example Usage - controlling EV charging sessions*
 
 .. code-block:: typescript
 
-    // find the connector on the network by its unique identifier
-    sc.connectors.getById(connectorId).then(connector => {
-    
-        // request charge at the connector for 5 seconds
-        sc.charging.useWallet(wallet).requestStart(connector, 5);
+    // find the evse on the network by its unique identifier
+    sc.evses.getById(evseId).then(evse => {
+
+        // request charge at the evse for 5 seconds
+        sc.charging.useWallet(wallet).requestStart(evse, 5);
 
         // confirm to the network that the charge started
-        sc.charging.useWallet(wallet).confirmStart(connector, addressOfDriver);
-        
-        // request stop at the connector
-        sc.charging.useWallet(wallet).requestStop(connector);
-        
+        sc.charging.useWallet(wallet).confirmStart(evse, addressOfDriver);
+
+        // request stop at the evse
+        sc.charging.useWallet(wallet).requestStop(evse);
+
         // confirm to the network that the charge stopped
-        sc.charging.useWallet(wallet).confirmStop(connector, addressOfDriver);
+        sc.charging.useWallet(wallet).confirmStop(evse, addressOfDriver);
 
         // notify network of error during charge session
-        await sc.charging.useWallet(wallet).error(connector, controller, 1 /* error code*/);
-    
+        await sc.charging.useWallet(wallet).error(evse, controller, 1 /* error code*/);
+
     });
 
-    
+
 *Example Usage - listening to events*
 
 .. code-block:: typescript
@@ -171,22 +171,22 @@ The module requires a configuration object which lets the library know how to in
     sc.on('StartRequested', async (request) => {
 
         // obtain values from StartRequested Event
-        const connectorId = request.connectorId;
+        const evseId = request.evseId;
         const driver = request.controller;
         const secondsToRent = request.secondsToRent;
 
-        // filter by connectorId
-        if (myListOfConnectors.includes(connectorId)) {
+        // filter by evseId
+        if (myListOfEvses.includes(evseId)) {
 
             // send a request to the charging pole to start the charge sesssion here
 
-            // get connector object from network to use in the following request
-            const connector = await sc.connectors.getById(connectorId);
+            // get evse object from network to use in the following request
+            const evse = await sc.evses.getById(evseId);
 
             // if start was successful, send a confirmation to the network
-            await sc.charging.useWallet(wallet).confirmStart(connector, controller);
+            await sc.charging.useWallet(wallet).confirmStart(evse, controller);
         }
-    
+
     });
 
 Further usage examples can be found `here <https://github.com/motionwerkGmbH/sharecharge-lib/tree/domain/examples>`__.
@@ -196,121 +196,121 @@ Further usage examples can be found `here <https://github.com/motionwerkGmbH/sha
 The following events are subscribable:
 
 - ``StationCreated``
-  
+
     Broadcast when a new station is added to the network
-        
+
     Values:
-        
+
     - ``stationId``
 
         Newly created station's unique identifier
 
 - ``StationUpdated``
-    
+
     Broadcast when a station is updated
 
     Values:
-        
+
     - ``stationId``
-        
+
         Updated station's unique identifier
 
-- ``ConnectorCreated``
-    
-    Broadcast when a new connector is added to the network
-        
-    Values:
-        
-    - ``connectorId``
-        
-        Newly created connector's unique identifier
+- ``EvseCreated``
 
-- ``ConnectorUpdated``
-  
-    Broadcast when a connector is updated
+    Broadcast when a new evse is added to the network
 
     Values:
-        
-    - ``connectorId``
-        
-        Updated station's connector identifier
+
+    - ``evseId``
+
+        Newly created evse's unique identifier
+
+- ``EvseUpdated``
+
+    Broadcast when a evse is updated
+
+    Values:
+
+    - ``evseId``
+
+        Updated station's evse identifier
 
 - ``StartRequested``
-    
+
     Broadcast when a driver has successfully requested a new charging session
 
     Values:
-        
-    - ``connectorId``
-        
-        The unique identifier of the connector which has been requested to start
-        
+
+    - ``evseId``
+
+        The unique identifier of the evse which has been requested to start
+
     - ``controller``
-        
+
         The Ethereum address of the driver who has requested the charge start
 
     - ``secondsToRent``
-        
-        The time to charge in seconds specified by the driver 
+
+        The time to charge in seconds specified by the driver
 
 - ``StartConfirmed``
-    
+
     Broadcast when a CPO has successfully confirmed a charging session
 
     Values:
-        
-    - ``connectorId``
-        
-        The unique identifier of the connector which is now charging
-        
+
+    - ``evseId``
+
+        The unique identifier of the evse which is now charging
+
     - ``controller``
-        
-        The Ethereum address of the driver who is charging at the connector
+
+        The Ethereum address of the driver who is charging at the evse
 
 - ``StopRequested``
-    
+
     Broadcast when a driver has successfully requested the end of a charging session
 
     Values:
 
-    - ``connectorId``
-            
-        The unique identifier of the connector has been requested to stop
-        
+    - ``evseId``
+
+        The unique identifier of the evse has been requested to stop
+
     - ``controller``
-        
+
         The Ethereum address of the driver who has requested the stop
-    
+
 - ``StopConfirmed``
-    
+
     Broadcast when a CPO has successfully confirmed the end of a charging session
 
     Values:
 
-    - ``connectorId``
-        
-        The unique identifier of the connector has stopped charging
-        
+    - ``evseId``
+
+        The unique identifier of the evse has stopped charging
+
     - ``controller``
-        
+
         The Ethereum address of the driver whose charging session has ended
 
 - ``Error``
-    
+
     Broadcast when a CPO has successfully notified the network that a charge failed
 
     Values:
 
-    - ``connectorId``
-        
-        The unique identifier of the connector which has failed
+    - ``evseId``
+
+        The unique identifier of the evse which has failed
 
     - ``controller``
-        
+
         The Ethereum address of the driver whose charging session has failed
 
     - ``errorCode``
-        
+
         The type of failure that has occurred (e.g. failed to start or stop)
 
 ----
@@ -318,7 +318,7 @@ The following events are subscribable:
 ``sc.stations``
 
 - ``getAll()``
-    
+
     Returns an array containing all stations on the network
 
 - ``getById(id: string)``
@@ -339,55 +339,55 @@ The following events are subscribable:
 
 ----
 
-``sc.connectors``
+``sc.evses``
 
 - ``getById(id: string)``
 
-    Returns connector object for given unique connector identifier
+    Returns evse object for given unique evse identifier
 
 - ``getByStation(station: Station)``
 
-    Returns array containing all connectors for a given a station
+    Returns array containing all evses for a given a station
 
 - ``anyFree(station: Station)``
 
-    Returns true if any connector on the station is available
+    Returns true if any evse on the station is available
 
-- ``isPersisted(connector: Connector)``
+- ``isPersisted(evse: Evse)``
 
-    Returns true if connector exists on network
+    Returns true if evse exists on network
 
-- ``useWallet(wallet: Wallet).create(connector: Connector)``
+- ``useWallet(wallet: Wallet).create(evse: Evse)``
 
-    Creates connector on network
+    Creates evse on network
 
-- ``useWallet(wallet: Wallet).update(connector: Connector)``
+- ``useWallet(wallet: Wallet).update(evse: Evse)``
 
-    Updates connector on network
+    Updates evse on network
 
 ----
 
 ``sc.charging``
 
-- ``useWallet(wallet: Wallet).requestStart(connector: Connector, secondsToRent: number)``
+- ``useWallet(wallet: Wallet).requestStart(evse: Evse, secondsToRent: number)``
 
-    Request a start at a connector for a specified number of seconds
+    Request a start at a evse for a specified number of seconds
 
-- ``useWallet(wallet: Wallet).confirmStart(connector: Connector, controller: string)``
+- ``useWallet(wallet: Wallet).confirmStart(evse: Evse, controller: string)``
 
-    Confirm a start on a connector for a certain driver. The controller (driver) will be broadcast in the StartRequested event.
+    Confirm a start on a evse for a certain driver. The controller (driver) will be broadcast in the StartRequested event.
 
-- ``useWallet(wallet: Wallet).requestStop(connector: Connector)``
+- ``useWallet(wallet: Wallet).requestStop(evse: Evse)``
 
-    Request a stop at a connector
+    Request a stop at a evse
 
-- ``useWallet(wallet: Wallet).confirmStop(connector: Connector, controller, string)``
+- ``useWallet(wallet: Wallet).confirmStop(evse: Evse, controller, string)``
 
-    Confirm a stop on a connector for a certain driver. The controller (driver) will be broadcast in the StopRequested event.
+    Confirm a stop on a evse for a certain driver. The controller (driver) will be broadcast in the StopRequested event.
 
-- ``useWallet(wallet: Wallet).error(connector: Connector, controller: string, errorCode: number)``
+- ``useWallet(wallet: Wallet).error(evse: Evse, controller: string, errorCode: number)``
 
-    Notify the network that an error occurred with the charging session for a given connector and controller. Error codes are TBC.  
+    Notify the network that an error occurred with the charging session for a given evse and controller. Error codes are TBC.
 
 ----
 
@@ -408,7 +408,7 @@ The Station module allows you to build station objects. They are configurable bu
     station.latitude = 52.5;
 
     // get a parameter
-    station.latitude    
+    station.latitude
     // 52.5
 
 
@@ -436,24 +436,24 @@ Properties:
 
 ----
 
-**Connector**
+**Evse**
 
-The Connector module allows you to build connector objects. They are configurable but are also defined with default values.
+The Evse module allows you to build evse objects. They are configurable but are also defined with default values.
 
 *Example Usage*:
 
 .. code-block:: typescript
 
-    import { Connector } from 'sharecharge-lib'
+    import { Evse } from 'sharecharge-lib'
 
-    // initialise new connector
-    const connector = new Connector();
+    // initialise new evse
+    const evse = new Evse();
 
     // set a parameter
-    connector.stationId = '0x01';
+    evse.stationId = '0x01';
 
     // get a parameter
-    connector.stationId
+    evse.stationId
     // '0x01'
 
 
@@ -461,7 +461,7 @@ Properties:
 
 - ``id [string]``
 
-    Unique identifier of the connector (generated by Share & Charge)
+    Unique identifier of the evse (generated by Share & Charge)
 
 - ``owner [string]``
 
@@ -469,12 +469,12 @@ Properties:
 
 - ``stationId [string]``
 
-    The unique identifier of the station that the connector belongs to
+    The unique identifier of the station that the evse belongs to
 
 - ``plugMask [number]``
 
-    A mask of plug types supported by the connector (TODO: plugMask format documentation)
+    A mask of plug types supported by the evse (TODO: plugMask format documentation)
 
 - ``available [boolean]``
 
-    Set availability of connector
+    Set availability of evse
