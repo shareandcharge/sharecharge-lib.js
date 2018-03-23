@@ -32,6 +32,7 @@ describe('IoC', function () {
 
     it('should resolve', async () => {
         const shareCharge = await IoC.resolve();
+        await shareCharge.hookup();
 
         const station = new Station();
         await shareCharge.stations.useWallet(wallet).create(station);
@@ -44,17 +45,16 @@ describe('IoC', function () {
         connector.plugTypes = [PlugType.CCS];
         await shareCharge.connectors.useWallet(wallet).create(connector);
 
-        const connector1 = await shareCharge.connectors.getById(connector.id);
-        expect(connector1.plugTypes.length).to.equal(connector.plugTypes.length);
-        expect(connector1.available).to.equal(true);
+        let connectorUpdatedId = "";
+        await shareCharge.on("ConnectorUpdated", async (result) => {
+            connectorUpdatedId = result.connectorId;
+        });
 
         await shareCharge.charging.useWallet(wallet).requestStart(connector, 10);
 
-        setTimeout(async () => {
-            const connector2 = await shareCharge.connectors.getById(connector.id);
-            expect(connector2.available).to.equal(false);
-        }, 500);
+        await EventPoller.instance.poll();
 
+        expect(connectorUpdatedId).to.equal(connector.id);
     });
 
 });
