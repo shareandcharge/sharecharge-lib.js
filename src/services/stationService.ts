@@ -54,20 +54,22 @@ export class StationService {
                 const lng = station.longitude * 1000000 << 0;
                 const hours = ToolKit.asciiToHex(OpeningHours.encode(station.openingHours));
                 station.tracker.resetProperties();
-                return contract.send("addStation", [id, wallet.address, lat, lng, hours], wallet);
+                const key = wallet.keyAtIndex(0);
+                return contract.send("addStation", [id, key.address, lat, lng, hours], key);
             },
             createBatch: async (...stations: Station[]) => {
                 const contract = await this.contract();
                 const batch = contract.newBatch();
-                wallet.nonce = await contract.getNonce(wallet);
+                const key = wallet.keyAtIndex(0);
+                key.nonce = await contract.getNonce(key);
                 for (const station of stations) {
                     const id = station.id;
                     const lat = station.latitude * 1000000 << 0;
                     const lng = station.longitude * 1000000 << 0;
                     const hours = ToolKit.asciiToHex(OpeningHours.encode(station.openingHours));
-                    const tx = await contract.request("addStation", [id, wallet.address, lat, lng, hours], wallet);
+                    const tx = await contract.request("addStation", [id, key.address, lat, lng, hours], key);
                     batch.add(tx);
-                    wallet.nonce++;
+                    key.nonce++;
                 }
                 batch.execute();
             },
@@ -75,13 +77,14 @@ export class StationService {
                 const contract = await this.contract();
                 if (await contract.call("getIndexById", station.id) >= 0) {
                     const batch = contract.newBatch();
-                    wallet.nonce = await contract.getNonce(wallet);
+                    const key = wallet.keyAtIndex(0);
+                    key.nonce = await contract.getNonce(key);
                     for (const property of station.tracker.getProperties()) {
                         if (station.tracker.didPropertyChange(property)) {
                             const funcName = "set" + property.charAt(0).toUpperCase() + property.substr(1);
-                            const tx = await contract.request(funcName, [station.id, station[property]], wallet);
+                            const tx = await contract.request(funcName, [station.id, station[property]], key);
                             batch.add(tx);
-                            wallet.nonce++;
+                            key.nonce++;
                         }
                     }
                     batch.execute();
@@ -91,17 +94,16 @@ export class StationService {
             updateBatch: async (...stations: Station[]) => {
                 const contract = await this.contract();
                 const batch = contract.newBatch();
-                wallet.nonce = await contract.getNonce(wallet);
+                const key = wallet.keyAtIndex(0);
+                key.nonce = await contract.getNonce(key);
                 for (const station of stations) {
                     if (await contract.call("getIndexById", station.id) >= 0) {
-                        const batch = contract.newBatch();
-                        wallet.nonce = await contract.getNonce(wallet);
                         for (const property of station.tracker.getProperties()) {
                             if (station.tracker.didPropertyChange(property)) {
                                 const funcName = "set" + property.charAt(0).toUpperCase() + property.substr(1);
-                                const tx = await contract.request(funcName, [station.id, station[property]], wallet);
+                                const tx = await contract.request(funcName, [station.id, station[property]], key);
                                 batch.add(tx);
-                                wallet.nonce++;
+                                key.nonce++;
                             }
                         }
                         station.tracker.resetProperties();

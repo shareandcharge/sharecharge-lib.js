@@ -54,28 +54,30 @@ export class EvseService {
         return {
             create: async (evse: Evse) => {
                 const contract = await this.contract();
+                const key = wallet.keyAtIndex(0);
                 const id = evse.id;
-                const owner = evse.owner = wallet.address;
+                const owner = evse.owner = key.address;
                 const stationId = evse.stationId;
                 const plugMask = ToolKit.toPlugMask(evse.plugTypes);
                 const available = evse.available;
-                await contract.send("addEvse", [id, owner, stationId, plugMask, available], wallet);
+                await contract.send("addEvse", [id, owner, stationId, plugMask, available], key);
             },
             createBatch: async (...evses: Evse[]) => {
                 const contract = await this.contract();
                 const batch = contract.newBatch();
-                wallet.nonce = await contract.getNonce(wallet);
+                const key = wallet.keyAtIndex(0);
+                key.nonce = await contract.getNonce(key);
                 for (const evse of evses) {
                     const parameters = [
                         evse.id,
-                        wallet.address,
+                        key.address,
                         evse.stationId,
                         ToolKit.toPlugMask(evse.plugTypes),
                         evse.available
                     ];
-                    const tx = await contract.request("addEvse", parameters, wallet);
+                    const tx = await contract.request("addEvse", parameters, key);
                     batch.add(tx);
-                    wallet.nonce++;
+                    key.nonce++;
                 }
                 batch.execute();
             },
@@ -84,14 +86,15 @@ export class EvseService {
 
                 if (await contract.call("getIndexById", evse.id) >= 0) {
                     const batch = contract.newBatch();
-                    wallet.nonce = await contract.getNonce(wallet);
+                    const key = wallet.keyAtIndex(0);
+                    key.nonce = await contract.getNonce(key);
 
                     for (const property of evse.tracker.getProperties()) {
                         if (evse.tracker.didPropertyChange(property)) {
                             const funcName = "set" + property.charAt(0).toUpperCase() + property.substr(1);
-                            const tx = await contract.request(funcName, [evse.id, evse[property]], wallet);
+                            const tx = await contract.request(funcName, [evse.id, evse[property]], key);
                             batch.add(tx);
-                            wallet.nonce++;
+                            key.nonce++;
                         }
                     }
 
@@ -102,16 +105,17 @@ export class EvseService {
             updateBatch: async (...evses: Evse[]) => {
                 const contract = await this.contract();
                 const batch = contract.newBatch();
-                wallet.nonce = await contract.getNonce(wallet);
+                const key = wallet.keyAtIndex(0);
+                key.nonce = await contract.getNonce(key);
 
                 for (const evse of evses) {
                     if (await contract.call("getIndexById", evse.id) >= 0) {
                         for (const property of evse.tracker.getProperties()) {
                             if (evse.tracker.didPropertyChange(property)) {
                                 const funcName = "set" + property.charAt(0).toUpperCase() + property.substr(1);
-                                const tx = await contract.request(funcName, [evse.id, evse[property]], wallet);
+                                const tx = await contract.request(funcName, [evse.id, evse[property]], key);
                                 batch.add(tx);
-                                wallet.nonce++;
+                                key.nonce++;
                             }
                         }
                         evse.tracker.resetProperties();

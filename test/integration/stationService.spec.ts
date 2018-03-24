@@ -15,6 +15,7 @@ import { StationService } from '../../src/services/stationService';
 import { config } from "../../src/utils/config";
 import { ToolKit } from './../../src/utils/toolKit';
 import { IContractProvider } from './../../src/services/contractProvider';
+import { Key } from '../../src/models/key';
 
 describe('StationService', function () {
 
@@ -24,13 +25,14 @@ describe('StationService', function () {
     const defs = ToolKit.contractDefsForStage(config.stage);
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
 
-    let stationService: StationService, wallet: Wallet, web3;
+    let stationService: StationService, wallet: Wallet, key: Key, web3;
 
     before(async () => {
         web3 = new Web3(config.provider);
         wallet = new Wallet(seed);
+        key = wallet.keyAtIndex(0);
 
-        await TestHelper.ensureFunds(web3, wallet);
+        await TestHelper.ensureFunds(web3, key);
     });
 
     beforeEach(async () => {
@@ -45,7 +47,7 @@ describe('StationService', function () {
     context('create', () => {
         it('should create station', async () => {
             const station = new StationBuilder()
-                .withOwner(wallet.address)
+                .withOwner(key.address)
                 .withLatitude(51.345)
                 .withLongitude(-0.92332)
                 .build();
@@ -126,7 +128,7 @@ describe('StationService', function () {
 
     context('#getAllStations()', () => {
         it('return all stations', async function () {
-            const station = new StationBuilder().withOwner(wallet.address).build();
+            const station = new StationBuilder().withOwner(key.address).build();
 
             await stationService.useWallet(wallet).create(station);
             await stationService.useWallet(wallet).create(station);
@@ -139,14 +141,14 @@ describe('StationService', function () {
 
     context('#isPersisted()', () => {
         it('should return true for persisted stations', async function () {
-            const station = new StationBuilder().withOwner(wallet.address).build();
+            const station = new StationBuilder().withOwner(key.address).build();
             await stationService.useWallet(wallet).create(station);
             const result = await stationService.isPersisted(station);
             expect(result).to.equal(true);
         });
 
         it('should return false for unpersisted stations', async function () {
-            const station = new StationBuilder().withOwner(wallet.address).build();
+            const station = new StationBuilder().withOwner(key.address).build();
             const result = await stationService.isPersisted(station);
             expect(result).to.equal(false);
         });

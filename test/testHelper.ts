@@ -2,6 +2,7 @@ import { ToolKit } from './../src/utils/toolKit';
 import { Contract } from './../src/models/contract';
 import { Wallet } from '../src/models/wallet';
 import { IContractProvider } from '../src/services/contractProvider';
+import { Key } from '../src/models/key';
 
 export class TestHelper {
 
@@ -9,11 +10,11 @@ export class TestHelper {
         return (Math.random() * 0xFFFFFFFFF << 0).toString(16);
     }
 
-    static async ensureFunds(web3: any, wallet: Wallet) {
+    static async ensureFunds(web3: any, key: Key) {
         const destBalance = 5;
-        const balance = web3.utils.fromWei(await web3.eth.getBalance(wallet.address), "ether");
+        const balance = web3.utils.fromWei(await web3.eth.getBalance(key.address), "ether");
         const coinbase = await web3.eth.getCoinbase();
-        const receiver = wallet.address;
+        const receiver = key.address;
         const amount = web3.utils.toWei(destBalance.toString(), "ether");
         if (balance < destBalance) {
             await web3.eth.sendTransaction({ from: coinbase, to: receiver, value: amount });

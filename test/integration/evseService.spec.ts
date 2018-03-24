@@ -15,6 +15,7 @@ import { config } from "../../src/utils/config";
 import { ToolKit } from './../../src/utils/toolKit';
 import { Station } from './../../src/models/station';
 import { StationBuilder } from '../stationBuilder';
+import { Key } from '../../src/models/key';
 
 describe('EvseService', function () {
 
@@ -24,13 +25,14 @@ describe('EvseService', function () {
     const defs = ToolKit.contractDefsForStage(config.stage);
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
 
-    let evseService: EvseService, wallet: Wallet, web3;
+    let evseService: EvseService, wallet: Wallet, key: Key, web3;
 
     before(async () => {
         web3 = new Web3(config.provider);
         wallet = new Wallet(seed);
+        key = wallet.keyAtIndex(0);
 
-        await TestHelper.ensureFunds(web3, wallet);
+        await TestHelper.ensureFunds(web3, key);
     });
 
     beforeEach(async () => {
@@ -58,7 +60,7 @@ describe('EvseService', function () {
 
             // compare
             expect(result.id).to.equal(evse.id);
-            expect(result.owner.toLowerCase()).to.equal(wallet.address);
+            expect(result.owner.toLowerCase()).to.equal(key.address);
             expect(result.available).to.equal(evse.available);
         });
 
@@ -180,7 +182,7 @@ describe('EvseService', function () {
 
     context('#isPersisted()', () => {
         it('should return true for persisted evses', async function () {
-            const evse = new EvseBuilder().withOwner(wallet.address).build();
+            const evse = new EvseBuilder().withOwner(key.address).build();
 
             await evseService.useWallet(wallet).create(evse);
 
@@ -190,7 +192,7 @@ describe('EvseService', function () {
         });
 
         it('should return false for unpersisted stations', async function () {
-            const evse = new EvseBuilder().withOwner(wallet.address).build();
+            const evse = new EvseBuilder().withOwner(key.address).build();
 
             const result = await evseService.isPersisted(evse);
 

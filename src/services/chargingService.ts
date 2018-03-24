@@ -23,23 +23,28 @@ export class ChargingService {
         return {
             requestStart: async (evse: Evse, secondsToRent: number) => {
                 const contract = await this.contract();
-                await contract.send("requestStart", [evse.id, secondsToRent], wallet);
+                const key = wallet.keyAtIndex(0);
+                await contract.send("requestStart", [evse.id, secondsToRent], key);
             },
             confirmStart: async (evse: Evse, controller: string) => {
                 const contract = await this.contract();
-                await contract.send("confirmStart", [evse.id, controller], wallet);
+                const key = wallet.keyAtIndex(0);
+                await contract.send("confirmStart", [evse.id, controller], key);
             },
             requestStop: async (evse: Evse) => {
                 const contract = await this.contract();
-                await contract.send("requestStop", [evse.id], wallet);
+                const key = wallet.keyAtIndex(0);
+                await contract.send("requestStop", [evse.id], key);
             },
             confirmStop: async (evse: Evse, controller: string) => {
                 const contract = await this.contract();
-                await contract.send("confirmStop", [evse.id, controller], wallet);
+                const key = wallet.keyAtIndex(0);
+                await contract.send("confirmStop", [evse.id, controller], key);
             },
             error: async (evse: Evse, controller: string, errorCode: number) => {
                 const contract = await this.contract();
-                await contract.send("logError", [evse.id, controller, errorCode], wallet);
+                const key = wallet.keyAtIndex(0);
+                await contract.send("logError", [evse.id, controller, errorCode], key);
             }
         };
     }

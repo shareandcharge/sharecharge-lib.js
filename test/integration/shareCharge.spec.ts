@@ -18,6 +18,7 @@ import { EvseService } from '../../src/services/evseService';
 import { StationService } from '../../src/services/stationService';
 import { Station } from '../../src/models/station';
 import { config } from "../../src/utils/config";
+import { Key } from '../../src/models/key';
 
 describe('ShareCharge', function () {
 
@@ -29,7 +30,7 @@ describe('ShareCharge', function () {
     const seed1 = 'filter march urge naive sauce distance under copy payment slow just cool';
     const seed2 = 'filter march urge naive sauce distance under copy payment slow just warm';
 
-    let shareCharge: ShareCharge, cpoWallet: Wallet, mspWallet: Wallet, web3;
+    let shareCharge: ShareCharge, cpoWallet: Wallet, cpoKey: Key, mspWallet: Wallet, mspKey: Key, web3;
     let stationService: StationService;
     let evseService: EvseService;
     let chargingService: ChargingService;
@@ -39,10 +40,12 @@ describe('ShareCharge', function () {
         web3 = new Web3(config.provider);
 
         cpoWallet = new Wallet(seed1);
+        cpoKey = cpoWallet.keyAtIndex(0);
         mspWallet = new Wallet(seed2);
+        mspKey = mspWallet.keyAtIndex(0);
 
-        await TestHelper.ensureFunds(web3, cpoWallet);
-        await TestHelper.ensureFunds(web3, mspWallet);
+        await TestHelper.ensureFunds(web3, cpoKey);
+        await TestHelper.ensureFunds(web3, mspKey);
 
         const testContractProvider = TestHelper.getTestContractProvider(web3, config, contractDefs);
         stationService = new StationService(testContractProvider);
@@ -70,7 +73,7 @@ describe('ShareCharge', function () {
 
         it('should broadcast start confirmed to msp', async () => {
             const evse = new EvseBuilder()
-                .withOwner(cpoWallet.address)
+                .withOwner(cpoKey.address)
                 .withIsAvailable(true)
                 .build();
 
@@ -81,7 +84,7 @@ describe('ShareCharge', function () {
 
             await shareCharge.on("StartConfirmed", async (result) => {
                 if (result.evseId === evse.id
-                    && result.controller.toLowerCase() === mspWallet.address) {
+                    && result.controller.toLowerCase() === mspKey.address) {
 
                     evseId = result.evseId;
                     controller = result.controller;
@@ -89,12 +92,12 @@ describe('ShareCharge', function () {
             });
 
             await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse, mspWallet.address);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse, mspKey.address);
 
             await EventPoller.instance.poll();
 
             expect(evseId).to.equal(evse.id);
-            expect(controller.toLowerCase()).to.equal(mspWallet.address);
+            expect(controller.toLowerCase()).to.equal(mspKey.address);
 
         });
 
@@ -107,7 +110,7 @@ describe('ShareCharge', function () {
 
             await shareCharge.on("StopConfirmed", async (result) => {
                 if (result.evseId === evse.id
-                    && result.controller.toLowerCase() === mspWallet.address) {
+                    && result.controller.toLowerCase() === mspKey.address) {
 
                     evseId = result.evseId;
                     controller = result.controller;
@@ -115,14 +118,14 @@ describe('ShareCharge', function () {
             });
 
             await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse, mspWallet.address);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse, mspKey.address);
             await shareCharge.charging.useWallet(mspWallet).requestStop(evse);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStop(evse, mspWallet.address);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStop(evse, mspKey.address);
 
             await EventPoller.instance.poll();
 
             expect(evseId).to.equal(evse.id);
-            expect(controller.toLowerCase()).to.equal(mspWallet.address);
+            expect(controller.toLowerCase()).to.equal(mspKey.address);
 
         });
 
@@ -136,19 +139,19 @@ describe('ShareCharge', function () {
 
             await shareCharge.on("Error", async (result) => {
                 if (result.evseId === evse.id
-                    && result.controller.toLowerCase() === mspWallet.address) {
+                    && result.controller.toLowerCase() === mspKey.address) {
                     evseId = result.evseId;
                     controller = result.controller;
                     errorCode = parseInt(result.errorCode);
                 }
             });
 
-            await shareCharge.charging.useWallet(cpoWallet).error(evse, mspWallet.address, 0);
+            await shareCharge.charging.useWallet(cpoWallet).error(evse, mspKey.address, 0);
 
             await EventPoller.instance.poll();
 
             expect(evseId).to.equal(evse.id);
-            expect(controller.toLowerCase()).to.equal(mspWallet.address);
+            expect(controller.toLowerCase()).to.equal(mspKey.address);
             expect(errorCode).to.equal(0);
 
         });
@@ -167,7 +170,7 @@ describe('ShareCharge', function () {
             });
 
             await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse, mspWallet.address);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse, mspKey.address);
             await shareCharge.charging.useWallet(mspWallet).requestStop(evse);
 
             await EventPoller.instance.poll();
@@ -194,7 +197,7 @@ describe('ShareCharge', function () {
             await EventPoller.instance.poll();
 
             expect(evseId).to.equal(evse.id);
-            expect(controller.toLowerCase()).to.equal(mspWallet.address);
+            expect(controller.toLowerCase()).to.equal(mspKey.address);
         });
 
         it('should broadcast evse created and updated events', async () => {
