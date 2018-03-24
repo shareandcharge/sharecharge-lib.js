@@ -6,7 +6,7 @@ import { ToolKit } from './../utils/toolKit';
 export class Connector {
     private _id: string = ToolKit.randomBytes32String();
     private _owner: string = "0x0000000000000000000000000000000000000000";
-    private _evse: Evse;
+    private _evseId: String = "0x0000000000000000000000000000000000000000";
     private _standard: ConnectorType = ConnectorType.CHADEMO;
     private _powerType: PowerType = PowerType.AC_1_PHASE;
     private _voltage: number = 0;
@@ -21,12 +21,12 @@ export class Connector {
         return this._owner;
     }
 
-    get evse(): Evse {
-        return this._evse;
+    get evseId(): String {
+        return this._evseId;
     }
 
-    set evse(value: Evse) {
-        this._evse = value;
+    set evse(value: String) {
+        this._evseId = value;
     }
 
     get standard(): ConnectorType {
