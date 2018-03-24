@@ -23,6 +23,7 @@ async function bulkCreate(wallet, sc: ShareCharge, total) {
 async function main() {
 
     const wallet = new Wallet('filter march urge naive sauce distance under copy payment slow just warm');
+    const key = wallet.keyAtIndex(0);
     const sc: ShareCharge = await IoC.resolve();
     await sc.hookup();
 

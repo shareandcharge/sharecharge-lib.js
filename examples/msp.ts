@@ -22,6 +22,7 @@ async function findFreeEvse(sc: ShareCharge) {
 async function main() {
 
     const wallet = new Wallet('filter march urge naive sauce distance under copy payment slow just cool');
+    const key = wallet.keyAtIndex(0);
 
     const sc: ShareCharge = await IoC.resolve();
     sc.hookup();
@@ -29,13 +30,13 @@ async function main() {
     let selectedevseId = '';
 
     sc.on("StartConfirmed", async (result) => {
-        if (result.evseId === selectedevseId && result.controller.toLowerCase() === wallet.address) {
+        if (result.evseId === selectedevseId && result.controller.toLowerCase() === key.address) {
             console.log('Started', result.evseId);
         }
     });
 
     sc.on("StopConfirmed", async (result) => {
-        if (result.evseId === selectedevseId && result.controller.toLowerCase() === wallet.address) {
+        if (result.evseId === selectedevseId && result.controller.toLowerCase() === key.address) {
             console.log('Stopped', result.evseId);
             sc.stopListening(); // for this demo, app shutdown should call stop listening!
         }
