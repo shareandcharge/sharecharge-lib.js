@@ -69,7 +69,7 @@ describe('StationService', function () {
                 stations.push(new StationBuilder().build());
             }
 
-            await stationService.useWallet(wallet).createBatch(...stations);
+            await stationService.useWallet(wallet).batch().create(...stations);
 
             return new Promise((resolve, reject) => {
                 setTimeout(async () => {
@@ -106,7 +106,7 @@ describe('StationService', function () {
                 stations.push(new StationBuilder().build());
             }
 
-            await stationService.useWallet(wallet).createBatch(...stations);
+            await stationService.useWallet(wallet).batch().create(...stations);
 
             stations.forEach(station => {
                 station.latitude = 50 * 1000000;
@@ -115,7 +115,7 @@ describe('StationService', function () {
 
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
-                    expect(async () => await stationService.useWallet(wallet).updateBatch(...stations)).to.not.throw();
+                    expect(async () => await stationService.useWallet(wallet).batch().update(...stations)).to.not.throw();
 
                     // allow the above transaction(s) to be mined before the next test case
                     // otherwise the next nonce will be incorrect

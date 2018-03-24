@@ -24,13 +24,6 @@ export class Evse {
         return this._owner;
     }
 
-    set owner(value: string) {
-        value = value.toLowerCase();
-        if (ToolKit.isAddress(value)) {
-            this.tracker.setProperty("owner", value);
-        }
-    }
-
     get stationId(): string {
         return this._stationId;
     }

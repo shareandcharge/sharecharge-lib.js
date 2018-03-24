@@ -25,7 +25,7 @@ export class ConnectorService {
             },
             update: async (connector: Connector) => {
             },
-            useBatch() {
+            batch() {
                 return {
                     create: async (connector: Connector) => {
                     },

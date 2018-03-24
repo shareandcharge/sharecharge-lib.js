@@ -48,7 +48,6 @@ describe('EvseService', function () {
         it('should create a single evse with the given parameters', async () => {
 
             const evse = new EvseBuilder()
-                .withOwner("0x123456")
                 .withIsAvailable(true)
                 .build();
 
@@ -74,7 +73,7 @@ describe('EvseService', function () {
                 evses.push(new EvseBuilder().withStation(station).build());
             }
 
-            await evseService.useWallet(wallet).createBatch(...evses);
+            await evseService.useWallet(wallet).batch().create(...evses);
 
             return new Promise((resolve, reject) => {
 
@@ -92,7 +91,6 @@ describe('EvseService', function () {
     context('update', () => {
         it('should update a evse with the given parameters', async () => {
             const evse = new EvseBuilder()
-                .withOwner("0x123456")
                 .withIsAvailable(true)
                 .build();
 
@@ -124,13 +122,13 @@ describe('EvseService', function () {
                 evses.push(new EvseBuilder().withIsAvailable(true).build());
             }
 
-            await evseService.useWallet(wallet).createBatch(...evses);
+            await evseService.useWallet(wallet).batch().create(...evses);
 
             evses.forEach(evse => evse.available = false);
 
             return new Promise((resolve, reject) => {
                 setTimeout(async () => {
-                    await evseService.useWallet(wallet).updateBatch(...evses);
+                    await evseService.useWallet(wallet).batch().update(...evses);
 
                     setTimeout(async () => {
                         const contractevses = await evseService.getByStation(station);
@@ -182,7 +180,7 @@ describe('EvseService', function () {
 
     context('#isPersisted()', () => {
         it('should return true for persisted evses', async function () {
-            const evse = new EvseBuilder().withOwner(key.address).build();
+            const evse = new EvseBuilder().build();
 
             await evseService.useWallet(wallet).create(evse);
 
@@ -192,7 +190,7 @@ describe('EvseService', function () {
         });
 
         it('should return false for unpersisted stations', async function () {
-            const evse = new EvseBuilder().withOwner(key.address).build();
+            const evse = new EvseBuilder().build();
 
             const result = await evseService.isPersisted(evse);
 

@@ -50,45 +50,87 @@ export class EvseService {
         return result >= 0;
     }
 
+    private toParameters(wallet: Wallet, evse: Evse): any[] {
+        const id = evse.id;
+        const owner = wallet.keyAtIndex(0).address;
+        const stationId = evse.stationId;
+        const plugMask = ToolKit.toPlugMask(evse.plugTypes);
+        const available = evse.available;
+        return [id, owner, stationId, plugMask, available];
+    }
+
     useWallet(wallet: Wallet) {
         return {
-            create: async (evse: Evse) => {
-                const contract = await this.contract();
-                const key = wallet.keyAtIndex(0);
-                const id = evse.id;
-                const owner = evse.owner = key.address;
-                const stationId = evse.stationId;
-                const plugMask = ToolKit.toPlugMask(evse.plugTypes);
-                const available = evse.available;
-                await contract.send("addEvse", [id, owner, stationId, plugMask, available], key);
-            },
-            createBatch: async (...evses: Evse[]) => {
-                const contract = await this.contract();
+            create: this.create(wallet),
+            update: this.update(wallet),
+            batch: () => {
+                return {
+                    create: this.batchCreate(wallet),
+                    update: this.batchUpdate(wallet)
+                }
+            }
+        }
+    }
+
+    private create(wallet: Wallet) {
+        return async (evse: Evse) => {
+            evse["_owner"] = wallet.keyAtIndex(0).address;
+            evse.tracker.resetProperties();
+            const contract = await this.contract();
+            await contract.send("addEvse", this.toParameters(wallet, evse), wallet.keyAtIndex(0));
+        };
+    }
+
+    private batchCreate(wallet: Wallet) {
+        return async (...evses: Evse[]) => {
+            const contract = await this.contract();
+            const batch = contract.newBatch();
+            const key = wallet.keyAtIndex(0);
+            key.nonce = await contract.getNonce(key);
+            for (const evse of evses) {
+                evse["_owner"] = wallet.keyAtIndex(0).address;
+                evse.tracker.resetProperties();
+                const tx = await contract.request("addEvse", this.toParameters(wallet, evse), key);
+                batch.add(tx);
+                key.nonce++;
+            }
+            batch.execute();
+        };
+    }
+
+    private update(wallet: Wallet) {
+        return async (evse: Evse) => {
+            const contract = await this.contract();
+
+            if (await contract.call("getIndexById", evse.id) >= 0) {
                 const batch = contract.newBatch();
                 const key = wallet.keyAtIndex(0);
                 key.nonce = await contract.getNonce(key);
-                for (const evse of evses) {
-                    const parameters = [
-                        evse.id,
-                        key.address,
-                        evse.stationId,
-                        ToolKit.toPlugMask(evse.plugTypes),
-                        evse.available
-                    ];
-                    const tx = await contract.request("addEvse", parameters, key);
-                    batch.add(tx);
-                    key.nonce++;
+
+                for (const property of evse.tracker.getProperties()) {
+                    if (evse.tracker.didPropertyChange(property)) {
+                        const funcName = "set" + property.charAt(0).toUpperCase() + property.substr(1);
+                        const tx = await contract.request(funcName, [evse.id, evse[property]], key);
+                        batch.add(tx);
+                        key.nonce++;
+                    }
                 }
+
                 batch.execute();
-            },
-            update: async (evse: Evse) => {
-                const contract = await this.contract();
+                evse.tracker.resetProperties();
+            }
+        };
+    }
 
+    private batchUpdate(wallet: Wallet) {
+        return async (...evses: Evse[]) => {
+            const contract = await this.contract();
+            const batch = contract.newBatch();
+            const key = wallet.keyAtIndex(0);
+            key.nonce = await contract.getNonce(key);
+
+            for (const evse of evses) {
                 if (await contract.call("getIndexById", evse.id) >= 0) {
-                    const batch = contract.newBatch();
-                    const key = wallet.keyAtIndex(0);
-                    key.nonce = await contract.getNonce(key);
-
                     for (const property of evse.tracker.getProperties()) {
                         if (evse.tracker.didPropertyChange(property)) {
                             const funcName = "set" + property.charAt(0).toUpperCase() + property.substr(1);
@@ -97,32 +139,11 @@ export class EvseService {
                             key.nonce++;
                         }
                     }
-
-                    batch.execute();
                     evse.tracker.resetProperties();
                 }
-            },
-            updateBatch: async (...evses: Evse[]) => {
-                const contract = await this.contract();
-                const batch = contract.newBatch();
-                const key = wallet.keyAtIndex(0);
-                key.nonce = await contract.getNonce(key);
-
-                for (const evse of evses) {
-                    if (await contract.call("getIndexById", evse.id) >= 0) {
-                        for (const property of evse.tracker.getProperties()) {
-                            if (evse.tracker.didPropertyChange(property)) {
-                                const funcName = "set" + property.charAt(0).toUpperCase() + property.substr(1);
-                                const tx = await contract.request(funcName, [evse.id, evse[property]], key);
-                                batch.add(tx);
-                                key.nonce++;
-                            }
-                        }
-                        evse.tracker.resetProperties();
-                    }
-                }
-                batch.execute();
             }
+            batch.execute();
         };
     }
+
 }

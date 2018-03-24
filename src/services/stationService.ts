@@ -47,38 +47,72 @@ export class StationService {
 
     useWallet(wallet: Wallet) {
         return {
-            create: async (station: Station) => {
-                const contract = await this.contract();
-                const id = station.id;
-                const lat = station.latitude * 1000000 << 0;
-                const lng = station.longitude * 1000000 << 0;
-                const hours = ToolKit.asciiToHex(OpeningHours.encode(station.openingHours));
+            create: this.create(wallet),
+            update: this.update(wallet),
+            batch: () => {
+                return {
+                    create: this.batchCreate(wallet),
+                    update: this.batchUpdate(wallet)
+                }
+            }
+        }
+    }
+
+    private create(wallet: Wallet) {
+        return async (station: Station) => {
+            station["_owner"] = wallet.keyAtIndex(0).address;
+            station.tracker.resetProperties();
+            const contract = await this.contract();
+            return contract.send("addStation", this.toParameters(wallet, station), wallet.keyAtIndex(0));
+        };
+    }
+
+    private batchCreate(wallet: Wallet) {
+        return async (...stations: Station[]) => {
+            const contract = await this.contract();
+            const batch = contract.newBatch();
+            const key = wallet.keyAtIndex(0);
+            key.nonce = await contract.getNonce(key);
+            for (const station of stations) {
+                station["_owner"] = wallet.keyAtIndex(0).address;
                 station.tracker.resetProperties();
-                const key = wallet.keyAtIndex(0);
-                return contract.send("addStation", [id, key.address, lat, lng, hours], key);
-            },
-            createBatch: async (...stations: Station[]) => {
-                const contract = await this.contract();
+                const tx = await contract.request("addStation", this.toParameters(wallet, station), key);
+                batch.add(tx);
+                key.nonce++;
+            }
+            batch.execute();
+        };
+    }
+
+    private update(wallet: Wallet) {
+        return async (station: Station) => {
+            const contract = await this.contract();
+            if (await contract.call("getIndexById", station.id) >= 0) {
                 const batch = contract.newBatch();
                 const key = wallet.keyAtIndex(0);
                 key.nonce = await contract.getNonce(key);
-                for (const station of stations) {
-                    const id = station.id;
-                    const lat = station.latitude * 1000000 << 0;
-                    const lng = station.longitude * 1000000 << 0;
-                    const hours = ToolKit.asciiToHex(OpeningHours.encode(station.openingHours));
-                    const tx = await contract.request("addStation", [id, key.address, lat, lng, hours], key);
-                    batch.add(tx);
-                    key.nonce++;
+                for (const property of station.tracker.getProperties()) {
+                    if (station.tracker.didPropertyChange(property)) {
+                        const funcName = "set" + property.charAt(0).toUpperCase() + property.substr(1);
+                        const tx = await contract.request(funcName, [station.id, station[property]], key);
+                        batch.add(tx);
+                        key.nonce++;
+                    }
                 }
                 batch.execute();
-            },
-            update: async (station: Station) => {
-                const contract = await this.contract();
+                station.tracker.resetProperties();
+            }
+        };
+    }
+
+    private batchUpdate(wallet: Wallet) {
+        return async (...stations: Station[]) => {
+            const contract = await this.contract();
+            const batch = contract.newBatch();
+            const key = wallet.keyAtIndex(0);
+            key.nonce = await contract.getNonce(key);
+            for (const station of stations) {
                 if (await contract.call("getIndexById", station.id) >= 0) {
-                    const batch = contract.newBatch();
-                    const key = wallet.keyAtIndex(0);
-                    key.nonce = await contract.getNonce(key);
                     for (const property of station.tracker.getProperties()) {
                         if (station.tracker.didPropertyChange(property)) {
                             const funcName = "set" + property.charAt(0).toUpperCase() + property.substr(1);
@@ -87,30 +121,18 @@ export class StationService {
                             key.nonce++;
                         }
                     }
-                    batch.execute();
                     station.tracker.resetProperties();
                 }
-            },
-            updateBatch: async (...stations: Station[]) => {
-                const contract = await this.contract();
-                const batch = contract.newBatch();
-                const key = wallet.keyAtIndex(0);
-                key.nonce = await contract.getNonce(key);
-                for (const station of stations) {
-                    if (await contract.call("getIndexById", station.id) >= 0) {
-                        for (const property of station.tracker.getProperties()) {
-                            if (station.tracker.didPropertyChange(property)) {
-                                const funcName = "set" + property.charAt(0).toUpperCase() + property.substr(1);
-                                const tx = await contract.request(funcName, [station.id, station[property]], key);
-                                batch.add(tx);
-                                key.nonce++;
-                            }
-                        }
-                        station.tracker.resetProperties();
-                    }
-                }
-                batch.execute();
             }
+            batch.execute();
         };
+    }
+
+    private toParameters(wallet: Wallet, station: Station): any[] {
+        const id = station.id;
+        const lat = station.latitude * 1000000 << 0;
+        const lng = station.longitude * 1000000 << 0;
+        const hours = ToolKit.asciiToHex(OpeningHours.encode(station.openingHours));
+        return [id, wallet.keyAtIndex(0).address, lat, lng, hours];
     }
 }

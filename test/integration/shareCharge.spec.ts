@@ -73,7 +73,6 @@ describe('ShareCharge', function () {
 
         it('should broadcast start confirmed to msp', async () => {
             const evse = new EvseBuilder()
-                .withOwner(cpoKey.address)
                 .withIsAvailable(true)
                 .build();
 
