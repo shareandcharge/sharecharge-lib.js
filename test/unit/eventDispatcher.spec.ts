@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { EventDispatcher } from '../../src/models/eventDispatcher';
+import { EventDispatcher } from '../../src/services/eventDispatcher';
 
 describe('EventDispatcher', function () {
 

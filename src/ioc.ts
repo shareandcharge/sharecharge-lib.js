@@ -1,7 +1,7 @@
 import { Container, injectable, inject } from "inversify";
 import "reflect-metadata";
 import { ConfigProvider } from "./services/configProvider";
-import { Symbols } from "./models/symbols";
+import { Symbols } from "./symbols";
 import { ContractProvider, IContractProvider } from "./services/contractProvider";
 import { StationService, EvseService, ShareCharge } from ".";
 import { ChargingService } from "./services/chargingService";

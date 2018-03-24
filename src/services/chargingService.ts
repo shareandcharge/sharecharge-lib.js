@@ -3,7 +3,7 @@ import { Contract } from "../models/contract";
 import { Wallet } from "../models/wallet";
 import { IContractProvider } from "./contractProvider";
 import { Container, injectable, inject } from "inversify";
-import { Symbols } from '../models/symbols';
+import { Symbols } from '../symbols';
 import "reflect-metadata";
 
 @injectable()

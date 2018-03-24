@@ -1,6 +1,7 @@
-import { Evse } from './../src/models/evse';
 import { ShareCharge } from '../src/shareCharge';
+import { Evse } from '../src/models/evse';
 import { Wallet } from '../src/models/wallet';
+import { Station } from '../src/models/station';
 import { config } from "../src/utils/config";
 import { IoC } from '../src/ioc';
 

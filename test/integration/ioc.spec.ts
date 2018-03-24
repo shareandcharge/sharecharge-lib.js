@@ -11,7 +11,7 @@ import { StationService } from '../../src/services/stationService';
 import { ConfigProvider } from '../../src/services/configProvider';
 import { ContractProvider } from '../../src/services/contractProvider';
 import { Wallet } from '../../src/models/wallet';
-import { Symbols } from '../../src/models/symbols';
+import { Symbols } from '../../src/symbols';
 import { Container, injectable, inject } from "inversify";
 import "reflect-metadata";
 import { PlugType } from '../../src/models/plugType';

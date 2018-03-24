@@ -8,7 +8,7 @@ import { ToolKit } from './utils/toolKit';
 import { ShareCharge } from "./shareCharge";
 import { IConfig } from './interfaces/iConfig';
 import { OpeningHours } from './models/openingHours';
-import { Symbols } from './models/symbols';
+import { Symbols } from './symbols';
 import { ConfigProvider } from './services/configProvider';
 import { ContractProvider } from './services/contractProvider';
 import { ChargingService } from './services/chargingService';

@@ -3,14 +3,14 @@ import { EvseService } from './services/evseService';
 import { StationService } from './services/stationService';
 import { Contract } from './models/contract';
 import { EventPoller } from './services/eventPoller';
-import { EventDispatcher } from './models/eventDispatcher';
+import { EventDispatcher } from './services/eventDispatcher';
 import { IDefs } from "./interfaces/iDefs";
 import { IServices } from "./interfaces/iServices";
 import { IConfig } from "./interfaces/iConfig";
 import { ConfigProvider } from './services/configProvider';
 import { IContractProvider, ContractProvider } from './services/contractProvider';
 import { Container, injectable, inject } from "inversify";
-import { Symbols } from './models/symbols';
+import { Symbols } from './symbols';
 import "reflect-metadata";
 
 

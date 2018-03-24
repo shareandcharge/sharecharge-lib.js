@@ -3,7 +3,7 @@ import { IDefs } from '../interfaces/iDefs';
 import { Contract } from '../models/contract';
 import { ToolKit } from '../utils/toolKit';
 import { Container, injectable, inject } from "inversify";
-import { Symbols } from '../models/symbols';
+import { Symbols } from '../symbols';
 import "reflect-metadata";
 const Web3 = require('web3');
 
