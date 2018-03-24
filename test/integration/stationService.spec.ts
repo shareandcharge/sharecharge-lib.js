@@ -47,7 +47,6 @@ describe('StationService', function () {
     context('create', () => {
         it('should create station', async () => {
             const station = new StationBuilder()
-                .withOwner(key.address)
                 .withLatitude(51.345)
                 .withLongitude(-0.92332)
                 .build();
@@ -128,11 +127,9 @@ describe('StationService', function () {
 
     context('#getAllStations()', () => {
         it('return all stations', async function () {
-            const station = new StationBuilder().withOwner(key.address).build();
-
-            await stationService.useWallet(wallet).create(station);
-            await stationService.useWallet(wallet).create(station);
-            await stationService.useWallet(wallet).create(station);
+            await stationService.useWallet(wallet).create(new StationBuilder().build());
+            await stationService.useWallet(wallet).create(new StationBuilder().build());
+            await stationService.useWallet(wallet).create(new StationBuilder().build());
 
             const result = await stationService.getAll();
             expect(result.length).to.equal(3);
@@ -141,14 +138,14 @@ describe('StationService', function () {
 
     context('#isPersisted()', () => {
         it('should return true for persisted stations', async function () {
-            const station = new StationBuilder().withOwner(key.address).build();
+            const station = new StationBuilder().build();
             await stationService.useWallet(wallet).create(station);
             const result = await stationService.isPersisted(station);
             expect(result).to.equal(true);
         });
 
         it('should return false for unpersisted stations', async function () {
-            const station = new StationBuilder().withOwner(key.address).build();
+            const station = new StationBuilder().build();
             const result = await stationService.isPersisted(station);
             expect(result).to.equal(false);
         });

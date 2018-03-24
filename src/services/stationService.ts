@@ -63,7 +63,7 @@ export class StationService {
             station["_owner"] = wallet.keyAtIndex(0).address;
             station.tracker.resetProperties();
             const contract = await this.contract();
-            return contract.send("addStation", this.toParameters(wallet, station), wallet.keyAtIndex(0));
+            return contract.send("addStation", this.toParameters(station), wallet.keyAtIndex(0));
         };
     }
 
@@ -76,7 +76,7 @@ export class StationService {
             for (const station of stations) {
                 station["_owner"] = wallet.keyAtIndex(0).address;
                 station.tracker.resetProperties();
-                const tx = await contract.request("addStation", this.toParameters(wallet, station), key);
+                const tx = await contract.request("addStation", this.toParameters(station), key);
                 batch.add(tx);
                 key.nonce++;
             }
@@ -128,11 +128,11 @@ export class StationService {
         };
     }
 
-    private toParameters(wallet: Wallet, station: Station): any[] {
+    private toParameters(station: Station): any[] {
         const id = station.id;
         const lat = station.latitude * 1000000 << 0;
         const lng = station.longitude * 1000000 << 0;
         const hours = ToolKit.asciiToHex(OpeningHours.encode(station.openingHours));
-        return [id, wallet.keyAtIndex(0).address, lat, lng, hours];
+        return [id, lat, lng, hours];
     }
 }

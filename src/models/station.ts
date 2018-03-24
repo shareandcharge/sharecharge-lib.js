@@ -24,13 +24,6 @@ export class Station {
         return this._owner;
     }
 
-    set owner(value: string) {
-        value = value.toLowerCase();
-        if (ToolKit.isAddress(value)) {
-            this.tracker.setProperty("owner", value);
-        }
-    }
-
     get latitude(): number {
         return this._latitude;
     }

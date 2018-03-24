@@ -5,35 +5,6 @@ import { ToolKit } from '../../src/utils/toolKit';
 
 describe('Station', function () {
 
-    context('owner', () => {
-
-        it('should allow a valid address string', () => {
-            const station = new Station();
-            const owner = '0xc1912fee45d61c87cc5ea59dae31190fffff232d';
-            station.owner = owner;
-            expect(station.owner).to.equal(owner.toLowerCase());
-        });
-
-        it('should handle mixed case address strings', () => {
-            const station = new Station();
-            const owner = '0xc1912fee45d61c87cc5ea59dAE31190fffff232d';
-            station.owner = owner;
-            expect(station.owner).to.equal(owner.toLowerCase());
-        });
-
-        it('should not set an invalid address strings', () => {
-            const station = new Station();
-            station.owner = '0xc1912fee45d61c87cc5';
-            expect(station.owner).to.not.equal('0xc1912fee45d61c87cc5');
-        });
-
-        it('should not allow non address strings', () => {
-            const station = new Station();
-            station.owner = 'hello world';
-            expect(station.owner).to.not.equal('hello world');
-        });
-    });
-
     context('latitude', () => {
         it('should not allow values less then -90', () => {
             const station = new Station();

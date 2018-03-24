@@ -50,15 +50,6 @@ export class EvseService {
         return result >= 0;
     }
 
-    private toParameters(wallet: Wallet, evse: Evse): any[] {
-        const id = evse.id;
-        const owner = wallet.keyAtIndex(0).address;
-        const stationId = evse.stationId;
-        const plugMask = ToolKit.toPlugMask(evse.plugTypes);
-        const available = evse.available;
-        return [id, owner, stationId, plugMask, available];
-    }
-
     useWallet(wallet: Wallet) {
         return {
             create: this.create(wallet),
@@ -77,7 +68,7 @@ export class EvseService {
             evse["_owner"] = wallet.keyAtIndex(0).address;
             evse.tracker.resetProperties();
             const contract = await this.contract();
-            await contract.send("addEvse", this.toParameters(wallet, evse), wallet.keyAtIndex(0));
+            await contract.send("addEvse", this.toParameters(evse), wallet.keyAtIndex(0));
         };
     }
 
@@ -90,7 +81,7 @@ export class EvseService {
             for (const evse of evses) {
                 evse["_owner"] = wallet.keyAtIndex(0).address;
                 evse.tracker.resetProperties();
-                const tx = await contract.request("addEvse", this.toParameters(wallet, evse), key);
+                const tx = await contract.request("addEvse", this.toParameters(evse), key);
                 batch.add(tx);
                 key.nonce++;
             }
@@ -146,4 +137,11 @@ export class EvseService {
         };
     }
 
+    private toParameters(evse: Evse): any[] {
+        const id = evse.id;
+        const stationId = evse.stationId;
+        const plugMask = ToolKit.toPlugMask(evse.plugTypes);
+        const available = evse.available;
+        return [id, stationId, plugMask, available];
+    }
 }
