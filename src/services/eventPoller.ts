@@ -2,25 +2,16 @@ import { Contract } from "../models/contract";
 
 interface ContractTracker {
     contract: Contract;
-    callback: (events: any) => void;
     fromBlock: number;
 }
 
-export interface Poller {
-    start();
-    stop();
-    poll();
-    add(contract: Contract, callback: (events: any) => void);
-    remove(contract: Contract);
-    removeAll();
-}
-
-export class EventPoller implements Poller {
+export class EventPoller {
 
     private static singleton;
 
     private intervalID: any;
-    private callbacks = new Map<string, ContractTracker>();
+    private trackers = new Map<string, ContractTracker>();
+    private callbacks = new Array();
 
     private constructor(private interval: number) {
     }
@@ -47,28 +38,28 @@ export class EventPoller implements Poller {
 
     async poll() {
         const promises: any[] = [];
-        this.callbacks.forEach((tracker: ContractTracker) => {
+        this.trackers.forEach(tracker => {
             promises.push(tracker.contract.native.getPastEvents({ fromBlock: tracker.fromBlock })
                 .then(pastEvents => {
                     if (pastEvents.length > 0) {
                         tracker.fromBlock = pastEvents[pastEvents.length - 1].blockNumber + 1;
-                        tracker.callback(pastEvents);
+                        this.callbacks.forEach(callback => callback(pastEvents));
                     }
                 }));
         });
         return Promise.all(promises);
     }
 
-    async add(contract: Contract, callback: (events: any) => void) {
+    async monitor(key: string, contract: Contract) {
         const block = await contract.getBlockNumber() + 1;
-        this.callbacks.set(contract.address, { contract, callback, fromBlock: block });
+        this.trackers.set(key, { contract, fromBlock: block });
     }
 
-    remove(contract: Contract) {
-        this.callbacks.delete(contract.address);
+    notify(callback: (events: any) => void) {
+        this.callbacks.push(callback);
     }
 
     removeAll() {
-        this.callbacks.clear();
+        this.callbacks = new Array();
     }
 }

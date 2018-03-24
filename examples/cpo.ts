@@ -41,7 +41,6 @@ async function main() {
     console.log(`Created new evse with id: ${evseId}`);
 
     sc.on("StartRequested", async (result) => {
-        console.log(result);
         if (result.evseId == evseId) {
             console.log(`Received start request for evse with id: ${evseId}`);
 
