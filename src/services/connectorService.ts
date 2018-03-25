@@ -31,8 +31,8 @@ export class ConnectorService {
                     },
                     update: async (connector: Connector) => {
                     }
-                }
+                };
             }
-        }
+        };
     }
 }
