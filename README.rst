@@ -62,25 +62,26 @@ A wallet can be generated using either a new or known 12 word seed phrase. This 
     import { Wallet } from 'sharecharge-lib';
 
     // generate new seed and keypair
-    let wallet = Wallet.generate();
+    let newWallet = Wallet.generate();
 
-    { seed: 'make side cargo palm tongue switch blur tuna reform soup shove music',
-      keys:
-      Wallet {
-        ks:
-        Wallet {
-            _privKey: <Buffer db 48 77 b6 1c e4 27 a1 2e f7 eb 6c 83 f8 52 35 70 82 32 0c fb ad 24 e3 e3 60 25 10 c2 bf ad 39>,
-            _pubKey: undefined } } }
+    // get seed of new wallet
+    newWallet.seed
+    // 'maid left ostrich minor ask stomach outdoor vacuum beach admit dinner avoid'
 
-    wallet.keys.address;
-    // 0x0aee9216f1db9b779a44ff16ec79d46d6feaf03c
-
+    // get generated wallet object
+    let wallet = newWallet.wallet
+    wallet.keychain[0].address;
+    // 0x6aded10b71224ca208f7476cebd72270771a451e
 
     // alternatively, generate from seed
-    let wallet = new Wallet('make side cargo palm tongue switch blur tuna reform soup shove music');
+    wallet = new Wallet('maid left ostrich minor ask stomach outdoor vacuum beach admit dinner avoid');
 
-    wallet.address;
-    // 0x0aee9216f1db9b779a44ff16ec79d46d6feaf03c
+    wallet.keychain[0].address;
+    // 0x6aded10b71224ca208f7476cebd72270771a451e
+
+    // add new key to the keychain
+    wallet.addKey('maid left ostrich minor ask stomach outdoor vacuum beach admit dinner avoid');
+    // true
 
 ----
 

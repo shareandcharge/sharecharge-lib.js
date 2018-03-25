@@ -29,8 +29,16 @@ describe('HD Wallet', function() {
     it('should add new keys to the keychain', () => {
         const wallet = new Wallet('hello world');
         expect(wallet.keychain.length).to.equal(1);
-        wallet.addKey('hello world');
+        const success = wallet.addKey('hello world');
+        expect(success).to.equal(true);
         expect(wallet.keychain.length).to.equal(2);
+    });
+
+    it('should not add new keys to the keychain if seed is incorrect', () => {
+        const wallet = new Wallet('hello world');
+        const success = wallet.addKey('hallo world');
+        expect(success).to.equal(false);
+        expect(wallet.keychain.length).to.equal(1);
     });
 
 });
