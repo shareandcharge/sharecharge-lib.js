@@ -19,31 +19,27 @@ export class ChargingService {
         return this._resolved;
     }
 
-    useWallet(wallet: Wallet) {
+    useWallet(wallet: Wallet, keyIndex: number = 0) {
+        const key = wallet.keychain[keyIndex];
         return {
             requestStart: async (evse: Evse, secondsToRent: number) => {
                 const contract = await this.contract();
-                const key = wallet.keyAtIndex(0);
                 await contract.send("requestStart", [evse.id, secondsToRent], key);
             },
             confirmStart: async (evse: Evse, controller: string) => {
                 const contract = await this.contract();
-                const key = wallet.keyAtIndex(0);
                 await contract.send("confirmStart", [evse.id, controller], key);
             },
             requestStop: async (evse: Evse) => {
                 const contract = await this.contract();
-                const key = wallet.keyAtIndex(0);
                 await contract.send("requestStop", [evse.id], key);
             },
             confirmStop: async (evse: Evse, controller: string) => {
                 const contract = await this.contract();
-                const key = wallet.keyAtIndex(0);
                 await contract.send("confirmStop", [evse.id, controller], key);
             },
             error: async (evse: Evse, controller: string, errorCode: number) => {
                 const contract = await this.contract();
-                const key = wallet.keyAtIndex(0);
                 await contract.send("logError", [evse.id, controller, errorCode], key);
             }
         };

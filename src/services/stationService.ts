@@ -7,6 +7,7 @@ import { IContractProvider } from './contractProvider';
 import { Container, injectable, inject } from "inversify";
 import { Symbols } from '../symbols';
 import "reflect-metadata";
+import { Key } from '../models/key';
 
 @injectable()
 export class StationService {
@@ -45,36 +46,36 @@ export class StationService {
         return result >= 0;
     }
 
-    useWallet(wallet: Wallet) {
+    useWallet(wallet: Wallet, keyIndex: number = 0) {
+        const key = wallet.keychain[keyIndex];
         return {
-            create: this.create(wallet),
-            update: this.update(wallet),
+            create: this.create(key),
+            update: this.update(key),
             batch: () => {
                 return {
-                    create: this.batchCreate(wallet),
-                    update: this.batchUpdate(wallet)
-                }
+                    create: this.batchCreate(key),
+                    update: this.batchUpdate(key)
+                };
             }
-        }
-    }
-
-    private create(wallet: Wallet) {
-        return async (station: Station) => {
-            station["_owner"] = wallet.keyAtIndex(0).address;
-            station.tracker.resetProperties();
-            const contract = await this.contract();
-            return contract.send("addStation", this.toParameters(station), wallet.keyAtIndex(0));
         };
     }
 
-    private batchCreate(wallet: Wallet) {
+    private create(key: Key) {
+        return async (station: Station) => {
+            station["_owner"] = key.address;
+            station.tracker.resetProperties();
+            const contract = await this.contract();
+            return contract.send("addStation", this.toParameters(station), key);
+        };
+    }
+
+    private batchCreate(key: Key) {
         return async (...stations: Station[]) => {
             const contract = await this.contract();
             const batch = contract.newBatch();
-            const key = wallet.keyAtIndex(0);
             key.nonce = await contract.getNonce(key);
             for (const station of stations) {
-                station["_owner"] = wallet.keyAtIndex(0).address;
+                station["_owner"] = key.address;
                 station.tracker.resetProperties();
                 const tx = await contract.request("addStation", this.toParameters(station), key);
                 batch.add(tx);
@@ -84,12 +85,11 @@ export class StationService {
         };
     }
 
-    private update(wallet: Wallet) {
+    private update(key: Key) {
         return async (station: Station) => {
             const contract = await this.contract();
             if (await contract.call("getIndexById", station.id) >= 0) {
                 const batch = contract.newBatch();
-                const key = wallet.keyAtIndex(0);
                 key.nonce = await contract.getNonce(key);
                 for (const property of station.tracker.getProperties()) {
                     if (station.tracker.didPropertyChange(property)) {
@@ -105,11 +105,10 @@ export class StationService {
         };
     }
 
-    private batchUpdate(wallet: Wallet) {
+    private batchUpdate(key: Key) {
         return async (...stations: Station[]) => {
             const contract = await this.contract();
             const batch = contract.newBatch();
-            const key = wallet.keyAtIndex(0);
             key.nonce = await contract.getNonce(key);
             for (const station of stations) {
                 if (await contract.call("getIndexById", station.id) >= 0) {

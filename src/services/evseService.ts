@@ -7,6 +7,7 @@ import { IContractProvider } from './contractProvider';
 import { Container, injectable, inject } from "inversify";
 import { Symbols } from '../symbols';
 import "reflect-metadata";
+import { Key } from '../models/key';
 
 @injectable()
 export class EvseService {
@@ -50,36 +51,36 @@ export class EvseService {
         return result >= 0;
     }
 
-    useWallet(wallet: Wallet) {
+    useWallet(wallet: Wallet, keyIndex: number = 0) {
+        const key = wallet.keychain[keyIndex];
         return {
-            create: this.create(wallet),
-            update: this.update(wallet),
+            create: this.create(key),
+            update: this.update(key),
             batch: () => {
                 return {
-                    create: this.batchCreate(wallet),
-                    update: this.batchUpdate(wallet)
-                }
+                    create: this.batchCreate(key),
+                    update: this.batchUpdate(key)
+                };
             }
-        }
-    }
-
-    private create(wallet: Wallet) {
-        return async (evse: Evse) => {
-            evse["_owner"] = wallet.keyAtIndex(0).address;
-            evse.tracker.resetProperties();
-            const contract = await this.contract();
-            await contract.send("addEvse", this.toParameters(evse), wallet.keyAtIndex(0));
         };
     }
 
-    private batchCreate(wallet: Wallet) {
+    private create(key: Key) {
+        return async (evse: Evse) => {
+            evse["_owner"] = key.address;
+            evse.tracker.resetProperties();
+            const contract = await this.contract();
+            await contract.send("addEvse", this.toParameters(evse), key);
+        };
+    }
+
+    private batchCreate(key: Key) {
         return async (...evses: Evse[]) => {
             const contract = await this.contract();
             const batch = contract.newBatch();
-            const key = wallet.keyAtIndex(0);
             key.nonce = await contract.getNonce(key);
             for (const evse of evses) {
-                evse["_owner"] = wallet.keyAtIndex(0).address;
+                evse["_owner"] = key.address;
                 evse.tracker.resetProperties();
                 const tx = await contract.request("addEvse", this.toParameters(evse), key);
                 batch.add(tx);
@@ -89,13 +90,12 @@ export class EvseService {
         };
     }
 
-    private update(wallet: Wallet) {
+    private update(key: Key) {
         return async (evse: Evse) => {
             const contract = await this.contract();
 
             if (await contract.call("getIndexById", evse.id) >= 0) {
                 const batch = contract.newBatch();
-                const key = wallet.keyAtIndex(0);
                 key.nonce = await contract.getNonce(key);
 
                 for (const property of evse.tracker.getProperties()) {
@@ -113,11 +113,10 @@ export class EvseService {
         };
     }
 
-    private batchUpdate(wallet: Wallet) {
+    private batchUpdate(key: Key) {
         return async (...evses: Evse[]) => {
             const contract = await this.contract();
             const batch = contract.newBatch();
-            const key = wallet.keyAtIndex(0);
             key.nonce = await contract.getNonce(key);
 
             for (const evse of evses) {

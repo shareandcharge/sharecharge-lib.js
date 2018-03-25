@@ -40,9 +40,9 @@ describe('ShareCharge', function () {
         web3 = new Web3(config.provider);
 
         cpoWallet = new Wallet(seed1);
-        cpoKey = cpoWallet.keyAtIndex(0);
+        cpoKey = cpoWallet.keychain[0];
         mspWallet = new Wallet(seed2);
-        mspKey = mspWallet.keyAtIndex(0);
+        mspKey = mspWallet.keychain[0];
 
         await TestHelper.ensureFunds(web3, cpoKey);
         await TestHelper.ensureFunds(web3, mspKey);

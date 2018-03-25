@@ -30,7 +30,7 @@ describe('StationService', function () {
     before(async () => {
         web3 = new Web3(config.provider);
         wallet = new Wallet(seed);
-        key = wallet.keyAtIndex(0);
+        key = wallet.keychain[0];
 
         await TestHelper.ensureFunds(web3, key);
     });

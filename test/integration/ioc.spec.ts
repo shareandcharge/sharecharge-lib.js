@@ -27,7 +27,7 @@ describe('IoC', function () {
 
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
     const wallet = new Wallet(seed);
-    const key = wallet.keyAtIndex(0);
+    const key = wallet.keychain[0];
 
     before(async () => {
         const web3 = new Web3(config.provider);

@@ -5,40 +5,27 @@ import { Key } from './key';
 export class Wallet {
 
     public readonly path: string;
-    private readonly master: any;
-    private readonly keys: number;
+    public readonly keychain: Key[] = [];
 
-    constructor(seedPhrase: string, subAccount: number = 0, numberOfKeys: number = 10) {
-        // m / purpose' / chain_id' / account' / address_index
+    constructor(seedPhrase: string, subAccount: number = 0, numberOfKeys: number = 1) {
+        // master / purpose' / chain_id' / account' / address_index
         // chain_id of ethereum main net is 60 (see https://github.com/satoshilabs/slips/blob/master/slip-0044.md)
         this.path = "m/44'/60'/" + subAccount;
-        this.keys = numberOfKeys - 1;
-        const hdwallet = hdkey.fromMasterSeed(seedPhrase);
-        const master = hdwallet.derivePath(this.path);
-        this.master = master.privateExtendedKey();
-    }
 
-    get key(): any {
-        const index = Math.round(Math.random() * this.keys);
-        const master = hdkey.fromExtendedKey(this.master);
-        const child = master.derivePath(this.path + "/" + index);
-        return new Key(child);
-    }
+        // the master from which keys are derived from
+        const master = hdkey.fromMasterSeed(seedPhrase);
 
-    keyAtIndex(index: number): any {
-        const master = hdkey.fromExtendedKey(this.master);
-        const child = master.derivePath(this.path + "/" + index);
-        return new Key(child);
-    }
-
-    get keychain(): string[] {
-        const children: string[] = [];
-        const master = hdkey.fromExtendedKey(this.master);
-        for (let i = 0; i <= this.keys; i++) {
-            const child = master.derivePath(this.path + "/" + i);
-            children.push(child.getWallet().getAddressString());
+        // allows keychain to be regenerated if lost
+        for (let index = 0; index < numberOfKeys; index++) {
+            const key = new Key(master.derivePath(this.path + '/' + index));
+            this.keychain.push(key);
         }
-        return children;
+    }
+
+    addKey(seedPhrase: string): void {
+        const master = hdkey.fromMasterSeed(seedPhrase);
+        const key = new Key(master.derivePath(this.path + '/' + this.keychain.length));
+        this.keychain.push(key);
     }
 
     get balance(): number {

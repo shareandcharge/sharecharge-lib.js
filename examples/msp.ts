@@ -23,7 +23,7 @@ async function findFreeEvse(sc: ShareCharge) {
 async function main() {
 
     const wallet = new Wallet('filter march urge naive sauce distance under copy payment slow just cool');
-    const key = wallet.keyAtIndex(0);
+    const key = wallet.keychain[0];
 
     const sc: ShareCharge = await IoC.resolve();
     sc.hookup();
