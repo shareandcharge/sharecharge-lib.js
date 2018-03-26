@@ -17,13 +17,13 @@ export class ConnectorService {
     }
 
     async getById(id: string): Promise<Connector> {
-        const contract = await this.contract;
+        const contract = this.contract;
         const result = await contract.call("getById", id);
         return Connector.deserialize(result);
     }
 
     async getByEvse(id: string): Promise<Connector[]> {
-        const contract = await this.contract;
+        const contract = this.contract;
         const connectorIds = await contract.call("getIdsByEvse", id);
         const connectors: Connector[] = [];
         for (const connectorId of connectorIds) {
@@ -49,14 +49,14 @@ export class ConnectorService {
 
     private create(key: Key) {
         return async (connector: Connector) => {
-            const contract = await this.contract;
+            const contract = this.contract;
             await contract.send("create", this.toParameters(connector), key);
         };
     }
 
     private batchCreate(key: Key) {
         return async (...connectors: Connector[]) => {
-            const contract = await this.contract;
+            const contract = this.contract;
             const batch = contract.newBatch();
             key.nonce = await contract.getNonce(key);
             for (const connector of connectors) {
@@ -70,14 +70,14 @@ export class ConnectorService {
 
     private update(key: Key) {
         return async (connector: Connector) => {
-            const contract = await this.contract;
+            const contract = this.contract;
             await contract.send("update", this.toParameters(connector), key);
         };
     }
 
     private batchUpdate(key: Key) {
         return async (...connectors: Connector[]) => {
-            const contract = await this.contract;
+            const contract = this.contract;
             const batch = contract.newBatch();
             key.nonce = await contract.getNonce(key);
             for (const connector of connectors) {

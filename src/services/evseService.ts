@@ -57,7 +57,7 @@ export class EvseService {
 
     private create(key: Key) {
         return async (evse: Evse) => {
-            const contract = await this.contract;
+            const contract = this.contract;
             await contract.send("create", this.toParameters(evse), key);
         };
     }
@@ -78,7 +78,7 @@ export class EvseService {
 
     private update(key: Key) {
         return async (evse: Evse) => {
-            const contract = await this.contract;
+            const contract = this.contract;
             await contract.send("update", this.toParameters(evse), key);
         };
     }

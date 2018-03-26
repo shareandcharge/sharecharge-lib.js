@@ -51,7 +51,7 @@ export class StationService {
 
     private create(key: Key) {
         return async (station: Station) => {
-            const contract = await this.contract;
+            const contract = this.contract;
             await contract.send("create", this.toParameters(station), key);
         };
     }
@@ -72,7 +72,7 @@ export class StationService {
 
     private update(key: Key) {
         return async (station: Station) => {
-            const contract = await this.contract;
+            const contract = this.contract;
             await contract.send("update", this.toParameters(station), key);
         };
     }
