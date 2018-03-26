@@ -5,7 +5,6 @@ import { Station } from './models/station';
 import { Wallet } from './models/wallet';
 import { ToolKit } from './utils/toolKit';
 import { ShareCharge } from "./shareCharge";
-import { IConfig } from './interfaces/iConfig';
 import { OpeningHours } from './models/openingHours';
 import { PlugType } from './models/plugType';
 
@@ -16,7 +15,6 @@ export {
     StationService,
     Wallet,
     ShareCharge,
-    IConfig,
     ToolKit,
     OpeningHours,
     PlugType
