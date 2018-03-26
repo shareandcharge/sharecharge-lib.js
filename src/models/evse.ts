@@ -1,20 +1,12 @@
 import { PlugType } from './plugType';
-import { ChangeTracker } from './changeTracker';
 import { ToolKit } from '../utils/toolKit';
 
 export class Evse {
-
-    public readonly tracker: ChangeTracker;
-
     private _id: string = ToolKit.randomBytes32String();
     private _owner: string = "0x0000000000000000000000000000000000000000";
     private _stationId: string = "0x0000000000000000000000000000000000000000";
     private _plugMask: number = 0;
     private _available: boolean = true;
-
-    constructor() {
-        this.tracker = new ChangeTracker(this);
-    }
 
     get id(): string {
         return this._id;
@@ -29,7 +21,7 @@ export class Evse {
     }
 
     set stationId(value: string) {
-        this.tracker.setProperty("stationId", value);
+        this._stationId = value;
     }
 
     get plugTypes(): PlugType[] {
@@ -37,7 +29,7 @@ export class Evse {
     }
 
     set plugTypes(value: PlugType[]) {
-        this.tracker.setProperty("plugMask", ToolKit.toPlugMask(value));
+        this._plugMask = ToolKit.toPlugMask(value);
     }
 
     get available(): boolean {
@@ -45,7 +37,7 @@ export class Evse {
     }
 
     set available(value: boolean) {
-        this.tracker.setProperty("available", value);
+        this._available = value;
     }
 
     static deserialize(payload: any): Evse {

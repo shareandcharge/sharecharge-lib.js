@@ -1,20 +1,12 @@
 import { ToolKit } from '../utils/toolKit';
-import { ChangeTracker } from './changeTracker';
 import { OpeningHours } from './openingHours';
 
 export class Station {
-
-    public readonly tracker: ChangeTracker;
-
     private _id: string = ToolKit.randomBytes32String();
     private _owner: string = "0x0000000000000000000000000000000000000000";
     private _latitude: number = 0;
     private _longitude: number = 0;
     private _openingHours: string = "0096009600960096009600960096";
-
-    constructor() {
-        this.tracker = new ChangeTracker(this);
-    }
 
     get id(): string {
         return this._id;
@@ -30,7 +22,7 @@ export class Station {
 
     set latitude(value: number) {
         if (value >= -90 && value <= 90) {
-            this.tracker.setProperty("latitude", value);
+            this._latitude = value;
         }
     }
 
@@ -40,7 +32,7 @@ export class Station {
 
     set longitude(value: number) {
         if (value >= -180 && value <= 180) {
-            this.tracker.setProperty("longitude", value);
+            this._longitude = value;
         }
     }
 
@@ -49,7 +41,7 @@ export class Station {
     }
 
     set openingHours(value: OpeningHours) {
-        this.tracker.setProperty("openingHours", OpeningHours.encode(value));
+        this._openingHours = OpeningHours.encode(value);
     }
 
     static serialize(station: Station) {
