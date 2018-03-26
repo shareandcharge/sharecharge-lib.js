@@ -15,7 +15,7 @@ export class Key {
 
     sign(txObject: any): Buffer {
         const tx = new EthereumTx(txObject);
-        tx.sign(this.ks._privKey);
+        tx.sign(this.ks.getPrivateKey());
         return tx.serialize();
     }
 

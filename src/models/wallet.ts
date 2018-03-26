@@ -8,8 +8,6 @@ export class Wallet {
     public readonly keychain: Key[] = [];
     private readonly id: string;
 
-    private web3: any;
-
     constructor(seedPhrase: string, subAccount: number = 0, numberOfKeys: number = 1) {
         // master / purpose' / chain_id' / account' / address_index
         // chain_id of ethereum main net is 60 (see https://github.com/satoshilabs/slips/blob/master/slip-0044.md)
