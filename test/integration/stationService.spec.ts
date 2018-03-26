@@ -141,19 +141,4 @@ describe('StationService', function () {
         });
     });
 
-    context('#isPersisted()', () => {
-        it('should return true for persisted stations', async function () {
-            const station = new StationBuilder().build();
-            await stationService.useWallet(wallet).create(station);
-            const result = await stationService.isPersisted(station);
-            expect(result).to.equal(true);
-        });
-
-        it('should return false for unpersisted stations', async function () {
-            const station = new StationBuilder().build();
-            const result = await stationService.isPersisted(station);
-            expect(result).to.equal(false);
-        });
-    });
-
 });

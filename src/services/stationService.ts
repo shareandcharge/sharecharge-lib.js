@@ -21,10 +21,9 @@ export class StationService {
     async getAll(): Promise<Station[]> {
         const contract = this.contract;
         const stations: Station[] = [];
-        const quantity = await contract.call("getNumberOfStations");
+        const quantity = await contract.call("getTotal");
         for (let i = 0; i < quantity; i++) {
-            const stationId = await contract.call("getIdByIndex", i);
-            const station = await contract.call("getStation", stationId);
+            const station = await contract.call("getByIndex", i);
             stations.push(Station.deserialize(station));
         }
         return stations;
@@ -32,14 +31,8 @@ export class StationService {
 
     async getById(id: string): Promise<Station> {
         const contract = this.contract;
-        const result = await contract.call("getStation", id);
+        const result = await contract.call("getById", id);
         return Station.deserialize(result);
-    }
-
-    async isPersisted(station: Station): Promise<boolean> {
-        const contract = this.contract;
-        const result = await contract.call("getIndexById", station.id);
-        return result >= 0;
     }
 
     useWallet(wallet: Wallet, keyIndex: number = 0) {

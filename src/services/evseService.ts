@@ -20,16 +20,16 @@ export class EvseService {
 
     async getById(id: string): Promise<Evse> {
         const contract = this.contract;
-        const result = await contract.call("getEvse", id);
+        const result = await contract.call("getById", id);
         return Evse.deserialize(result);
     }
 
     async getByStation(station: Station): Promise<Evse[]> {
         const contract = this.contract;
         const evses: Evse[] = [];
-        const evseIds = await contract.call("getStationEvses", station.id);
+        const evseIds = await contract.call("getIdsByStation", station.id);
         for (const id of evseIds) {
-            const evse = await contract.call("getEvse", id);
+            const evse = await contract.call("getById", id);
             evses.push(Evse.deserialize(evse));
         }
         return evses;
@@ -39,12 +39,6 @@ export class EvseService {
         const contract = this.contract;
         const result = await contract.call("getStationAvailability", station.id);
         return result;
-    }
-
-    async isPersisted(evse: Evse): Promise<boolean> {
-        const contract = this.contract;
-        const result = await contract.call("getIndexById", evse.id);
-        return result >= 0;
     }
 
     useWallet(wallet: Wallet, keyIndex: number = 0) {

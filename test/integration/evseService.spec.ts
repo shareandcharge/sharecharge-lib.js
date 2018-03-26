@@ -183,24 +183,4 @@ describe('EvseService', function () {
             expect(result).to.equal(true);
         });
     });
-
-    context('#isPersisted()', () => {
-        it('should return true for persisted evses', async function () {
-            const evse = new EvseBuilder().build();
-
-            await evseService.useWallet(wallet).create(evse);
-
-            const result = await evseService.isPersisted(evse);
-
-            expect(result).to.equal(true);
-        });
-
-        it('should return false for unpersisted stations', async function () {
-            const evse = new EvseBuilder().build();
-
-            const result = await evseService.isPersisted(evse);
-
-            expect(result).to.equal(false);
-        });
-    });
 });
