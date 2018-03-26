@@ -9,8 +9,6 @@ import { Container, injectable, inject } from "inversify";
 import { Symbols } from './symbols';
 import "reflect-metadata";
 
-const config = new ConfigProvider();
-
 @injectable()
 export class ShareCharge {
 
@@ -20,17 +18,17 @@ export class ShareCharge {
     public readonly evses: EvseService;
     public readonly charging: ChargingService;
 
-    constructor(@inject(Symbols.StationSerivce) stationService?: StationService,
-                @inject(Symbols.EvseService) evseService?: EvseService,
-                @inject(Symbols.ChargingService) chargingService?: ChargingService) {
-        this.stations = stationService || new StationService(new ContractProvider(config));
-        this.evses = evseService || new EvseService(new ContractProvider(config));
-        this.charging = chargingService || new ChargingService(new ContractProvider(config));
+    constructor(@inject(Symbols.StationSerivce) stationService: StationService,
+                @inject(Symbols.EvseService) evseService: EvseService,
+                @inject(Symbols.ChargingService) chargingService: ChargingService) {
+        this.stations = stationService;
+        this.evses = evseService;
+        this.charging = chargingService;
 
         // EventPoller.instance.monitor('ConnectorStorage', this.connectors.contract);
         EventPoller.instance.monitor('StationStorage', this.stations.contract);
-        EventPoller.instance.monitor('EvseStorage',  this.evses.contract);
-        EventPoller.instance.monitor('Charging',  this.charging.contract);
+        EventPoller.instance.monitor('EvseStorage', this.evses.contract);
+        EventPoller.instance.monitor('Charging', this.charging.contract);
 
         EventPoller.instance.notify(events => events.forEach(item =>
             this.eventDispatcher.dispatchAll(item.event, item.returnValues)
@@ -50,6 +48,7 @@ export class ShareCharge {
     }
 
     private static container;
+
     static getInstance() {
         if (!ShareCharge.container) {
             const container = new Container();

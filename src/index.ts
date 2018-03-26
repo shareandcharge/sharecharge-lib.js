@@ -7,10 +7,7 @@ import { ToolKit } from './utils/toolKit';
 import { ShareCharge } from "./shareCharge";
 import { IConfig } from './interfaces/iConfig';
 import { OpeningHours } from './models/openingHours';
-import { Symbols } from './symbols';
-import { ConfigProvider } from './services/configProvider';
-import { ContractProvider } from './services/contractProvider';
-import { ChargingService } from './services/chargingService';
+import { PlugType } from './models/plugType';
 
 export {
     Evse,
@@ -21,5 +18,6 @@ export {
     ShareCharge,
     IConfig,
     ToolKit,
-    OpeningHours
+    OpeningHours,
+    PlugType
 };
