@@ -12,7 +12,7 @@ import { Key } from '../models/key';
 @injectable()
 export class StationService {
 
-    public readonly contract;
+    public readonly contract: Contract;
 
     constructor(@inject(Symbols.ContractProvider) private contractProvider: IContractProvider) {
         this.contract = this.contractProvider.obtain('StationStorage');

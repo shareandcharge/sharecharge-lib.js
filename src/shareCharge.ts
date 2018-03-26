@@ -49,7 +49,7 @@ export class ShareCharge {
 
     private static container;
 
-    static getInstance() {
+    static getInstance(): ShareCharge {
         if (!ShareCharge.container) {
             const container = new Container();
             container.bind<ConfigProvider>(Symbols.ConfigProvider).to(ConfigProvider).inSingletonScope();
