@@ -37,7 +37,7 @@ describe('StationService', function () {
     });
 
     beforeEach(async () => {
-        const contract = await TestHelper.createContract(web3, config, defs["StationStorage"])
+        const contract = await TestHelper.createContract(web3, config, defs["StationStorage"]);
 
         stationService = new StationService(<IContractProvider>{
             obtain(key: string): Contract {
@@ -61,7 +61,7 @@ describe('StationService', function () {
             const result = await stationService.getById(station.id);
 
             expect(result.id).to.not.equal(undefined);
-            expect(result.owner.toLowerCase()).to.equal(station.owner.toLowerCase());
+            expect(result.owner.toLowerCase()).to.equal(key.address);
             expect(result.latitude).to.equal(station.latitude);
             expect(result.longitude).to.equal(station.longitude);
             expect(OpeningHours.encode(result.openingHours)).to.equal(OpeningHours.encode(station.openingHours));
@@ -90,15 +90,15 @@ describe('StationService', function () {
         it('should update a single station\'s parameters', async () => {
             const station = new StationBuilder().build();
             await stationService.useWallet(wallet).create(station);
-            station.latitude = 52;
-            station.longitude = 10.8;
+            station.latitude += 1;
+            station.longitude += 1;
             await stationService.useWallet(wallet).update(station);
 
             return new Promise((resolve, reject) => {
                 setTimeout(async () => {
                     const contractStation = await stationService.getById(station.id);
-                    expect(contractStation.latitude).to.equal(0.000052);
-                    expect(contractStation.longitude).to.equal(0.00001);
+                    expect(contractStation.latitude).to.equal(53.51667);
+                    expect(contractStation.longitude).to.equal(14.38333);
                     resolve();
                 }, batchTimeout);
             });

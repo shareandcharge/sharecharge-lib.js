@@ -58,10 +58,8 @@ export class StationService {
 
     private create(key: Key) {
         return async (station: Station) => {
-            station["_owner"] = key.address;
-            station.tracker.resetProperties();
-            const contract = this.contract;
-            return contract.send("addStation", this.toParameters(station), key);
+            const contract = await this.contract;
+            await contract.send("create", this.toParameters(station), key);
         };
     }
 
@@ -71,9 +69,7 @@ export class StationService {
             const batch = contract.newBatch();
             key.nonce = await contract.getNonce(key);
             for (const station of stations) {
-                station["_owner"] = key.address;
-                station.tracker.resetProperties();
-                const tx = await contract.request("addStation", this.toParameters(station), key);
+                const tx = await contract.request("create", this.toParameters(station), key);
                 batch.add(tx);
                 key.nonce++;
             }
@@ -83,21 +79,8 @@ export class StationService {
 
     private update(key: Key) {
         return async (station: Station) => {
-            const contract = this.contract;
-            if (await contract.call("getIndexById", station.id) >= 0) {
-                const batch = contract.newBatch();
-                key.nonce = await contract.getNonce(key);
-                for (const property of station.tracker.getProperties()) {
-                    if (station.tracker.didPropertyChange(property)) {
-                        const funcName = "set" + property.charAt(0).toUpperCase() + property.substr(1);
-                        const tx = await contract.request(funcName, [station.id, station[property]], key);
-                        batch.add(tx);
-                        key.nonce++;
-                    }
-                }
-                batch.execute();
-                station.tracker.resetProperties();
-            }
+            const contract = await this.contract;
+            await contract.send("update", this.toParameters(station), key);
         };
     }
 
@@ -107,17 +90,9 @@ export class StationService {
             const batch = contract.newBatch();
             key.nonce = await contract.getNonce(key);
             for (const station of stations) {
-                if (await contract.call("getIndexById", station.id) >= 0) {
-                    for (const property of station.tracker.getProperties()) {
-                        if (station.tracker.didPropertyChange(property)) {
-                            const funcName = "set" + property.charAt(0).toUpperCase() + property.substr(1);
-                            const tx = await contract.request(funcName, [station.id, station[property]], key);
-                            batch.add(tx);
-                            key.nonce++;
-                        }
-                    }
-                    station.tracker.resetProperties();
-                }
+                const tx = await contract.request("update", this.toParameters(station), key);
+                batch.add(tx);
+                key.nonce++;
             }
             batch.execute();
         };

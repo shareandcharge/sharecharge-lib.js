@@ -25,7 +25,7 @@ export class Connector {
         return this._evseId;
     }
 
-    set evse(value: String) {
+    set evseId(value: String) {
         this._evseId = value;
     }
 
@@ -69,5 +69,18 @@ export class Connector {
 
     set tariffId(value: string) {
         this._tariffId = value;
+    }
+
+    static deserialize(payload: any): Connector {
+        const connector = new Connector();
+        connector._id = payload["id"];
+        connector._owner = payload["owner"];
+        connector._evseId = payload["evseId"];
+        connector._standard = payload["standard"];
+        connector._powerType = payload["powerType"];
+        connector._voltage = parseInt(payload["voltage"]);
+        connector._amperage = parseInt(payload["amperage"]);
+        connector._tariffId = payload["tariffId"];
+        return connector;
     }
 }

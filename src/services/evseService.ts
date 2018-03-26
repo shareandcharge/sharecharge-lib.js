@@ -63,10 +63,8 @@ export class EvseService {
 
     private create(key: Key) {
         return async (evse: Evse) => {
-            evse["_owner"] = key.address;
-            evse.tracker.resetProperties();
-            const contract = this.contract;
-            await contract.send("addEvse", this.toParameters(evse), key);
+            const contract = await this.contract;
+            await contract.send("create", this.toParameters(evse), key);
         };
     }
 
@@ -76,9 +74,7 @@ export class EvseService {
             const batch = contract.newBatch();
             key.nonce = await contract.getNonce(key);
             for (const evse of evses) {
-                evse["_owner"] = key.address;
-                evse.tracker.resetProperties();
-                const tx = await contract.request("addEvse", this.toParameters(evse), key);
+                const tx = await contract.request("create", this.toParameters(evse), key);
                 batch.add(tx);
                 key.nonce++;
             }
@@ -88,24 +84,8 @@ export class EvseService {
 
     private update(key: Key) {
         return async (evse: Evse) => {
-            const contract = this.contract;
-
-            if (await contract.call("getIndexById", evse.id) >= 0) {
-                const batch = contract.newBatch();
-                key.nonce = await contract.getNonce(key);
-
-                for (const property of evse.tracker.getProperties()) {
-                    if (evse.tracker.didPropertyChange(property)) {
-                        const funcName = "set" + property.charAt(0).toUpperCase() + property.substr(1);
-                        const tx = await contract.request(funcName, [evse.id, evse[property]], key);
-                        batch.add(tx);
-                        key.nonce++;
-                    }
-                }
-
-                batch.execute();
-                evse.tracker.resetProperties();
-            }
+            const contract = await this.contract;
+            await contract.send("update", this.toParameters(evse), key);
         };
     }
 
@@ -114,19 +94,10 @@ export class EvseService {
             const contract = this.contract;
             const batch = contract.newBatch();
             key.nonce = await contract.getNonce(key);
-
             for (const evse of evses) {
-                if (await contract.call("getIndexById", evse.id) >= 0) {
-                    for (const property of evse.tracker.getProperties()) {
-                        if (evse.tracker.didPropertyChange(property)) {
-                            const funcName = "set" + property.charAt(0).toUpperCase() + property.substr(1);
-                            const tx = await contract.request(funcName, [evse.id, evse[property]], key);
-                            batch.add(tx);
-                            key.nonce++;
-                        }
-                    }
-                    evse.tracker.resetProperties();
-                }
+                const tx = await contract.request("update", this.toParameters(evse), key);
+                batch.add(tx);
+                key.nonce++;
             }
             batch.execute();
         };
