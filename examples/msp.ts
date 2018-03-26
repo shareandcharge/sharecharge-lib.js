@@ -2,7 +2,6 @@ import { ShareCharge } from '../src/shareCharge';
 import { Evse } from '../src/models/evse';
 import { Wallet } from '../src/models/wallet';
 import { Station } from '../src/models/station';
-import { IoC } from '../src/ioc';
 
 async function findFreeEvse(sc: ShareCharge) {
     const stations = await sc.stations.getAll();
@@ -24,7 +23,7 @@ async function main() {
     const wallet = new Wallet('filter march urge naive sauce distance under copy payment slow just cool');
     const key = wallet.keychain[0];
 
-    const sc: ShareCharge = await IoC.resolve();
+    const sc: ShareCharge = ShareCharge.getInstance();
 
     let selectedevseId = '';
 

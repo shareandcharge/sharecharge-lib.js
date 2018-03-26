@@ -2,7 +2,6 @@ import { ShareCharge } from '../src/shareCharge';
 import { Evse } from '../src/models/evse';
 import { Wallet } from '../src/models/wallet';
 import { Station } from '../src/models/station';
-import { IoC } from '../src/ioc';
 
 async function bulkCreate(wallet, sc: ShareCharge, total) {
     for (let i = 0; i < total; i++) {
@@ -23,7 +22,7 @@ async function main() {
 
     const wallet = new Wallet('filter march urge naive sauce distance under copy payment slow just warm');
     const key = wallet.keychain[0];
-    const sc: ShareCharge = await IoC.resolve();
+    const sc: ShareCharge = ShareCharge.getInstance();
 
     // how to do this fast?
     // await bulkCreate(wallet, sc, 250);

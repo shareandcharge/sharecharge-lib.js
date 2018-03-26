@@ -4,8 +4,8 @@ import { StationService } from './services/stationService';
 import { EventPoller } from './services/eventPoller';
 import { EventDispatcher } from './services/eventDispatcher';
 import { ConfigProvider } from './services/configProvider';
-import { ContractProvider } from './services/contractProvider';
-import { injectable, inject } from "inversify";
+import { ContractProvider, IContractProvider } from './services/contractProvider';
+import { Container, injectable, inject } from "inversify";
 import { Symbols } from './symbols';
 import "reflect-metadata";
 
@@ -47,5 +47,20 @@ export class ShareCharge {
 
     stopListening() {
         EventPoller.instance.stop();
+    }
+
+    private static container;
+    static getInstance() {
+        if (!ShareCharge.container) {
+            const container = new Container();
+            container.bind<ConfigProvider>(Symbols.ConfigProvider).to(ConfigProvider).inSingletonScope();
+            container.bind<IContractProvider>(Symbols.ContractProvider).to(ContractProvider).inSingletonScope();
+            container.bind<StationService>(Symbols.StationSerivce).to(StationService).inSingletonScope();
+            container.bind<EvseService>(Symbols.EvseService).to(EvseService).inSingletonScope();
+            container.bind<ChargingService>(Symbols.ChargingService).to(ChargingService).inSingletonScope();
+            container.bind<ShareCharge>(Symbols.ShareCharge).to(ShareCharge).inSingletonScope();
+            ShareCharge.container = container;
+        }
+        return ShareCharge.container.resolve(ShareCharge);
     }
 }

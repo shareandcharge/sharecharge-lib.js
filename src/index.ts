@@ -1,4 +1,3 @@
-import { IoC } from './ioc';
 import { StationService } from './services/stationService';
 import { EvseService } from './services/evseService';
 import { Evse } from './models/evse';
@@ -22,6 +21,5 @@ export {
     ShareCharge,
     IConfig,
     ToolKit,
-    OpeningHours,
-    IoC
+    OpeningHours
 };
