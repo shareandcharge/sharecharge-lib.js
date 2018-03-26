@@ -13,8 +13,7 @@ import { Container, injectable, inject } from "inversify";
 import { Symbols } from './symbols';
 import "reflect-metadata";
 
-
-const Web3 = require('web3');
+const config = new ConfigProvider();
 
 @injectable()
 export class ShareCharge {
@@ -25,12 +24,12 @@ export class ShareCharge {
     public readonly evses: EvseService;
     public readonly charging: ChargingService;
 
-    constructor(@inject(Symbols.StationSerivce) stationService,
-                @inject(Symbols.EvseService) evseService,
-                @inject(Symbols.ChargingService) chargingService) {
-        this.stations = stationService;
-        this.evses = evseService;
-        this.charging = chargingService;
+    constructor(@inject(Symbols.StationSerivce) stationService?,
+                @inject(Symbols.EvseService) evseService?,
+                @inject(Symbols.ChargingService) chargingService?) {
+        this.stations = stationService || new StationService(new ContractProvider(config));
+        this.evses = evseService || new EvseService(new ContractProvider(config));
+        this.charging = chargingService || new ChargingService(new ContractProvider(config));
 
         EventPoller.instance.notify(events => events.forEach(item =>
             this.eventDispatcher.dispatchAll(item.event, item.returnValues)
