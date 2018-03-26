@@ -18,10 +18,10 @@ import { PlugType } from '../../src/models/plugType';
 import { EventPoller } from '../../src/services/eventPoller';
 import { IoC } from '../../src/ioc';
 import { TestHelper } from '../testHelper';
-import { config } from "../../src/utils/config";
 import { Contract } from '../../src/models/contract';
 
 const Web3 = require('web3');
+const config = new ConfigProvider();
 
 describe('IoC', function () {
 
@@ -44,21 +44,21 @@ describe('IoC', function () {
         const chargingContract = await testContractProvider2.obtain("Charging");
 
         const coinbase = await web3.eth.getCoinbase();
-        await evseContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
+        await evseContract.native.methods["setAccess"](chargingContract.address).send({from: coinbase});
 
         IoC.getContainer().rebind<IContractProvider>(Symbols.ContractProvider)
-        .toConstantValue(<IContractProvider>{
-            async obtain(key: string): Promise<Contract> {
-                switch (key) {
-                    case "StationStorage":
-                        return stationContract;
-                    case "EvseStorage":
-                        return evseContract;
-                    default:
-                        return chargingContract;
+            .toConstantValue(<IContractProvider>{
+                async obtain(key: string): Promise<Contract> {
+                    switch (key) {
+                        case "StationStorage":
+                            return stationContract;
+                        case "EvseStorage":
+                            return evseContract;
+                        default:
+                            return chargingContract;
+                    }
                 }
-            }
-        });
+            });
     });
 
     it('should resolve', async () => {

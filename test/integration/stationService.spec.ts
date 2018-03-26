@@ -12,10 +12,12 @@ import { Wallet } from '../../src/models/wallet';
 import { Contract } from '../../src/models/contract';
 import { EventPoller } from '../../src/services/eventPoller';
 import { StationService } from '../../src/services/stationService';
-import { config } from "../../src/utils/config";
+import { ConfigProvider } from "../../src/services/configProvider";
 import { ToolKit } from './../../src/utils/toolKit';
 import { IContractProvider } from './../../src/services/contractProvider';
 import { Key } from '../../src/models/key';
+
+const config = new ConfigProvider();
 
 describe('StationService', function () {
 

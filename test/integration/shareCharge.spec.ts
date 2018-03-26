@@ -17,8 +17,10 @@ import { ChargingService } from '../../src/services/chargingService';
 import { EvseService } from '../../src/services/evseService';
 import { StationService } from '../../src/services/stationService';
 import { Station } from '../../src/models/station';
-import { config } from "../../src/utils/config";
+import { ConfigProvider } from "../../src/services/configProvider";
 import { Key } from '../../src/models/key';
+
+const config = new ConfigProvider();
 
 describe('ShareCharge', function () {
 

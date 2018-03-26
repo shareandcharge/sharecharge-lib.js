@@ -11,11 +11,13 @@ import { Evse } from '../../src/models/evse';
 import { EventPoller } from '../../src/services/eventPoller';
 import { EvseService } from '../../src/services/evseService';
 import { EvseBuilder } from "../evseBuilder";
-import { config } from "../../src/utils/config";
+import { ConfigProvider } from "../../src/services/configProvider";
 import { ToolKit } from './../../src/utils/toolKit';
 import { Station } from './../../src/models/station';
 import { StationBuilder } from '../stationBuilder';
 import { Key } from '../../src/models/key';
+
+const config = new ConfigProvider();
 
 describe('EvseService', function () {
 

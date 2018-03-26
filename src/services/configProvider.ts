@@ -1,5 +1,6 @@
 import { Container, injectable, inject } from "inversify";
 import "reflect-metadata";
+import * as path from "path";
 
 @injectable()
 export class ConfigProvider {
@@ -7,7 +8,7 @@ export class ConfigProvider {
     private config;
 
     constructor() {
-        this.config = require(`../../config/${process.env.sc_stage || "local"}.json`);
+        this.config = require(path.join(__dirname, `../../config/${process.env.sc_stage || "local"}.json`));
     }
 
     get stage() {
