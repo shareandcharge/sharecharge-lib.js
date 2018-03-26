@@ -15,7 +15,7 @@ export class EventPoller {
     private contracts = new Map<string, Contract>();
     private fromBlock: number = -1;
 
-    public events = new Subject<any[]>();
+    public readonly events = new Subject<any[]>();
 
     public constructor(@inject(Symbols.ConfigProvider) private config: ConfigProvider) {
         this.web3 = new Web3(config.provider);
