@@ -1,4 +1,3 @@
-import { IEventPoller } from './../../src/interfaces/iEventPoller';
 import { ToolKit } from './../../src/utils/toolKit';
 import * as sinon from 'sinon';
 import * as mocha from 'mocha';
@@ -38,7 +37,7 @@ describe('ShareCharge', function () {
     let stationService: StationService;
     let evseService: EvseService;
     let chargingService: ChargingService;
-    let eventPoller: IEventPoller;
+    let eventPoller: EventPoller;
 
     before(async () => {
 

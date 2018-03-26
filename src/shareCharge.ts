@@ -1,4 +1,3 @@
-import { IEventPoller } from './interfaces/iEventPoller';
 import { ChargingService } from './services/chargingService';
 import { EvseService } from './services/evseService';
 import { StationService } from './services/stationService';
@@ -22,7 +21,7 @@ export class ShareCharge {
     constructor(@inject(Symbols.StationSerivce) stationService: StationService,
                 @inject(Symbols.EvseService) evseService: EvseService,
                 @inject(Symbols.ChargingService) chargingService: ChargingService,
-                @inject(Symbols.EventPoller) private eventPoller: IEventPoller) {
+                @inject(Symbols.EventPoller) private eventPoller: EventPoller) {
         this.stations = stationService;
         this.evses = evseService;
         this.charging = chargingService;
@@ -59,7 +58,7 @@ export class ShareCharge {
             container.bind<StationService>(Symbols.StationSerivce).to(StationService).inSingletonScope();
             container.bind<EvseService>(Symbols.EvseService).to(EvseService).inSingletonScope();
             container.bind<ChargingService>(Symbols.ChargingService).to(ChargingService).inSingletonScope();
-            container.bind<IEventPoller>(Symbols.EventPoller).to(EventPoller).inSingletonScope();
+            container.bind<EventPoller>(Symbols.EventPoller).to(EventPoller).inSingletonScope();
             container.bind<ShareCharge>(Symbols.ShareCharge).to(ShareCharge).inSingletonScope();
             ShareCharge.container = container;
         }

@@ -1,5 +1,4 @@
 import { ConfigProvider } from './configProvider';
-import { IDefs } from '../interfaces/iDefs';
 import { Contract } from '../models/contract';
 import { ToolKit } from '../utils/toolKit';
 import { Container, injectable, inject } from "inversify";

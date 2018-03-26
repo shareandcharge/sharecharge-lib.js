@@ -1,4 +1,4 @@
-import { Container, injectable, inject } from "inversify";
+import { injectable } from "inversify";
 import "reflect-metadata";
 import * as path from "path";
 
@@ -8,19 +8,20 @@ export class ConfigProvider {
     private config;
 
     constructor() {
-        this.config = require(path.join(__dirname, `../../config/${process.env.sc_stage || "local"}.json`));
+        const id = path.join(__dirname, `../../config/${process.env.sc_stage || "local"}.json`);
+        this.config = require(id) || {};
     }
 
     get stage() {
-        return this.config.stage;
+        return this.config.stage || 'local';
     }
 
     get provider() {
-        return this.config.provider;
+        return this.config.provider || 'http://localhost:8545';
     }
 
     get gasPrice() {
-        return this.config.gasPrice;
+        return this.config.gasPrice || 18000000000;
     }
 
     get pollingInterval() {

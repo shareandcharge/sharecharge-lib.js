@@ -1,5 +1,4 @@
 import { ConfigProvider } from "./configProvider";
-import { IEventPoller } from "../interfaces/iEventPoller";
 import { Contract } from "../models/contract";
 import { inject, injectable } from "inversify";
 import { Symbols } from '../symbols';
@@ -7,7 +6,7 @@ import "reflect-metadata";
 const Web3 = require('web3');
 
 @injectable()
-export class EventPoller implements IEventPoller {
+export class EventPoller {
 
     private web3;
     private interval: number;

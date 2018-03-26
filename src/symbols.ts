@@ -5,6 +5,5 @@ export const Symbols = {
     EvseService: Symbol.for("EvseService"),
     ChargingService: Symbol.for("ChargingService"),
     EventPoller: Symbol.for("EventPoller"),
-    Web3Provider: Symbol.for("Web3Provider"),
     ShareCharge: Symbol.for("ShareCharge")
 };
