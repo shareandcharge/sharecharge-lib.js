@@ -12,18 +12,14 @@ import { Key } from '../models/key';
 @injectable()
 export class StationService {
 
-    private _resolved;
+    public readonly contract;
 
     constructor(@inject(Symbols.ContractProvider) private contractProvider: IContractProvider) {
-    }
-
-    async contract(): Promise<Contract> {
-        this._resolved = this._resolved || await this.contractProvider.obtain('StationStorage');
-        return this._resolved;
+        this.contract = this.contractProvider.obtain('StationStorage');
     }
 
     async getAll(): Promise<Station[]> {
-        const contract = await this.contract();
+        const contract = this.contract;
         const stations: Station[] = [];
         const quantity = await contract.call("getNumberOfStations");
         for (let i = 0; i < quantity; i++) {
@@ -35,13 +31,13 @@ export class StationService {
     }
 
     async getById(id: string): Promise<Station> {
-        const contract = await this.contract();
+        const contract = this.contract;
         const result = await contract.call("getStation", id);
         return Station.deserialize(result);
     }
 
     async isPersisted(station: Station): Promise<boolean> {
-        const contract = await this.contract();
+        const contract = this.contract;
         const result = await contract.call("getIndexById", station.id);
         return result >= 0;
     }
@@ -64,14 +60,14 @@ export class StationService {
         return async (station: Station) => {
             station["_owner"] = key.address;
             station.tracker.resetProperties();
-            const contract = await this.contract();
+            const contract = this.contract;
             return contract.send("addStation", this.toParameters(station), key);
         };
     }
 
     private batchCreate(key: Key) {
         return async (...stations: Station[]) => {
-            const contract = await this.contract();
+            const contract = this.contract;
             const batch = contract.newBatch();
             key.nonce = await contract.getNonce(key);
             for (const station of stations) {
@@ -87,7 +83,7 @@ export class StationService {
 
     private update(key: Key) {
         return async (station: Station) => {
-            const contract = await this.contract();
+            const contract = this.contract;
             if (await contract.call("getIndexById", station.id) >= 0) {
                 const batch = contract.newBatch();
                 key.nonce = await contract.getNonce(key);
@@ -107,7 +103,7 @@ export class StationService {
 
     private batchUpdate(key: Key) {
         return async (...stations: Station[]) => {
-            const contract = await this.contract();
+            const contract = this.contract;
             const batch = contract.newBatch();
             key.nonce = await contract.getNonce(key);
             for (const station of stations) {

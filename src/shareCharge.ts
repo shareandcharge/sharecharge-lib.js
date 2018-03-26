@@ -27,16 +27,14 @@ export class ShareCharge {
         this.evses = evseService || new EvseService(new ContractProvider(config));
         this.charging = chargingService || new ChargingService(new ContractProvider(config));
 
+        // EventPoller.instance.monitor('ConnectorStorage', this.connectors.contract);
+        EventPoller.instance.monitor('StationStorage', this.stations.contract);
+        EventPoller.instance.monitor('EvseStorage',  this.evses.contract);
+        EventPoller.instance.monitor('Charging',  this.charging.contract);
+
         EventPoller.instance.notify(events => events.forEach(item =>
             this.eventDispatcher.dispatchAll(item.event, item.returnValues)
         ));
-    }
-
-    async hookup() {
-        // EventPoller.instance.monitor('ConnectorStorage', this._resolved);
-        EventPoller.instance.monitor('StationStorage', await this.stations.contract());
-        EventPoller.instance.monitor('EvseStorage', await this.evses.contract());
-        EventPoller.instance.monitor('Charging', await this.charging.contract());
     }
 
     on(eventName: string, callback: (...args) => void) {

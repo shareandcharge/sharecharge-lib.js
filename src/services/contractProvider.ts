@@ -8,7 +8,7 @@ import "reflect-metadata";
 const Web3 = require('web3');
 
 export interface IContractProvider {
-    obtain(key: string): Promise<Contract>;
+    obtain(key: string): Contract;
 }
 
 @injectable()
@@ -22,7 +22,7 @@ export class ContractProvider implements IContractProvider {
         this.definitions = ToolKit.contractDefsForStage(config.stage);
     }
 
-    async obtain(key: string): Promise<Contract> {
+    obtain(key: string): Contract {
         const contractDef = this.definitions[key];
         return new Contract(this.web3, {
             abi: contractDef.abi,

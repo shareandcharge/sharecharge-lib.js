@@ -19,6 +19,7 @@ import { StationService } from '../../src/services/stationService';
 import { Station } from '../../src/models/station';
 import { ConfigProvider } from "../../src/services/configProvider";
 import { Key } from '../../src/models/key';
+import { IContractProvider } from '../../src/services/contractProvider';
 
 const config = new ConfigProvider();
 
@@ -43,28 +44,41 @@ describe('ShareCharge', function () {
 
         cpoWallet = new Wallet(seed1);
         cpoKey = cpoWallet.keychain[0];
+
         mspWallet = new Wallet(seed2);
         mspKey = mspWallet.keychain[0];
 
         await TestHelper.ensureFunds(web3, cpoKey);
         await TestHelper.ensureFunds(web3, mspKey);
 
-        const testContractProvider = TestHelper.getTestContractProvider(web3, config, contractDefs);
-        stationService = new StationService(testContractProvider);
-        evseService = new EvseService(testContractProvider);
-
-        const evseContract = await evseService.contract();
-        const testContractProvider2 = TestHelper.getTestContractProvider(web3, config, contractDefs, [evseContract.address]);
-        chargingService = new ChargingService(testContractProvider2);
-
         const coinbase = await web3.eth.getCoinbase();
-        const chargingContract = await chargingService.contract();
+
+        const evseContract = await TestHelper.createContract(web3, config, contractDefs["EvseStorage"]);
+        evseService = new EvseService(<IContractProvider>{
+            obtain(key: string): Contract {
+                return evseContract;
+            }
+        });
+
+        const stationContract = await TestHelper.createContract(web3, config, contractDefs["StationStorage"]);
+        stationService = new StationService(<IContractProvider>{
+            obtain(key: string): Contract {
+                return stationContract;
+            }
+        });
+
+        const chargingContract = await TestHelper.createContract(web3, config, contractDefs["Charging"], [evseContract.address]);
+        chargingService = new ChargingService(<IContractProvider>{
+            obtain(key: string): Contract {
+                return chargingContract;
+            }
+        });
+
         await evseContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
     });
 
     beforeEach(async () => {
         shareCharge = new ShareCharge(stationService, evseService, chargingService);
-        await shareCharge.hookup();
     });
 
     afterEach(async () => {

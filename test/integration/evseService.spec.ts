@@ -16,6 +16,7 @@ import { ToolKit } from './../../src/utils/toolKit';
 import { Station } from './../../src/models/station';
 import { StationBuilder } from '../stationBuilder';
 import { Key } from '../../src/models/key';
+import { IContractProvider } from '../../src/services/contractProvider';
 
 const config = new ConfigProvider();
 
@@ -38,8 +39,13 @@ describe('EvseService', function () {
     });
 
     beforeEach(async () => {
-        const testContractProvider = TestHelper.getTestContractProvider(web3, config, defs);
-        evseService = new EvseService(testContractProvider);
+        const contract = await TestHelper.createContract(web3, config, defs["EvseStorage"]);
+
+        evseService = new EvseService(<IContractProvider>{
+            obtain(key: string): Contract {
+                return contract;
+            }
+        });
     });
 
     afterEach(async () => {

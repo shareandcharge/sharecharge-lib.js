@@ -12,24 +12,20 @@ import { Key } from '../models/key';
 @injectable()
 export class EvseService {
 
-    private _resolved;
+    public readonly contract;
 
     constructor(@inject(Symbols.ContractProvider) private contractProvider: IContractProvider) {
-    }
-
-    async contract(): Promise<Contract> {
-        this._resolved = this._resolved || await this.contractProvider.obtain('EvseStorage');
-        return this._resolved;
+        this.contract = this.contractProvider.obtain('EvseStorage');
     }
 
     async getById(id: string): Promise<Evse> {
-        const contract = await this.contract();
+        const contract = this.contract;
         const result = await contract.call("getEvse", id);
         return Evse.deserialize(result);
     }
 
     async getByStation(station: Station): Promise<Evse[]> {
-        const contract = await this.contract();
+        const contract = this.contract;
         const evses: Evse[] = [];
         const evseIds = await contract.call("getStationEvses", station.id);
         for (const id of evseIds) {
@@ -40,13 +36,13 @@ export class EvseService {
     }
 
     async anyFree(station: Station): Promise<boolean> {
-        const contract = await this.contract();
+        const contract = this.contract;
         const result = await contract.call("getStationAvailability", station.id);
         return result;
     }
 
     async isPersisted(evse: Evse): Promise<boolean> {
-        const contract = await this.contract();
+        const contract = this.contract;
         const result = await contract.call("getIndexById", evse.id);
         return result >= 0;
     }
@@ -69,14 +65,14 @@ export class EvseService {
         return async (evse: Evse) => {
             evse["_owner"] = key.address;
             evse.tracker.resetProperties();
-            const contract = await this.contract();
+            const contract = this.contract;
             await contract.send("addEvse", this.toParameters(evse), key);
         };
     }
 
     private batchCreate(key: Key) {
         return async (...evses: Evse[]) => {
-            const contract = await this.contract();
+            const contract = this.contract;
             const batch = contract.newBatch();
             key.nonce = await contract.getNonce(key);
             for (const evse of evses) {
@@ -92,7 +88,7 @@ export class EvseService {
 
     private update(key: Key) {
         return async (evse: Evse) => {
-            const contract = await this.contract();
+            const contract = this.contract;
 
             if (await contract.call("getIndexById", evse.id) >= 0) {
                 const batch = contract.newBatch();
@@ -115,7 +111,7 @@ export class EvseService {
 
     private batchUpdate(key: Key) {
         return async (...evses: Evse[]) => {
-            const contract = await this.contract();
+            const contract = this.contract;
             const batch = contract.newBatch();
             key.nonce = await contract.getNonce(key);
 

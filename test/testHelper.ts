@@ -21,6 +21,15 @@ export class TestHelper {
         }
     }
 
+    static async createContract(web3, config, def, args?: any[]) {
+        const address = await TestHelper.deployContract(web3, def, args);
+        return new Contract(web3, {
+            abi: def.abi,
+            address: address,
+            gasPrice: config.gasPrice
+        });
+    }
+
     static async deployContract(web3: any, config: { abi: any, bytecode: any }, args: any[] = [], gas: number = 2000000) {
         const coinbase = await web3.eth.getCoinbase();
         const contract = new web3.eth.Contract(config.abi, {
@@ -32,17 +41,4 @@ export class TestHelper {
         return receipt.options.address;
     }
 
-    static getTestContractProvider(web3, config, defs, args?: any[]): IContractProvider {
-        return <IContractProvider>{
-            async obtain(key: string): Promise<Contract> {
-                const contractDef = defs[key];
-                const address = await TestHelper.deployContract(web3, contractDef, args);
-                return new Contract(web3, {
-                    abi: contractDef.abi,
-                    address: address,
-                    gasPrice: config.gasPrice
-                });
-            }
-        };
-    }
 }

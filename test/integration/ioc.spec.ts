@@ -28,27 +28,40 @@ describe('IoC', function () {
     const seed = 'filter march urge naive sauce distance under copy payment slow just cool';
     const wallet = new Wallet(seed);
     const key = wallet.keychain[0];
+    const contractDefs = ToolKit.contractDefsForStage(config.stage);
 
     before(async () => {
         const web3 = new Web3(config.provider);
         await TestHelper.ensureFunds(web3, key);
 
-        const contractDefs = ToolKit.contractDefsForStage(config.stage);
-
-        const testContractProvider = TestHelper.getTestContractProvider(web3, config, contractDefs);
-
-        const stationContract = await testContractProvider.obtain("StationStorage");
-        const evseContract = await testContractProvider.obtain("EvseStorage");
-
-        const testContractProvider2 = TestHelper.getTestContractProvider(web3, config, contractDefs, [evseContract.address]);
-        const chargingContract = await testContractProvider2.obtain("Charging");
-
         const coinbase = await web3.eth.getCoinbase();
-        await evseContract.native.methods["setAccess"](chargingContract.address).send({from: coinbase});
+
+        const evseContract = await TestHelper.createContract(web3, config, contractDefs["EvseStorage"]);
+        const evseService = new EvseService(<IContractProvider>{
+            obtain(key: string): Contract {
+                return evseContract;
+            }
+        });
+
+        const stationContract = await TestHelper.createContract(web3, config, contractDefs["StationStorage"]);
+        const stationService = new StationService(<IContractProvider>{
+            obtain(key: string): Contract {
+                return stationContract;
+            }
+        });
+
+        const chargingContract = await TestHelper.createContract(web3, config, contractDefs["Charging"], [evseContract.address]);
+        const chargingService = new ChargingService(<IContractProvider>{
+            obtain(key: string): Contract {
+                return chargingContract;
+            }
+        });
+
+        await evseContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
 
         IoC.getContainer().rebind<IContractProvider>(Symbols.ContractProvider)
             .toConstantValue(<IContractProvider>{
-                async obtain(key: string): Promise<Contract> {
+                obtain(key: string): Contract {
                     switch (key) {
                         case "StationStorage":
                             return stationContract;
@@ -63,7 +76,6 @@ describe('IoC', function () {
 
     it('should resolve', async () => {
         const shareCharge: ShareCharge = await IoC.resolve();
-        await shareCharge.hookup();
 
         const station = new Station();
         await shareCharge.stations.useWallet(wallet).create(station);

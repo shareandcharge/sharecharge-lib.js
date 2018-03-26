@@ -9,14 +9,10 @@ import "reflect-metadata";
 @injectable()
 export class ConnectorService {
 
-    private _resolved;
+    public readonly contract;
 
     constructor(@inject(Symbols.ContractProvider) private contractProvider: IContractProvider) {
-    }
-
-    async contract(): Promise<Contract> {
-        this._resolved = this._resolved || await this.contractProvider.obtain('ConnectorStorage');
-        return this._resolved;
+        this.contract = this.contractProvider.obtain('ConnectorStorage');
     }
 
     useWallet(wallet: Wallet) {

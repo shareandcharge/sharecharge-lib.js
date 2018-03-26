@@ -24,7 +24,6 @@ async function main() {
     const wallet = new Wallet('filter march urge naive sauce distance under copy payment slow just warm');
     const key = wallet.keychain[0];
     const sc: ShareCharge = await IoC.resolve();
-    await sc.hookup();
 
     // how to do this fast?
     // await bulkCreate(wallet, sc, 250);

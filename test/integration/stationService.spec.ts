@@ -38,8 +38,13 @@ describe('StationService', function () {
     });
 
     beforeEach(async () => {
-        const testContractProvider = TestHelper.getTestContractProvider(web3, config, defs);
-        stationService = new StationService(testContractProvider);
+        const contract = await TestHelper.createContract(web3, config, defs["StationStorage"])
+
+        stationService = new StationService(<IContractProvider>{
+            obtain(key: string): Contract {
+                return contract;
+            }
+        });
     });
 
     afterEach(async () => {

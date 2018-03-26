@@ -25,7 +25,6 @@ async function main() {
     const key = wallet.keychain[0];
 
     const sc: ShareCharge = await IoC.resolve();
-    sc.hookup();
 
     let selectedevseId = '';
 
