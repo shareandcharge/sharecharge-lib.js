@@ -85,7 +85,7 @@ describe('ShareCharge', function () {
     });
 
     afterEach(async () => {
-        eventPoller.reset();
+        // eventPoller.reset();
     });
 
     context('#stations', async () => {

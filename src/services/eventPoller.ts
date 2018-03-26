@@ -1,3 +1,4 @@
+import { Subject } from "rxjs/Subject";
 import { ConfigProvider } from "./configProvider";
 import { Contract } from "../models/contract";
 import { inject, injectable } from "inversify";
@@ -9,20 +10,21 @@ const Web3 = require('web3');
 export class EventPoller {
 
     private web3;
-    private interval: number;
+    private intervalMillis: number;
     private intervalID: any;
     private contracts = new Map<string, Contract>();
-    private callbacks = new Array();
     private fromBlock: number = -1;
+
+    public events = new Subject<any[]>();
 
     public constructor(@inject(Symbols.ConfigProvider) private config: ConfigProvider) {
         this.web3 = new Web3(config.provider);
-        this.interval = config.pollingInterval;
+        this.intervalMillis = config.pollingInterval;
     }
 
     start() {
         if (!this.intervalID) {
-            this.intervalID = setInterval(() => this.poll(), this.interval);
+            this.intervalID = setInterval(() => this.poll(), this.intervalMillis);
         }
     }
 
@@ -38,27 +40,15 @@ export class EventPoller {
             this.fromBlock = await this.web3.eth.getBlockNumber();
         }
         const promises: any[] = [];
-        this.contracts.forEach(contract => {
-            promises.push(contract.native.getPastEvents({ fromBlock: this.fromBlock })
-                .then(pastEvents => {
-                    if (pastEvents.length > 0) {
-                        this.callbacks.forEach(callback => callback(pastEvents));
-                    }
-                }));
-        });
+        this.contracts.forEach(contract => promises.push(
+            contract.native.getPastEvents({ fromBlock: this.fromBlock })
+                .then(pastEvents => this.events.next(pastEvents))
+        ));
         await Promise.all(promises);
         this.fromBlock = await this.web3.eth.getBlockNumber() + 1;
     }
 
     monitor(key: string, contract: Contract) {
         this.contracts.set(key, contract);
-    }
-
-    notify(callback: (events: any) => void) {
-        this.callbacks.push(callback);
-    }
-
-    reset() {
-        this.callbacks = new Array();
     }
 }

@@ -31,7 +31,7 @@ export class ShareCharge {
         eventPoller.monitor('EvseStorage', this.evses.contract);
         eventPoller.monitor('Charging', this.charging.contract);
 
-        eventPoller.notify(events => events.forEach(item =>
+        eventPoller.events.subscribe(events => events.forEach(item =>
             this.eventDispatcher.dispatchAll(item.event, item.returnValues)
         ));
     }

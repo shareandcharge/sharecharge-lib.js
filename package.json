@@ -33,6 +33,7 @@
     "ethereumjs-wallet": "^0.6.0",
     "inversify": "^4.11.1",
     "reflect-metadata": "^0.1.12",
+    "rxjs": "^5.5.7",
     "sharecharge-contracts": "git+ssh://git@github.com/motionwerkGmbH/sharecharge-contracts.git#domain",
     "sinon": "^4.4.8",
     "web3": "1.0.0-beta.33"
