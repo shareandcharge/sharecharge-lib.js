@@ -1,26 +1,22 @@
+import { IEventPoller } from './../interfaces/iEventPoller';
 import { Contract } from "../models/contract";
+import { injectable } from "inversify";
+import { Symbols } from '../symbols';
+import "reflect-metadata";
 
 interface ContractTracker {
     contract: Contract;
     fromBlock: number;
 }
 
-export class EventPoller {
-
-    private static singleton;
+@injectable()
+export class EventPoller implements IEventPoller {
 
     private intervalID: any;
     private trackers = new Map<string, ContractTracker>();
     private callbacks = new Array();
 
-    private constructor(private interval: number) {
-    }
-
-    static get instance(): EventPoller {
-        if (!EventPoller.singleton) {
-            EventPoller.singleton = new EventPoller(1000);
-        }
-        return EventPoller.singleton;
+    public constructor(private interval: number = 1000) {
     }
 
     start() {
@@ -59,7 +55,7 @@ export class EventPoller {
         this.callbacks.push(callback);
     }
 
-    removeAll() {
+    reset() {
         this.callbacks = new Array();
     }
 }

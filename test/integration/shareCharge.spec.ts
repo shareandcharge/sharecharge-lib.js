@@ -1,3 +1,4 @@
+import { IEventPoller } from './../../src/interfaces/iEventPoller';
 import { ToolKit } from './../../src/utils/toolKit';
 import * as sinon from 'sinon';
 import * as mocha from 'mocha';
@@ -37,6 +38,7 @@ describe('ShareCharge', function () {
     let stationService: StationService;
     let evseService: EvseService;
     let chargingService: ChargingService;
+    let eventPoller: IEventPoller;
 
     before(async () => {
 
@@ -75,14 +77,16 @@ describe('ShareCharge', function () {
         });
 
         await evseContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
+
+        eventPoller = new EventPoller();
     });
 
     beforeEach(async () => {
-        shareCharge = new ShareCharge(stationService, evseService, chargingService);
+        shareCharge = new ShareCharge(stationService, evseService, chargingService, eventPoller);
     });
 
     afterEach(async () => {
-        EventPoller.instance.removeAll();
+        eventPoller.reset();
     });
 
     context('#stations', async () => {
@@ -109,7 +113,7 @@ describe('ShareCharge', function () {
             await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60);
             await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse, mspKey.address);
 
-            await EventPoller.instance.poll();
+            await eventPoller.poll();
 
             expect(evseId).to.equal(evse.id);
             expect(controller.toLowerCase()).to.equal(mspKey.address);
@@ -137,7 +141,7 @@ describe('ShareCharge', function () {
             await shareCharge.charging.useWallet(mspWallet).requestStop(evse);
             await shareCharge.charging.useWallet(cpoWallet).confirmStop(evse, mspKey.address);
 
-            await EventPoller.instance.poll();
+            await eventPoller.poll();
 
             expect(evseId).to.equal(evse.id);
             expect(controller.toLowerCase()).to.equal(mspKey.address);
@@ -163,7 +167,7 @@ describe('ShareCharge', function () {
 
             await shareCharge.charging.useWallet(cpoWallet).error(evse, mspKey.address, 0);
 
-            await EventPoller.instance.poll();
+            await eventPoller.poll();
 
             expect(evseId).to.equal(evse.id);
             expect(controller.toLowerCase()).to.equal(mspKey.address);
@@ -188,7 +192,7 @@ describe('ShareCharge', function () {
             await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse, mspKey.address);
             await shareCharge.charging.useWallet(mspWallet).requestStop(evse);
 
-            await EventPoller.instance.poll();
+            await eventPoller.poll();
 
             expect(evseId).to.equal(evse.id);
         });
@@ -209,7 +213,7 @@ describe('ShareCharge', function () {
 
             await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60);
 
-            await EventPoller.instance.poll();
+            await eventPoller.poll();
 
             expect(evseId).to.equal(evse.id);
             expect(controller.toLowerCase()).to.equal(mspKey.address);
@@ -234,7 +238,7 @@ describe('ShareCharge', function () {
             evse.available = !evse.available;
             await shareCharge.evses.useWallet(cpoWallet).update(evse);
 
-            await EventPoller.instance.poll();
+            await eventPoller.poll();
 
             expect(evseCreatedId).to.equal(evse.id);
 
@@ -265,7 +269,7 @@ describe('ShareCharge', function () {
 
             await shareCharge.stations.useWallet(cpoWallet).update(station);
 
-            await EventPoller.instance.poll();
+            await eventPoller.poll();
 
             expect(stationCreatedId).to.equal(station.id);
             // expect(stationUpdatedId).to.equal(station.id);

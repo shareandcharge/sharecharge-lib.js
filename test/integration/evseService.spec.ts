@@ -8,7 +8,6 @@ import { TestHelper } from '../testHelper';
 import { Wallet } from '../../src/models/wallet';
 import { Contract } from '../../src/models/contract';
 import { Evse } from '../../src/models/evse';
-import { EventPoller } from '../../src/services/eventPoller';
 import { EvseService } from '../../src/services/evseService';
 import { EvseBuilder } from "../evseBuilder";
 import { ConfigProvider } from "../../src/services/configProvider";
@@ -49,7 +48,6 @@ describe('EvseService', function () {
     });
 
     afterEach(async () => {
-        EventPoller.instance.removeAll();
     });
 
     context('create', () => {

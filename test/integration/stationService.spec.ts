@@ -10,7 +10,6 @@ import { StationBuilder } from '../stationBuilder';
 import { TestHelper } from '../testHelper';
 import { Wallet } from '../../src/models/wallet';
 import { Contract } from '../../src/models/contract';
-import { EventPoller } from '../../src/services/eventPoller';
 import { StationService } from '../../src/services/stationService';
 import { ConfigProvider } from "../../src/services/configProvider";
 import { ToolKit } from './../../src/utils/toolKit';
@@ -48,7 +47,6 @@ describe('StationService', function () {
     });
 
     afterEach(async () => {
-        EventPoller.instance.removeAll();
     });
 
     context('create', () => {

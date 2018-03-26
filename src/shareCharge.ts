@@ -1,3 +1,4 @@
+import { IEventPoller } from './interfaces/iEventPoller';
 import { ChargingService } from './services/chargingService';
 import { EvseService } from './services/evseService';
 import { StationService } from './services/stationService';
@@ -20,17 +21,18 @@ export class ShareCharge {
 
     constructor(@inject(Symbols.StationSerivce) stationService: StationService,
                 @inject(Symbols.EvseService) evseService: EvseService,
-                @inject(Symbols.ChargingService) chargingService: ChargingService) {
+                @inject(Symbols.ChargingService) chargingService: ChargingService,
+                @inject(Symbols.EventPoller) private eventPoller: IEventPoller) {
         this.stations = stationService;
         this.evses = evseService;
         this.charging = chargingService;
 
         // EventPoller.instance.monitor('ConnectorStorage', this.connectors.contract);
-        EventPoller.instance.monitor('StationStorage', this.stations.contract);
-        EventPoller.instance.monitor('EvseStorage', this.evses.contract);
-        EventPoller.instance.monitor('Charging', this.charging.contract);
+        eventPoller.monitor('StationStorage', this.stations.contract);
+        eventPoller.monitor('EvseStorage', this.evses.contract);
+        eventPoller.monitor('Charging', this.charging.contract);
 
-        EventPoller.instance.notify(events => events.forEach(item =>
+        eventPoller.notify(events => events.forEach(item =>
             this.eventDispatcher.dispatchAll(item.event, item.returnValues)
         ));
     }
@@ -40,11 +42,11 @@ export class ShareCharge {
     }
 
     startListening() {
-        EventPoller.instance.start();
+        this.eventPoller.start();
     }
 
     stopListening() {
-        EventPoller.instance.stop();
+        this.eventPoller.stop();
     }
 
     private static container;
@@ -57,6 +59,7 @@ export class ShareCharge {
             container.bind<StationService>(Symbols.StationSerivce).to(StationService).inSingletonScope();
             container.bind<EvseService>(Symbols.EvseService).to(EvseService).inSingletonScope();
             container.bind<ChargingService>(Symbols.ChargingService).to(ChargingService).inSingletonScope();
+            container.bind<IEventPoller>(Symbols.EventPoller).to(EventPoller).inSingletonScope();
             container.bind<ShareCharge>(Symbols.ShareCharge).to(ShareCharge).inSingletonScope();
             ShareCharge.container = container;
         }
