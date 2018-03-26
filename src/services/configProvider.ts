@@ -23,4 +23,7 @@ export class ConfigProvider {
         return this.config.gasPrice;
     }
 
+    get pollingInterval() {
+        return this.config.pollingInterval || 1000;
+    }
 }

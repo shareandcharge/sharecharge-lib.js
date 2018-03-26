@@ -78,7 +78,7 @@ describe('ShareCharge', function () {
 
         await evseContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
 
-        eventPoller = new EventPoller();
+        eventPoller = new EventPoller(config);
     });
 
     beforeEach(async () => {

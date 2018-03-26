@@ -12,11 +12,6 @@ export class Contract {
         this.native = new this.web3.eth.Contract(config.abi, config.address);
     }
 
-    async getBlockNumber(): Promise<number> {
-        const blockNumber = await this.web3.eth.getBlockNumber();
-        return blockNumber;
-    }
-
     async getNonce(key: Key): Promise<number> {
         const nonce = await this.web3.eth.getTransactionCount(key.address);
         return nonce;

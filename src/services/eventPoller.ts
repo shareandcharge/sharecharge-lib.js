@@ -1,22 +1,24 @@
-import { IEventPoller } from './../interfaces/iEventPoller';
+import { ConfigProvider } from "./configProvider";
+import { IEventPoller } from "../interfaces/iEventPoller";
 import { Contract } from "../models/contract";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { Symbols } from '../symbols';
 import "reflect-metadata";
-
-interface ContractTracker {
-    contract: Contract;
-    fromBlock: number;
-}
+const Web3 = require('web3');
 
 @injectable()
 export class EventPoller implements IEventPoller {
 
+    private web3;
+    private interval: number;
     private intervalID: any;
-    private trackers = new Map<string, ContractTracker>();
+    private contracts = new Map<string, Contract>();
     private callbacks = new Array();
+    private fromBlock: number = -1;
 
-    public constructor(private interval: number = 1000) {
+    public constructor(@inject(Symbols.ConfigProvider) private config: ConfigProvider) {
+        this.web3 = new Web3(config.provider);
+        this.interval = config.pollingInterval;
     }
 
     start() {
@@ -33,22 +35,24 @@ export class EventPoller implements IEventPoller {
     }
 
     async poll() {
+        if (this.fromBlock === -1) {
+            this.fromBlock = await this.web3.eth.getBlockNumber();
+        }
         const promises: any[] = [];
-        this.trackers.forEach(tracker => {
-            promises.push(tracker.contract.native.getPastEvents({ fromBlock: tracker.fromBlock })
+        this.contracts.forEach(contract => {
+            promises.push(contract.native.getPastEvents({ fromBlock: this.fromBlock })
                 .then(pastEvents => {
                     if (pastEvents.length > 0) {
-                        tracker.fromBlock = pastEvents[pastEvents.length - 1].blockNumber + 1;
                         this.callbacks.forEach(callback => callback(pastEvents));
                     }
                 }));
         });
-        return Promise.all(promises);
+        await Promise.all(promises);
+        this.fromBlock = await this.web3.eth.getBlockNumber() + 1;
     }
 
-    async monitor(key: string, contract: Contract) {
-        const block = await contract.getBlockNumber() + 1;
-        this.trackers.set(key, { contract, fromBlock: block });
+    monitor(key: string, contract: Contract) {
+        this.contracts.set(key, contract);
     }
 
     notify(callback: (events: any) => void) {

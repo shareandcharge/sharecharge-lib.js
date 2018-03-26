@@ -4,18 +4,19 @@ import { Wallet } from '../src/models/wallet';
 import { Station } from '../src/models/station';
 
 async function findFreeEvse(sc: ShareCharge) {
+    let evseid = "";
     const stations = await sc.stations.getAll();
     for (const station of stations) {
         if (await sc.evses.anyFree(station)) {
             const evses = await sc.evses.getByStation(station);
             for (const evse of evses) {
                 if (evse.available) {
-                    return evse.id;
+                    evseid = evse.id;
                 }
             }
         }
     }
-    return "";
+    return evseid;
 }
 
 async function main() {
