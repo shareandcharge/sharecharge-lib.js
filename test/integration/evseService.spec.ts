@@ -104,14 +104,14 @@ describe('EvseService', function () {
 
             const result = await evseService.getById(evse.id);
 
-            evse.available = false;
+            evse.available = true;
 
             await evseService.useWallet(wallet).update(evse);
 
             return new Promise((resolve, reject) => {
                 setTimeout(async () => {
                     const result2 = await evseService.getById(evse.id);
-                    expect(result2.available).to.equal(false);
+                    expect(result2.available).to.equal(true);
                     resolve();
                 }, batchTimeout);
             });
