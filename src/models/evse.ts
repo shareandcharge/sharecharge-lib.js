@@ -42,11 +42,11 @@ export class Evse {
 
     static deserialize(payload: any): Evse {
         const evse = new Evse();
-        evse._id = payload["id"];
-        evse._owner = payload["owner"];
-        evse._stationId = payload["stationId"];
-        evse._plugMask = payload["plugMask"];
-        evse._available = payload["available"];
+        evse._id = payload["id"] || evse._id;
+        evse._owner = payload["owner"] || evse._owner;
+        evse._stationId = payload["stationId"] || evse._stationId;
+        evse._plugMask = payload["plugMask"] || evse._plugMask;
+        evse._available = payload["available"] || evse._available;
         return evse;
     }
 }
