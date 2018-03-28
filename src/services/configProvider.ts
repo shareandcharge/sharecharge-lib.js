@@ -8,8 +8,13 @@ export class ConfigProvider {
     private config;
 
     constructor() {
-        const id = path.join(__dirname, `../../config/${process.env.sc_stage || "local"}.json`);
-        this.config = require(id) || {};
+        // horrible, need a better way to configure for different runtimes!
+        if (typeof process === 'object') {
+            const id = path.join(__dirname, `../../config/${process.env.sc_stage || "local"}.json`);
+            this.config = require(id) || {};
+        } else {
+            this.config = {};
+        }
     }
 
     get stage() {
