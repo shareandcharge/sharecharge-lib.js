@@ -109,7 +109,7 @@ describe('ShareCharge', function () {
                 }
             });
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60);
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0, 8000);
             await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse, mspKey.address);
 
             await eventPoller.poll();
@@ -135,7 +135,7 @@ describe('ShareCharge', function () {
                 }
             });
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60);
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60, 0);
             await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse, mspKey.address);
             await shareCharge.charging.useWallet(mspWallet).requestStop(evse);
             await shareCharge.charging.useWallet(cpoWallet).confirmStop(evse, mspKey.address, Date.now(), Date.now() + 60, 18000);
@@ -187,7 +187,7 @@ describe('ShareCharge', function () {
                 }
             });
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60);
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60, 0);
             await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse, mspKey.address);
             await shareCharge.charging.useWallet(mspWallet).requestStop(evse);
 
@@ -210,7 +210,7 @@ describe('ShareCharge', function () {
                 }
             });
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60);
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60, 0);
 
             await eventPoller.poll();
 
