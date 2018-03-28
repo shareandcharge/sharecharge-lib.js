@@ -11,7 +11,6 @@ export class Connector {
     private _powerType: PowerType = PowerType.AC_1_PHASE;
     private _voltage: number = 0;
     private _amperage: number = 0;
-    private _tariffId: string = '';
 
     get id(): string {
         return this._id;
@@ -63,14 +62,6 @@ export class Connector {
         this._amperage = value;
     }
 
-    get tariffId(): string {
-        return this._tariffId;
-    }
-
-    set tariffId(value: string) {
-        this._tariffId = value;
-    }
-
     static deserialize(payload: any): Connector {
         const connector = new Connector();
         connector._id = payload["id"];
@@ -80,7 +71,6 @@ export class Connector {
         connector._powerType = payload["powerType"];
         connector._voltage = parseInt(payload["voltage"]);
         connector._amperage = parseInt(payload["amperage"]);
-        connector._tariffId = payload["tariffId"];
         return connector;
     }
 }

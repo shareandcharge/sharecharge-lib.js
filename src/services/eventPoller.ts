@@ -24,7 +24,7 @@ export class EventPoller {
 
     start() {
         if (!this.intervalID) {
-            this.intervalID = setInterval(() => this.poll(), this.intervalMillis);
+            this.intervalID = setInterval(async () => await this.poll(), this.intervalMillis);
         }
     }
 

@@ -10,7 +10,6 @@ export class ConnectorBuilder {
     private powerType: number = PowerType.AC_1_PHASE;
     private voltage: number = 240;
     private amperage: number = 100;
-    private tarrifId: string = "0x0000000000000000000000000000000000000001";
 
     withEvseId(val: string): ConnectorBuilder {
         this.evseId = val; return this;
@@ -32,10 +31,6 @@ export class ConnectorBuilder {
         this.amperage = val; return this;
     }
 
-    withTariffId(val: string): ConnectorBuilder {
-        this.tarrifId = val; return this;
-    }
-
     build(): Connector {
         const connector = new Connector();
         connector.evseId = this.evseId;
@@ -43,7 +38,6 @@ export class ConnectorBuilder {
         connector.powerType = this.powerType;
         connector.voltage = this.voltage;
         connector.amperage = this.amperage;
-        connector.tariffId = this.tarrifId;
         return connector;
     }
 }

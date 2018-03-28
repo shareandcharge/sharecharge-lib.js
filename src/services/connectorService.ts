@@ -96,8 +96,7 @@ export class ConnectorService {
         const powerType = connector.powerType;
         const voltage = connector.voltage;
         const amperage = connector.amperage;
-        const tarrifId = connector.tariffId;
-        return [id, evseId, standard, powerType, voltage, amperage, tarrifId];
+        return [id, evseId, standard, powerType, voltage, amperage];
     }
 
 }

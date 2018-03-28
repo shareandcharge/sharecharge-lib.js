@@ -30,9 +30,9 @@ export class ChargingService {
                 const contract = this.contract;
                 await contract.send("requestStop", [evse.id], key);
             },
-            confirmStop: async (evse: Evse, controller: string) => {
+            confirmStop: async (evse: Evse, controller: string, startTime: number, stopTime: number, totalEnergy: number) => {
                 const contract = this.contract;
-                await contract.send("confirmStop", [evse.id, controller], key);
+                await contract.send("confirmStop", [evse.id, controller, startTime, stopTime, totalEnergy], key);
             },
             error: async (evse: Evse, controller: string, errorCode: number) => {
                 const contract = this.contract;

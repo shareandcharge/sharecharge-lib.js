@@ -100,8 +100,10 @@ export class EvseService {
     private toParameters(evse: Evse): any[] {
         const id = evse.id;
         const stationId = evse.stationId;
-        const plugMask = ToolKit.toPlugMask(evse.plugTypes);
+        const currency = evse.currency;
+        const basePrice = evse.basePrice;
+        const tariffId = evse.tariffId;
         const available = evse.available;
-        return [id, stationId, plugMask, available];
+        return [id, stationId, currency, basePrice, tariffId, available];
     }
 }

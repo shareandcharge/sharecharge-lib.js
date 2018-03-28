@@ -5,7 +5,9 @@ export class Evse {
     private _id: string = ToolKit.randomBytes32String();
     private _owner: string = "0x0000000000000000000000000000000000000000";
     private _stationId: string = "0x0000000000000000000000000000000000000000";
-    private _plugMask: number = 0;
+    private _currency: string = ToolKit.asciiToHex("EUR");
+    private _basePrice: number = 0;
+    private _tariffId: number = 0;
     private _available: boolean = true;
 
     get id(): string {
@@ -24,12 +26,30 @@ export class Evse {
         this._stationId = value;
     }
 
-    get plugTypes(): PlugType[] {
-        return ToolKit.fromPlugMask(this._plugMask);
+    get currency(): string {
+        return this._currency;
     }
 
-    set plugTypes(value: PlugType[]) {
-        this._plugMask = ToolKit.toPlugMask(value);
+    set currency(value: string) {
+        if (value.length === 3) {
+            this._currency = ToolKit.asciiToHex(value);
+        }
+    }
+
+    get basePrice(): number {
+        return this._basePrice;
+    }
+
+    set basePrice(value: number) {
+        this._basePrice = value;
+    }
+
+    get tariffId(): number {
+        return this._tariffId;
+    }
+
+    set tariffId(value: number) {
+        this._tariffId = value;
     }
 
     get available(): boolean {
@@ -42,11 +62,13 @@ export class Evse {
 
     static deserialize(payload: any): Evse {
         const evse = new Evse();
-        evse._id = payload["id"] || evse._id;
-        evse._owner = payload["owner"] || evse._owner;
-        evse._stationId = payload["stationId"] || evse._stationId;
-        evse._plugMask = payload["plugMask"] || evse._plugMask;
-        evse._available = payload["available"] || evse._available;
+        evse._id = payload["id"];
+        evse._owner = payload["owner"];
+        evse._stationId = payload["stationId"];
+        evse._currency = payload["currency"];
+        evse._basePrice = payload["basePrice"];
+        evse._tariffId = payload["tariffId"];
+        evse._available = payload["available"];
         return evse;
     }
 }
