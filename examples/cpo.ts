@@ -71,6 +71,12 @@ async function main() {
         }
     });
 
+    sc.on("ChargeDetailRecord", async (result) => {
+        if (result.evseId == evseId) {
+            console.log("Received CDR");
+        }
+    });
+
     sc.startListening();
     console.log(`Listening for events`);
 }

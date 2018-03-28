@@ -37,7 +37,13 @@ async function main() {
     sc.on("StopConfirmed", async (result) => {
         if (result.evseId === selectedevseId && result.controller.toLowerCase() === key.address) {
             console.log('Stopped', result.evseId);
-            sc.stopListening(); // for this demo, app shutdown should call stop listening!
+        }
+    });
+
+    sc.on("ChargeDetailRecord", async (result) => {
+        if (result.evseId === selectedevseId && result.controller.toLowerCase() === key.address) {
+            console.log('Received CDR');
+            sc.stopListening();
         }
     });
 
@@ -47,9 +53,9 @@ async function main() {
 
         const evse = await sc.evses.getById(evseId);
         selectedevseId = evse.id;
-        console.log(selectedevseId);
+        console.log('Found', selectedevseId);
 
-        await sc.charging.useWallet(wallet).requestStart(evse, 5);
+        await sc.charging.useWallet(wallet).requestStart(evse, 2000);
 
         setTimeout(() => sc.charging.useWallet(wallet).requestStop(evse), 2000);
 
