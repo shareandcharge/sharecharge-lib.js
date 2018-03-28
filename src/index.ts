@@ -7,8 +7,17 @@ import { ToolKit } from './utils/toolKit';
 import { ShareCharge } from "./shareCharge";
 import { OpeningHours } from './models/openingHours';
 import { PlugType } from './models/plugType';
+import { ConfigProvider } from './services/configProvider';
+import { IContractProvider, ContractProvider } from './services/contractProvider';
+import { ChargingService } from './services/chargingService';
+import { EventPoller } from './services/eventPoller';
 
 export {
+    ConfigProvider,
+    IContractProvider,
+    ContractProvider,
+    ChargingService,
+    EventPoller,
     Evse,
     EvseService,
     Station,
