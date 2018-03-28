@@ -37,12 +37,16 @@ async function main() {
     await sc.evses.useWallet(wallet).create(evse);
     console.log(`Created new evse with id: ${evseId}`);
 
+    let start, duration;
+
     sc.on("StartRequested", async (result) => {
         if (result.evseId == evseId) {
             console.log(`Received start request for evse with id: ${evseId}`);
 
             // send start request to device... we assume success in this example!
             const success = true;
+            start = Date.now();
+            duration = result.secondsToRent;
             const evse = await sc.evses.getById(evseId);
             if (success) {
                 sc.charging.useWallet(wallet).confirmStart(evse, result.controller);
@@ -60,7 +64,7 @@ async function main() {
             const success = true;
             const evse = await sc.evses.getById(evseId);
             if (success) {
-                sc.charging.useWallet(wallet).confirmStop(evse, result.controller);
+                sc.charging.useWallet(wallet).confirmStop(evse, result.controller, start, start + (duration * 1000), 22000);
             } else {
                 sc.charging.useWallet(wallet).error(evse, result.controller, 0x3);
             }
