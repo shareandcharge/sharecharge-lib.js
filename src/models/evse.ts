@@ -1,5 +1,5 @@
-import { PlugType } from './plugType';
 import { ToolKit } from '../utils/toolKit';
+import { Tariff } from './tariff';
 
 export class Evse {
     private _id: string = ToolKit.randomBytes32String();
@@ -7,7 +7,7 @@ export class Evse {
     private _stationId: string = "0x0000000000000000000000000000000000000000";
     private _currency: string = ToolKit.asciiToHex("EUR");
     private _basePrice: number = 0;
-    private _tariffId: number = 0;
+    private _tariffId: number = Tariff.FLAT;
     private _available: boolean = true;
 
     get id(): string {
@@ -41,7 +41,7 @@ export class Evse {
     }
 
     set basePrice(value: number) {
-        this._basePrice = value;
+        this._basePrice = value * 100;
     }
 
     get tariffId(): number {
@@ -65,8 +65,8 @@ export class Evse {
         evse._id = payload["id"];
         evse._owner = payload["owner"];
         evse._stationId = payload["stationId"];
-        evse._currency = payload["currency"];
-        evse._basePrice = payload["basePrice"];
+        evse._currency = ToolKit.hexToString(payload["currency"]);
+        evse._basePrice = payload["basePrice"] / 100;
         evse._tariffId = payload["tariffId"];
         evse._available = payload["available"];
         return evse;

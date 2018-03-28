@@ -3,7 +3,6 @@ import * as fs from "fs";
 import * as path from "path";
 
 const web3Utils = require('web3').utils;
-import { PlugType } from '../models/plugType';
 
 export class ToolKit {
 
@@ -21,25 +20,6 @@ export class ToolKit {
 
     static asciiToHex(val: string): string {
         return web3Utils.asciiToHex(val);
-    }
-
-    static toPlugMask(plugTypes: PlugType[]): number {
-        let mask = 0;
-        for (let i = 0; i < plugTypes.length; i++) {
-            mask |= plugTypes[i];
-        }
-        return mask;
-    }
-
-    static fromPlugMask(mask: number): PlugType[] {
-        const plugs: PlugType[] = [];
-        for (let bit = 0; bit < 16; bit++) {
-            const flag = (mask >> bit) & 0x01;
-            if (flag) {
-                plugs.push(flag << bit);
-            }
-        }
-        return plugs;
     }
 
     static contractDefsForStage(stage: string, verbose: boolean = false) {

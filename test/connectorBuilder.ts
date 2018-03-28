@@ -9,7 +9,7 @@ export class ConnectorBuilder {
     private standard: number = ConnectorType.CHADEMO;
     private powerType: number = PowerType.AC_1_PHASE;
     private voltage: number = 240;
-    private amperage: number = 100;
+    private amperage: number = 30;
 
     withEvseId(val: string): ConnectorBuilder {
         this.evseId = val; return this;

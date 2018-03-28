@@ -101,7 +101,7 @@ describe('ConnectorService', function () {
             return new Promise((resolve, reject) => {
                 setTimeout(async () => {
                     const contractConnector = await connectorService.getById(connector.id);
-                    expect(contractConnector.amperage).to.equal(110);
+                    expect(contractConnector.amperage).to.equal(40);
                     resolve();
                 }, batchTimeout);
             });

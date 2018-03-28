@@ -1,5 +1,4 @@
 import { Evse } from '../src/models/evse';
-import { PlugType } from '../src/models/plugType';
 import { Station } from '../src/models/station';
 import { ToolKit } from '../src/utils/toolKit';
 
