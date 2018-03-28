@@ -1,16 +1,14 @@
 import { IConfigProvider } from "./iConfigProvider";
 import { injectable } from "inversify";
 import "reflect-metadata";
-import * as path from "path";
 
 @injectable()
-export class ConfigProvider implements IConfigProvider {
+export class WebConfigProvider implements IConfigProvider {
 
     private config;
 
     constructor() {
-        const id = path.join(__dirname, `../../config/${process.env.sc_stage || "local"}.json`);
-        this.config = require(id) || {};
+        this.config = {};
     }
 
     get stage() {
