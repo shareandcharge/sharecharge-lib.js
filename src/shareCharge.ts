@@ -50,10 +50,10 @@ export class ShareCharge {
 
     private static container;
 
-    static getInstance(): ShareCharge {
+    static getInstance(config: any = {}): ShareCharge {
         if (!ShareCharge.container) {
             const container = new Container();
-            container.bind<ConfigProvider>(Symbols.ConfigProvider).to(ConfigProvider).inSingletonScope();
+            container.bind<ConfigProvider>(Symbols.ConfigProvider).toConstantValue(new ConfigProvider(config));
             container.bind<IContractProvider>(Symbols.ContractProvider).to(ContractProvider).inSingletonScope();
             container.bind<StationService>(Symbols.StationSerivce).to(StationService).inSingletonScope();
             container.bind<EvseService>(Symbols.EvseService).to(EvseService).inSingletonScope();
