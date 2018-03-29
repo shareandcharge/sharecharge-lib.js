@@ -100,7 +100,7 @@ export class EvseService {
     private toParameters(evse: Evse): any[] {
         const id = evse.id;
         const stationId = evse.stationId;
-        const currency = evse.currency;
+        const currency = ToolKit.asciiToHex(evse.currency);
         const basePrice = evse.basePrice;
         const tariffId = evse.tariffId;
         const available = evse.available;
