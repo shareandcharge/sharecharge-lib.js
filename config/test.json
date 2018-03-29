@@ -1,5 +1,0 @@
-{
-    "stage": "test",
-    "provider": "http://localhost:8545",
-    "gasPrice": 18000000000
-}

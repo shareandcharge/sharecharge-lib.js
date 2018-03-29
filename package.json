@@ -24,7 +24,8 @@
     "watch-ts": "tsc -w",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
     "webpack": "webpack",
-    "geth-dev": "geth --dev --datadir=../.chaindata --dev.period 1 --rpc --rpcaddr 0.0.0.0 --ws --wsaddr 0.0.0.0 --wsorigins=* --wsapi=eth,personal,net,pubsub"
+    "geth-dev": "geth --dev --datadir=../.chaindata --dev.period 1 --rpc --rpcaddr 0.0.0.0 --ws --wsaddr 0.0.0.0 --wsorigins=* --wsapi=eth,personal,net,pubsub",
+    "patch-contract": "cp ~/.sharecharge/contract.defs.local.json node_modules/sharecharge-contracts/contract.defs.local.json"
   },
   "dependencies": {
     "@types/node": "^9.4.7",
