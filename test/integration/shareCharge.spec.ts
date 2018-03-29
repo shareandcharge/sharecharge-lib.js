@@ -68,12 +68,14 @@ describe('ShareCharge', function () {
             }
         });
 
-        const chargingContract = await TestHelper.createContract(web3, config, contractDefs["Charging"], [evseContract.address]);
+        const chargingContract = await TestHelper.createContract(web3, config, contractDefs["Charging"]);
         chargingService = new ChargingService(<IContractProvider>{
             obtain(key: string): Contract {
                 return chargingContract;
             }
         });
+
+        await chargingContract.native.methods["setEvsesAddress"](evseContract.address).send({ from: coinbase });
 
         await evseContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
 
