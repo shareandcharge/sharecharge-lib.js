@@ -1,10 +1,9 @@
-import { IConfigProvider } from "./iConfigProvider";
 import { injectable } from "inversify";
 import "reflect-metadata";
 import * as path from "path";
 
 @injectable()
-export class ConfigProvider implements IConfigProvider {
+export class ConfigProvider {
 
     private config;
 

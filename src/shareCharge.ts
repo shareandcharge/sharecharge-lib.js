@@ -4,12 +4,10 @@ import { StationService } from './services/stationService';
 import { EventPoller } from './services/eventPoller';
 import { EventDispatcher } from './services/eventDispatcher';
 import { ConfigProvider } from './services/configProvider';
-import { WebConfigProvider } from './services/webConfigProvider';
 import { ContractProvider, IContractProvider } from './services/contractProvider';
 import { Container, injectable, inject } from "inversify";
 import { Symbols } from './symbols';
 import "reflect-metadata";
-import { IConfigProvider } from './services/iConfigProvider';
 
 @injectable()
 export class ShareCharge {
@@ -55,11 +53,7 @@ export class ShareCharge {
     static getInstance(): ShareCharge {
         if (!ShareCharge.container) {
             const container = new Container();
-            if (typeof process === 'object') {
-                container.bind<IConfigProvider>(Symbols.ConfigProvider).to(ConfigProvider).inSingletonScope();
-            } else {
-                container.bind<IConfigProvider>(Symbols.ConfigProvider).to(WebConfigProvider).inSingletonScope();
-            }
+            container.bind<ConfigProvider>(Symbols.ConfigProvider).to(ConfigProvider).inSingletonScope();
             container.bind<IContractProvider>(Symbols.ContractProvider).to(ContractProvider).inSingletonScope();
             container.bind<StationService>(Symbols.StationSerivce).to(StationService).inSingletonScope();
             container.bind<EvseService>(Symbols.EvseService).to(EvseService).inSingletonScope();
