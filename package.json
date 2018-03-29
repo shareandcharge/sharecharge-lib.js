@@ -11,7 +11,7 @@
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "scripts": {
-    "install": "rm -rf dist && npm run build-ts && cp -r ./config/ ./dist/config",
+    "install": "rm -rf dist && npm run build-ts",
     "start": "node dist/server.js",
     "build": "npm run build-ts && npm run tslint",
     "deploy": "rm -rf dist && npm run build && npm pack",
