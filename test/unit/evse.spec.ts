@@ -7,6 +7,7 @@ describe('Evse', function () {
     it('should deserialize correctly', () => {
         const payload = {
             id: '0xd65a96b1d16c4fca52fc1fd845b63ac5a86f8b8c0fe1970420ec02fc154af884',
+            uid: '0x4652313338453145544735353738353637595538440000000000000000000000',
             owner: '0xBD422974a93966C37bb740daF4d248dEE88C7ca1',
             stationId: '0x00aabb0000000000000000000000000000000101',
             currency: '0x455552',

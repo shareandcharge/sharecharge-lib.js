@@ -3,6 +3,7 @@ import { Tariff } from './tariff';
 
 export class Evse {
     private _id: string = ToolKit.randomBytes32String();
+    private _uid: string = "";
     private _owner: string = "0x0000000000000000000000000000000000000000";
     private _stationId: string = "0x0000000000000000000000000000000000000000";
     private _currency: string = "EUR";
@@ -12,6 +13,14 @@ export class Evse {
 
     get id(): string {
         return this._id;
+    }
+
+    get uid(): string {
+        return this._uid;
+    }
+
+    set uid(value: string) {
+        this._uid = value;
     }
 
     get owner(): string {
@@ -63,6 +72,7 @@ export class Evse {
     static deserialize(payload: any): Evse {
         const evse = new Evse();
         evse._id = payload["id"];
+        evse._uid = ToolKit.hexToString(payload["uid"]);
         evse._owner = payload["owner"];
         evse._stationId = payload["stationId"];
         evse._currency = ToolKit.hexToString(payload["currency"]);

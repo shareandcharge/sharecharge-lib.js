@@ -23,6 +23,13 @@ export class EvseService {
         const result = await contract.call("getById", id);
         return Evse.deserialize(result);
     }
+    
+    async getByUid(uid: string): Promise<Evse> {
+        const contract = this.contract;
+        const result = await contract.call("getByUid", ToolKit.asciiToHex(uid));
+        return Evse.deserialize(result);
+        
+    } 
 
     async getByStation(station: Station): Promise<Evse[]> {
         const contract = this.contract;
@@ -99,11 +106,12 @@ export class EvseService {
 
     private toParameters(evse: Evse): any[] {
         const id = evse.id;
+        const uid = ToolKit.asciiToHex(evse.uid);
         const stationId = evse.stationId;
         const currency = ToolKit.asciiToHex(evse.currency);
         const basePrice = evse.basePrice;
         const tariffId = evse.tariffId;
         const available = evse.available;
-        return [id, stationId, currency, basePrice, tariffId, available];
+        return [id, uid, stationId, currency, basePrice, tariffId, available];
     }
 }

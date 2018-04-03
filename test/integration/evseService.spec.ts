@@ -157,6 +157,17 @@ describe('EvseService', function () {
         });
     });
 
+    context('#getByUid', ()=> {
+        it('should get evse by uid', async () => {
+            const evse = new EvseBuilder().build();
+            await evseService.useWallet(wallet).create(evse);
+
+            const result = await evseService.getByUid(evse.uid);
+            expect(result.uid).to.equal(evse.uid);
+            
+        });
+    });
+
     context('#areevsesAvailable', () => {
         it('should report false if all evses on a station are in use', async () => {
             const station = new Station();
