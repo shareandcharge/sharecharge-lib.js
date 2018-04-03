@@ -15,11 +15,11 @@ jobs:
       - checkout
 
       # Download and cache dependencies
-      # - restore_cache:
-      #     keys:
-      #     - v1-dependencies-{{ checksum "package.json" }}
-      #     # fallback to using the latest cache if no exact match is found
-      #     - v1-dependencies-
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
 
       - run:
           name: install
@@ -27,11 +27,11 @@ jobs:
             npm install
             npm install ganache-cli@6.0.3
 
-      # # update cache if needed
-      # - save_cache:
-      #     key: v1-dependencies-{{ checksum "package.json" }}
-      #     paths:
-      #       - node_modules
+      # update cache if needed
+      - save_cache:
+          key: v1-dependencies-{{ checksum "package.json" }}
+          paths:
+            - node_modules
 
       # run rpc
       - run:
