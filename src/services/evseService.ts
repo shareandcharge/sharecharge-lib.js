@@ -42,11 +42,19 @@ export class EvseService {
         return evses;
     }
 
+    async getSession(evse: Evse) {
+        const contract = this.contract;
+        const result = await contract.call("getSessionById", evse.id);
+        return result;
+    }
+
     async anyFree(station: Station): Promise<boolean> {
         const contract = this.contract;
         const result = await contract.call("getStationAvailability", station.id);
         return result;
     }
+
+    async 
 
     useWallet(wallet: Wallet, keyIndex: number = 0) {
         const key = wallet.keychain[keyIndex];
