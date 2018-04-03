@@ -33,6 +33,7 @@ async function main() {
     console.log(`Created new station with id: ${station.id}`);
 
     const evse = new Evse();
+    evse.uid = "FR138E1ETG5578567YU8D";
     evse.stationId = station.id;
     evse.available = true;
     const evseId = evse.id;
