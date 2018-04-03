@@ -27,6 +27,8 @@ async function main() {
     // how to do this fast?
     // await bulkCreate(wallet, sc, 250);
     const station = new Station();
+    station.latitude = 52.5200;
+    station.longitude = 13.4050;
     await sc.stations.useWallet(wallet).create(station);
     console.log(`Created new station with id: ${station.id}`);
 
