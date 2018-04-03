@@ -43,8 +43,12 @@ export class EvseService {
     }
 
     async getSession(evse: Evse) {
-        const contract = this.contract;
-        const result = await contract.call("getSessionById", evse.id);
+        const result = await this.contract.call("getSessionById", evse.id);
+        return result;
+    }
+
+    async isAvailable(evse: Evse) {
+        const result = await this.contract.call("getAvailableById", evse.id);
         return result;
     }
 
