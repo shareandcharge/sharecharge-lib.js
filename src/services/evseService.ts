@@ -42,12 +42,12 @@ export class EvseService {
         return evses;
     }
 
-    async getSession(evse: Evse) {
+    async getSession(evse: Evse): Promise<string> {
         const result = await this.contract.call("getSessionById", evse.id);
         return result;
     }
 
-    async isAvailable(evse: Evse) {
+    async isAvailable(evse: Evse): Promise<boolean> {
         const result = await this.contract.call("getAvailableById", evse.id);
         return result;
     }
