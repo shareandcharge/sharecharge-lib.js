@@ -22,10 +22,14 @@ jobs:
           - v1-dependencies-
 
       - run:
-          name: install
-          command: |
-            npm install
+          name: install ganache
+          command:
             npm install ganache-cli@6.0.3
+
+      - run:
+          name: install
+          command:
+            npm install
 
       # update cache if needed
       - save_cache:
