@@ -4,6 +4,7 @@ export const Symbols = {
     StationSerivce: Symbol.for("StationService"),
     EvseService: Symbol.for("EvseService"),
     ChargingService: Symbol.for("ChargingService"),
+    TokenService: Symbol.for("TokenService"),
     EventPoller: Symbol.for("EventPoller"),
     ShareCharge: Symbol.for("ShareCharge")
 };

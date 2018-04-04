@@ -7,6 +7,8 @@ export class Wallet {
     public readonly path: string;
     public readonly keychain: Key[] = [];
     private readonly id: string;
+    
+    private static container;
 
     constructor(seedPhrase: string, subAccount: number = 0, numberOfKeys: number = 1) {
         // master / purpose' / chain_id' / account' / address_index

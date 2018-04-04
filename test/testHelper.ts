@@ -21,6 +21,13 @@ export class TestHelper {
         }
     }
 
+    static async ensureTokens(web3: any, tokenContract: any, key: Key) {
+        const destBalance = 10;
+        const coinbase = await web3.eth.getCoinbase();
+        const receiver = key.address;
+        tokenContract.native.methods["mint"](receiver, destBalance).send({ from: coinbase });
+    }
+
     static async createContract(web3, config, def, args?: any[]) {
         const address = await TestHelper.deployContract(web3, def, args);
         return new Contract(web3, {
@@ -30,7 +37,7 @@ export class TestHelper {
         });
     }
 
-    static async deployContract(web3: any, config: { abi: any, bytecode: any }, args: any[] = [], gas: number = 2000000) {
+    static async deployContract(web3: any, config: { abi: any, bytecode: any }, args: any[] = [], gas: number = 3000000) {
         const coinbase = await web3.eth.getCoinbase();
         const contract = new web3.eth.Contract(config.abi, {
             from: coinbase,

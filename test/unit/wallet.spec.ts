@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { Wallet } from '../../src/models/wallet';
+import { TestHelper } from '../testHelper';
 
 describe('HD Wallet', function() {
 

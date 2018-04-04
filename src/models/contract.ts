@@ -17,6 +17,10 @@ export class Contract {
         return nonce;
     }
 
+    async getBalance(key: Key): Promise<number> {
+        return this.web3.eth.getBalance(key.address);
+    }
+
     async call(method: string, ...args: any[]): Promise<any> {
         return this.native.methods[method](...args).call();
     }

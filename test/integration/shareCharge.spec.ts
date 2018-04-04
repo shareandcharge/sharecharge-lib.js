@@ -20,6 +20,7 @@ import { Station } from '../../src/models/station';
 import { ConfigProvider } from "../../src/services/configProvider";
 import { Key } from '../../src/models/key';
 import { IContractProvider } from '../../src/services/contractProvider';
+import { TokenService } from '../../src/services/tokenService';
 
 const config = new ConfigProvider();
 
@@ -37,6 +38,7 @@ describe('ShareCharge', function () {
     let stationService: StationService;
     let evseService: EvseService;
     let chargingService: ChargingService;
+    let tokenService: TokenService;
     let eventPoller: EventPoller;
 
     before(async () => {
@@ -75,15 +77,26 @@ describe('ShareCharge', function () {
             }
         });
 
+        const tokenContract = await TestHelper.createContract(web3, config, contractDefs["MSPToken"], ["MSPToken", "MSP"]);
+        tokenService = new TokenService(<IContractProvider>{
+            obtain(key: string): Contract {
+                return tokenContract;
+            }
+        });
+
         await chargingContract.native.methods["setEvsesAddress"](evseContract.address).send({ from: coinbase });
+        await chargingContract.native.methods["setTokenAddress"](tokenContract.address).send({ from: coinbase });
 
         await evseContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
+        await tokenContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
+
+        await tokenContract.native.methods["mint"](mspKey.address, 3).send({ from: coinbase });
 
         eventPoller = new EventPoller(config);
     });
 
     beforeEach(async () => {
-        shareCharge = new ShareCharge(stationService, evseService, chargingService, eventPoller);
+        shareCharge = new ShareCharge(stationService, evseService, chargingService, tokenService, eventPoller);
     });
 
     afterEach(async () => {
@@ -166,6 +179,7 @@ describe('ShareCharge', function () {
                 }
             });
 
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 10, 0);
             await shareCharge.charging.useWallet(cpoWallet).error(evse, mspKey.address, 0);
 
             await eventPoller.poll();

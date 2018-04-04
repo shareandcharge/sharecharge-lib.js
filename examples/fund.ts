@@ -3,6 +3,7 @@ import { Key } from '../src/models/key';
 import { TestHelper } from '../test/testHelper';
 
 const Web3 = require('web3');
+const def = require('../node_modules/sharecharge-contracts/contract.defs.local.json').MSPToken;
 
 async function main() {
 
@@ -13,6 +14,11 @@ async function main() {
 
     await TestHelper.ensureFunds(web3, wallet1.keychain[0]);
     await TestHelper.ensureFunds(web3, wallet2.keychain[0]);
+
+    const coinbase = await web3.eth.getCoinbase();
+    const contract = new web3.eth.Contract(def.abi, def.address);
+    await contract.methods.mint(wallet2.keychain[0].address, 50).send({ from: coinbase });
+
 }
 
 main();
