@@ -23,7 +23,7 @@ export class ShareCharge {
     constructor(@inject(Symbols.StationSerivce) stationService: StationService,
                 @inject(Symbols.EvseService) evseService: EvseService,
                 @inject(Symbols.ChargingService) chargingService: ChargingService,
-                @inject(Symbols.ChargingService) tokenService: TokenService,                
+                @inject(Symbols.TokenService) tokenService: TokenService,                
                 @inject(Symbols.EventPoller) private eventPoller: EventPoller) {
         this.stations = stationService;
         this.evses = evseService;
