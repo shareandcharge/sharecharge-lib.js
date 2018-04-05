@@ -1,12 +1,9 @@
 import { Subject } from "rxjs/Subject";
 import { ConfigProvider } from "./configProvider";
 import { Contract } from "../models/contract";
-import { inject, injectable } from "inversify";
-import { Symbols } from '../symbols';
-import "reflect-metadata";
+
 const Web3 = require('web3');
 
-@injectable()
 export class EventPoller {
 
     private web3;
@@ -17,7 +14,7 @@ export class EventPoller {
 
     public readonly events = new Subject<any[]>();
 
-    public constructor(@inject(Symbols.ConfigProvider) private config: ConfigProvider) {
+    public constructor(private config: ConfigProvider) {
         this.web3 = new Web3(config.provider);
         this.intervalMillis = config.pollingInterval;
     }

@@ -5,12 +5,8 @@ import { TokenService } from './services/tokenService';
 import { EventPoller } from './services/eventPoller';
 import { EventDispatcher } from './services/eventDispatcher';
 import { ConfigProvider } from './services/configProvider';
-import { ContractProvider, IContractProvider } from './services/contractProvider';
-import { Container, injectable, inject } from "inversify";
-import { Symbols } from './symbols';
-import "reflect-metadata";
+import { ContractProvider } from './services/contractProvider';
 
-@injectable()
 export class ShareCharge {
 
     private eventDispatcher = new EventDispatcher<string>();
@@ -20,11 +16,11 @@ export class ShareCharge {
     public readonly charging: ChargingService;
     public readonly token: TokenService;
 
-    constructor(@inject(Symbols.StationSerivce) stationService: StationService,
-                @inject(Symbols.EvseService) evseService: EvseService,
-                @inject(Symbols.ChargingService) chargingService: ChargingService,
-                @inject(Symbols.TokenService) tokenService: TokenService,                
-                @inject(Symbols.EventPoller) private eventPoller: EventPoller) {
+    constructor(stationService: StationService,
+                evseService: EvseService,
+                chargingService: ChargingService,
+                tokenService: TokenService,
+                private eventPoller: EventPoller) {
         this.stations = stationService;
         this.evses = evseService;
         this.charging = chargingService;
@@ -53,21 +49,18 @@ export class ShareCharge {
         this.eventPoller.stop();
     }
 
-    private static container;
-
+    private static instance;
     static getInstance(config: any = {}): ShareCharge {
-        if (!ShareCharge.container) {
-            const container = new Container();
-            container.bind<ConfigProvider>(Symbols.ConfigProvider).toConstantValue(new ConfigProvider(config));
-            container.bind<IContractProvider>(Symbols.ContractProvider).to(ContractProvider).inSingletonScope();
-            container.bind<StationService>(Symbols.StationSerivce).to(StationService).inSingletonScope();
-            container.bind<EvseService>(Symbols.EvseService).to(EvseService).inSingletonScope();
-            container.bind<ChargingService>(Symbols.ChargingService).to(ChargingService).inSingletonScope();
-            container.bind<TokenService>(Symbols.TokenService).to(TokenService).inSingletonScope();
-            container.bind<EventPoller>(Symbols.EventPoller).to(EventPoller).inSingletonScope();
-            container.bind<ShareCharge>(Symbols.ShareCharge).to(ShareCharge).inSingletonScope();
-            ShareCharge.container = container;
+        if (!ShareCharge.instance) {
+            const configProvider = new ConfigProvider(config);
+            const contractProvider = new ContractProvider(configProvider);
+            const eventPoller = new EventPoller(configProvider);
+            const stationService = new StationService(contractProvider);
+            const evseService = new EvseService(contractProvider);
+            const chargingService = new ChargingService(contractProvider);
+            const tokenService = new TokenService(contractProvider);
+            ShareCharge.instance = new ShareCharge(stationService, evseService, chargingService, tokenService, eventPoller);
         }
-        return ShareCharge.container.resolve(ShareCharge);
+        return ShareCharge.instance;
     }
 }

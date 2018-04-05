@@ -19,7 +19,7 @@ import { StationService } from '../../src/services/stationService';
 import { Station } from '../../src/models/station';
 import { ConfigProvider } from "../../src/services/configProvider";
 import { Key } from '../../src/models/key';
-import { IContractProvider } from '../../src/services/contractProvider';
+import { ContractProvider } from '../../src/services/contractProvider';
 import { TokenService } from '../../src/services/tokenService';
 
 const config = new ConfigProvider();
@@ -57,28 +57,28 @@ describe('ShareCharge', function () {
         const coinbase = await web3.eth.getCoinbase();
 
         const evseContract = await TestHelper.createContract(web3, config, contractDefs["EvseStorage"]);
-        evseService = new EvseService(<IContractProvider>{
+        evseService = new EvseService(<ContractProvider>{
             obtain(key: string): Contract {
                 return evseContract;
             }
         });
 
         const stationContract = await TestHelper.createContract(web3, config, contractDefs["StationStorage"]);
-        stationService = new StationService(<IContractProvider>{
+        stationService = new StationService(<ContractProvider>{
             obtain(key: string): Contract {
                 return stationContract;
             }
         });
 
         const chargingContract = await TestHelper.createContract(web3, config, contractDefs["Charging"]);
-        chargingService = new ChargingService(<IContractProvider>{
+        chargingService = new ChargingService(<ContractProvider>{
             obtain(key: string): Contract {
                 return chargingContract;
             }
         });
 
         const tokenContract = await TestHelper.createContract(web3, config, contractDefs["MSPToken"], ["MSPToken", "MSP"]);
-        tokenService = new TokenService(<IContractProvider>{
+        tokenService = new TokenService(<ContractProvider>{
             obtain(key: string): Contract {
                 return tokenContract;
             }

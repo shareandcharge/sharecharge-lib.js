@@ -1,17 +1,13 @@
 import { Evse } from "../models/evse";
 import { Contract } from "../models/contract";
 import { Wallet } from "../models/wallet";
-import { IContractProvider } from "./contractProvider";
-import { Container, injectable, inject } from "inversify";
-import { Symbols } from '../symbols';
-import "reflect-metadata";
+import { ContractProvider } from "./contractProvider";
 
-@injectable()
 export class ChargingService {
 
     public readonly contract;
 
-    constructor(@inject(Symbols.ContractProvider) private contractProvider: IContractProvider) {
+    constructor(private contractProvider: ContractProvider) {
         this.contract = this.contractProvider.obtain('Charging');
     }
 

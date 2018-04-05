@@ -1,17 +1,13 @@
-import { IContractProvider } from './contractProvider';
-import { Container, injectable, inject } from "inversify";
-import { Symbols } from '../symbols';
-import "reflect-metadata";
+import { ContractProvider } from './contractProvider';
 import { Wallet } from '../models/wallet';
 import { Contract } from '../models/contract';
 
-@injectable()
 export class TokenService {
 
     public readonly contract: Contract;
 
-    constructor(@inject(Symbols.ContractProvider) private contractProvider: IContractProvider) {
-        this.contract = this.contractProvider.obtain('MSPToken');                
+    constructor(private contractProvider: ContractProvider) {
+        this.contract = this.contractProvider.obtain('MSPToken');
     }
 
     async balance(wallet: Wallet) {

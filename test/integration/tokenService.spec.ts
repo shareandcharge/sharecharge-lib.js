@@ -6,8 +6,8 @@ import { Wallet } from '../../src/models/wallet';
 import { TokenService } from '../../src/services/tokenService';
 import { TestHelper } from '../testHelper';
 import { ToolKit } from '../../src/utils/toolKit';
-import { IContractProvider } from '../../src/services/contractProvider';
 import { Contract } from '../../src/models/contract';
+import { ContractProvider } from '../../src/services/contractProvider';
 const Web3 = require('web3');
 const config = new ConfigProvider();
 
@@ -19,13 +19,13 @@ describe('TokenService', function () {
 
     before(async () => {
         web3 = new Web3(config.provider);
-        coinbase = await web3.eth.getCoinbase(); 
+        coinbase = await web3.eth.getCoinbase();
     });
 
     beforeEach(async () => {
         contract = await TestHelper.createContract(web3, config, defs["MSPToken"], ["MSPToken", "MSP"]);
 
-        tokenService = new TokenService(<IContractProvider>{
+        tokenService = new TokenService(<ContractProvider>{
             obtain(key: string): Contract {
                 return contract;
             }

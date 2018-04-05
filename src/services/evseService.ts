@@ -3,18 +3,14 @@ import { Contract } from "../models/contract";
 import { Station } from '../models/station';
 import { ToolKit } from '../utils/toolKit';
 import { Wallet } from '../models/wallet';
-import { IContractProvider } from './contractProvider';
-import { Container, injectable, inject } from "inversify";
-import { Symbols } from '../symbols';
-import "reflect-metadata";
+import { ContractProvider } from './contractProvider';
 import { Key } from '../models/key';
 
-@injectable()
 export class EvseService {
 
     public readonly contract;
 
-    constructor(@inject(Symbols.ContractProvider) private contractProvider: IContractProvider) {
+    constructor(private contractProvider: ContractProvider) {
         this.contract = this.contractProvider.obtain('EvseStorage');
     }
 
@@ -23,13 +19,13 @@ export class EvseService {
         const result = await contract.call("getById", id);
         return Evse.deserialize(result);
     }
-    
+
     async getByUid(uid: string): Promise<Evse> {
         const contract = this.contract;
         const result = await contract.call("getByUid", ToolKit.asciiToHex(uid));
         return Evse.deserialize(result);
-        
-    } 
+
+    }
 
     async getByStation(station: Station): Promise<Evse[]> {
         const contract = this.contract;
@@ -58,7 +54,7 @@ export class EvseService {
         return result;
     }
 
-    async 
+    async
 
     useWallet(wallet: Wallet, keyIndex: number = 0) {
         const key = wallet.keychain[keyIndex];

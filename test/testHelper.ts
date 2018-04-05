@@ -1,7 +1,6 @@
 import { ToolKit } from './../src/utils/toolKit';
 import { Contract } from './../src/models/contract';
 import { Wallet } from '../src/models/wallet';
-import { IContractProvider } from '../src/services/contractProvider';
 import { Key } from '../src/models/key';
 
 export class TestHelper {

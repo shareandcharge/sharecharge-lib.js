@@ -14,9 +14,9 @@ import { EventPoller } from '../../src/services/eventPoller';
 import { ConnectorService } from '../../src/services/connectorService';
 import { ConfigProvider } from "../../src/services/configProvider";
 import { ToolKit } from './../../src/utils/toolKit';
-import { IContractProvider } from './../../src/services/contractProvider';
 import { Key } from '../../src/models/key';
 import { Evse } from '../../src';
+import { ContractProvider } from '../../src/services/contractProvider';
 
 const config = new ConfigProvider();
 
@@ -46,7 +46,7 @@ describe('ConnectorService', function () {
     beforeEach(async () => {
         const contract = await TestHelper.createContract(web3, config, defs["ConnectorStorage"]);
 
-        connectorService = new ConnectorService(<IContractProvider>{
+        connectorService = new ConnectorService(<ContractProvider>{
             obtain(key: string): Contract {
                 return contract;
             }

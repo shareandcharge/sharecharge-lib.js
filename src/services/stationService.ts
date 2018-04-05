@@ -3,18 +3,14 @@ import { Station } from '../models/station';
 import { Contract } from '../models/contract';
 import { ToolKit } from '../utils/toolKit';
 import { Wallet } from '../models/wallet';
-import { IContractProvider } from './contractProvider';
-import { Container, injectable, inject } from "inversify";
-import { Symbols } from '../symbols';
-import "reflect-metadata";
+import { ContractProvider } from './contractProvider';
 import { Key } from '../models/key';
 
-@injectable()
 export class StationService {
 
     public readonly contract: Contract;
 
-    constructor(@inject(Symbols.ContractProvider) private contractProvider: IContractProvider) {
+    constructor(private contractProvider: ContractProvider) {
         this.contract = this.contractProvider.obtain('StationStorage');
     }
 

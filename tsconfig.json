@@ -11,8 +11,7 @@
     "emitDecoratorMetadata": true,
     "types": [
       "node",
-      "mocha",
-      "reflect-metadata"
+      "mocha"
     ],
     "typeRoots": [
       "./node_modules/@types"

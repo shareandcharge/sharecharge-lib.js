@@ -2,17 +2,13 @@ import { Connector } from './../models/connector';
 import { Wallet } from '../models/wallet';
 import { Key } from '../models/key';
 import { Contract } from '../models/contract';
-import { IContractProvider } from './contractProvider';
-import { Container, injectable, inject } from "inversify";
-import { Symbols } from '../symbols';
-import "reflect-metadata";
+import { ContractProvider } from './contractProvider';
 
-@injectable()
 export class ConnectorService {
 
     public readonly contract;
 
-    constructor(@inject(Symbols.ContractProvider) private contractProvider: IContractProvider) {
+    constructor(private contractProvider: ContractProvider) {
         this.contract = this.contractProvider.obtain('ConnectorStorage');
     }
 

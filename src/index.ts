@@ -13,7 +13,7 @@ import { Tariff } from './models/tariff';
 import { ConnectorType } from './models/connectorType';
 import { PowerType } from './models/powerType';
 import { ConfigProvider } from './services/configProvider';
-import { IContractProvider, ContractProvider } from './services/contractProvider';
+import { ContractProvider } from './services/contractProvider';
 import { ChargingService } from './services/chargingService';
 
 export {

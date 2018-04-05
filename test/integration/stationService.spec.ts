@@ -13,7 +13,7 @@ import { Contract } from '../../src/models/contract';
 import { StationService } from '../../src/services/stationService';
 import { ConfigProvider } from "../../src/services/configProvider";
 import { ToolKit } from './../../src/utils/toolKit';
-import { IContractProvider } from './../../src/services/contractProvider';
+import { ContractProvider } from './../../src/services/contractProvider';
 import { Key } from '../../src/models/key';
 
 const config = new ConfigProvider();
@@ -39,7 +39,7 @@ describe('StationService', function () {
     beforeEach(async () => {
         const contract = await TestHelper.createContract(web3, config, defs["StationStorage"]);
 
-        stationService = new StationService(<IContractProvider>{
+        stationService = new StationService(<ContractProvider>{
             obtain(key: string): Contract {
                 return contract;
             }
