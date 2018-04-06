@@ -321,6 +321,16 @@ describe('ShareCharge', function () {
             const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', { controller: mspWallet.keychain[0].address });
             expect(logsAfter.length).to.equal(logsBefore.length + 2);
         });
+
+        it('should return gasUsed and timestamp', async () => {
+            const evse = new EvseBuilder().build();
+            await shareCharge.evses.useWallet(cpoWallet).create(evse);
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60, 0);
+
+            const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', { controller: mspWallet.keychain[0].address });
+            expect(logsAfter[0].gasUsed).to.not.be.undefined;
+            expect(logsAfter[0].timestamp).to.not.be.undefined;
+        });
     });
 
 
