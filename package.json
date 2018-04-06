@@ -34,7 +34,6 @@
     "ethereumjs-wallet": "^0.6.0",
     "rxjs": "^5.5.7",
     "sharecharge-contracts": "git+ssh://git@github.com/motionwerkGmbH/sharecharge-contracts.git#domain",
-    "sinon": "^4.4.8",
     "web3": "1.0.0-beta.33"
   },
   "devDependencies": {
@@ -47,6 +46,7 @@
     "ts-loader": "^4.1.0",
     "ts-node": "^5.0.1",
     "tslint": "^5.9.1",
-    "typescript": "^2.7.2"
+    "typescript": "^2.7.2",
+    "sinon": "^4.4.8"
   }
 }
