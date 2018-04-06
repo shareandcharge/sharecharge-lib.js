@@ -8,8 +8,8 @@
   },
   "author": "MotionWerk GmbH",
   "license": "LGPL-3.0",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "install": "rm -rf dist && npm run build-ts",
     "start": "node dist/server.js",
