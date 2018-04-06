@@ -11,6 +11,14 @@ export class ChargingService {
         this.contract = this.contractProvider.obtain('Charging');
     }
 
+    async getLogs(eventName: string, filter = {}, fromBlock = 0): Promise<any[]> {
+        let logs = await this.contract.getPastEvents(eventName, fromBlock);
+        for (const [key, value] of Object.entries(filter)) {
+            logs = logs.filter(log => log.returnValues[key].toLowerCase() === value);
+        }
+        return logs;
+    }
+
     useWallet(wallet: Wallet, keyIndex: number = 0) {
         const key = wallet.keychain[keyIndex];
         return {
