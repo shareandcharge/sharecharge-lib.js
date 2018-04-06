@@ -21,9 +21,12 @@ export class Contract {
         return this.web3.eth.getBalance(key.address);
     }
 
-    async getPastEvents(eventName: string, fromBlock = 0): Promise<any[]> {
-        const options = { fromBlock };
-        return this.native.getPastEvents(eventName, options);
+    async getLogs(eventName: string, filter = {}, fromBlock = 0): Promise<any[]> {
+        let logs = await this.native.getPastEvents(eventName, { fromBlock });
+        for (const [key, value] of Object.entries(filter)) {
+            logs = logs.filter(log => log.returnValues[key].toLowerCase() === value);
+        }
+        return logs;
     }
 
     async call(method: string, ...args: any[]): Promise<any> {
