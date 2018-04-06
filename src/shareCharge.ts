@@ -32,8 +32,16 @@ export class ShareCharge {
         eventPoller.monitor('Charging', this.charging.contract);
         eventPoller.monitor('MSPToken', this.token.contract);
 
-        eventPoller.events.subscribe(events => events.forEach(item =>
-            this.eventDispatcher.dispatchAll(item.event, item.returnValues)
+        eventPoller.events.subscribe(events => events.forEach(item => {
+            const returnValues = {
+                ...item.returnValues,
+                transactionHash: item.transactionHash,
+                blockNumber: item.blockNumber,
+                address: item.address,
+                timestamp: Date.now()
+            };
+            this.eventDispatcher.dispatchAll(item.event, returnValues);
+        }
         ));
     }
 
