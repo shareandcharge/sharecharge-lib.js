@@ -484,14 +484,10 @@ NPM Link for faster local development
 --------------------------------------------------
 Run the following command to create a symlink in the global folder for use later with other projects
 
-``
-npm link
-``
+``npm link``
 
 Followed by this command to link sharecharge-contracts to the local global folder, this acts as a replacement for patch-contracts
 
-``
-npm link sharecharge-contracts
-``
+``npm link sharecharge-contracts``
 
 The above order of linking must be followed otherwise linking won't work!
