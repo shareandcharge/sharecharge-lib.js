@@ -17,7 +17,7 @@ async function main() {
 
     const coinbase = await web3.eth.getCoinbase();
     const contract = new web3.eth.Contract(def.abi, def.address);
-    await contract.methods.mint(wallet2.keychain[0].address, 50).send({ from: coinbase });
+    await contract.methods.mint(wallet2.keychain[0].address, 5000).send({ from: coinbase });
 
 }
 
