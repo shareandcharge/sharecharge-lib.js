@@ -20,13 +20,6 @@ export class TestHelper {
         }
     }
 
-    static async ensureTokens(web3: any, tokenContract: any, key: Key) {
-        const destBalance = 10;
-        const coinbase = await web3.eth.getCoinbase();
-        const receiver = key.address;
-        tokenContract.native.methods["mint"](receiver, destBalance).send({ from: coinbase });
-    }
-
     static async createContract(web3, config, def, args?: any[]) {
         const address = await TestHelper.deployContract(web3, def, args);
         return new Contract(web3, {

@@ -36,6 +36,7 @@ async function main() {
     evse.uid = "FR138E1ETG5578567YU8D";
     evse.stationId = station.id;
     evse.available = true;
+    evse.basePrice = 1;
     const evseId = evse.id;
     await sc.evses.useWallet(wallet).create(evse);
     console.log(`Created new evse with id: ${evseId}`);
@@ -52,9 +53,9 @@ async function main() {
             duration = result.secondsToRent;
             const evse = await sc.evses.getById(evseId);
             if (success) {
-                sc.charging.useWallet(wallet).confirmStart(evse, result.controller);
+                sc.charging.useWallet(wallet).confirmStart(evse);
             } else {
-                sc.charging.useWallet(wallet).error(evse, result.controller, 0x7);
+                sc.charging.useWallet(wallet).error(evse, 0);
             }
         }
     });
@@ -67,9 +68,9 @@ async function main() {
             const success = true;
             const evse = await sc.evses.getById(evseId);
             if (success) {
-                sc.charging.useWallet(wallet).confirmStop(evse, result.controller, start, start + (duration * 1000), 22000);
+                sc.charging.useWallet(wallet).confirmStop(evse, start, start + (duration * 1000), 22000);
             } else {
-                sc.charging.useWallet(wallet).error(evse, result.controller, 0x3);
+                sc.charging.useWallet(wallet).error(evse, 1);
             }
         }
     });

@@ -2,6 +2,7 @@ import { ShareCharge } from '../src/shareCharge';
 import { Evse } from '../src/models/evse';
 import { Wallet } from '../src/models/wallet';
 import { Station } from '../src/models/station';
+import { ToolKit } from '../src/utils/toolKit';
 
 async function main() {
 
@@ -26,7 +27,10 @@ async function main() {
 
     sc.on("ChargeDetailRecord", async (result) => {
         if (result.evseId === selectedevseId && result.controller.toLowerCase() === key.address) {
-            console.log('Received CDR');
+            const currency = ToolKit.hexToString(result.currency);
+            console.log(`Price of charge: ${result.price / 100} ${currency}`);
+            const balance = await sc.token.balance(wallet);
+            console.log(`Remaining balance: ${balance / 100} ${currency}`);
             sc.stopListening();
         }
     });

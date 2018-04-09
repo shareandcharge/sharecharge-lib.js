@@ -90,7 +90,8 @@ describe('ShareCharge', function () {
         await evseContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
         await tokenContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
 
-        await tokenContract.native.methods["mint"](mspKey.address, 3).send({ from: coinbase });
+        // mint 100 euros worth of stable tokens for the msp user
+        await tokenContract.native.methods["mint"](mspKey.address, 10000).send({ from: coinbase });
 
         eventPoller = new EventPoller(config);
     });
@@ -108,6 +109,7 @@ describe('ShareCharge', function () {
         it('should broadcast start confirmed to msp', async () => {
             const evse = new EvseBuilder()
                 .withIsAvailable(true)
+                .withBasePrice(1)
                 .build();
 
             await shareCharge.evses.useWallet(cpoWallet).create(evse);
@@ -124,8 +126,8 @@ describe('ShareCharge', function () {
                 }
             });
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0, 8000);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse, mspKey.address);
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0, 0);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse);
 
             await eventPoller.poll();
 
@@ -135,7 +137,7 @@ describe('ShareCharge', function () {
         });
 
         it('should broadcast stop confirmed to msp', async () => {
-            const evse = new EvseBuilder().build();
+            const evse = new EvseBuilder().withBasePrice(1).build();
             await shareCharge.evses.useWallet(cpoWallet).create(evse);
 
             let evseId = "";
@@ -150,10 +152,10 @@ describe('ShareCharge', function () {
                 }
             });
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60, 0);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse, mspKey.address);
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0, 0);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse);
             await shareCharge.charging.useWallet(mspWallet).requestStop(evse);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStop(evse, mspKey.address, Date.now(), Date.now() + 60, 18000);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStop(evse, Date.now(), Date.now() + 3600, 18000);
 
             await eventPoller.poll();
 
@@ -163,7 +165,7 @@ describe('ShareCharge', function () {
         });
 
         it('should broadcast error to msp', async () => {
-            const evse = new EvseBuilder().build();
+            const evse = new EvseBuilder().withBasePrice(1).build();
             await shareCharge.evses.useWallet(cpoWallet).create(evse);
 
             let evseId = "";
@@ -179,8 +181,8 @@ describe('ShareCharge', function () {
                 }
             });
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 10, 0);
-            await shareCharge.charging.useWallet(cpoWallet).error(evse, mspKey.address, 0);
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0, 0);
+            await shareCharge.charging.useWallet(cpoWallet).error(evse, 0);
 
             await eventPoller.poll();
 
@@ -192,7 +194,7 @@ describe('ShareCharge', function () {
 
 
         it('should broadcast charge stop requested to cpo', async () => {
-            const evse = new EvseBuilder().build();
+            const evse = new EvseBuilder().withBasePrice(1).build();
             await shareCharge.evses.useWallet(cpoWallet).create(evse);
 
             let evseId = "";
@@ -203,8 +205,8 @@ describe('ShareCharge', function () {
                 }
             });
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60, 0);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse, mspKey.address);
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0, 0);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse);
             await shareCharge.charging.useWallet(mspWallet).requestStop(evse);
 
             await eventPoller.poll();
@@ -213,7 +215,7 @@ describe('ShareCharge', function () {
         });
 
         it('should broadcast charge start requested to cpo', async () => {
-            const evse = new EvseBuilder().build();
+            const evse = new EvseBuilder().withBasePrice(1).build();
             await shareCharge.evses.useWallet(cpoWallet).create(evse);
 
             let evseId = "";
@@ -226,7 +228,7 @@ describe('ShareCharge', function () {
                 }
             });
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60, 0);
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0, 0);
 
             await eventPoller.poll();
 
@@ -246,7 +248,7 @@ describe('ShareCharge', function () {
                 evseUpdatedId = result.evseId;
             });
 
-            const evse = new EvseBuilder().build();
+            const evse = new EvseBuilder().withBasePrice(1).build();
 
             await shareCharge.evses.useWallet(cpoWallet).create(evse);
 
@@ -294,14 +296,14 @@ describe('ShareCharge', function () {
     context('#GetLogs()', () => {
 
         it('should retrieve all contract events of a particular type', async () => {
-            const evse = new EvseBuilder().build();
+            const evse = new EvseBuilder().withBasePrice(1).build();
             await shareCharge.evses.useWallet(cpoWallet).create(evse);
 
             const logsBefore = await shareCharge.charging.contract.getLogs('StartRequested');
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60, 0);
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60, 0);
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60, 0);
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0, 0);
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0, 0);
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0, 0);
 
             const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested');
             expect(logsAfter.length).to.equal(logsBefore.length + 3);
@@ -309,23 +311,23 @@ describe('ShareCharge', function () {
         });
 
         it('should filter contract events', async () => {
-            const evse = new EvseBuilder().build();
+            const evse = new EvseBuilder().withBasePrice(1).build();
             await shareCharge.evses.useWallet(cpoWallet).create(evse);
 
             const logsBefore = await shareCharge.charging.contract.getLogs('StartRequested');
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60, 0);
-            await shareCharge.charging.useWallet(cpoWallet).requestStart(evse, 60, 0);
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60, 0);
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0, 0);
+            await shareCharge.charging.useWallet(cpoWallet).requestStart(evse, 0, 0);
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0, 0);
 
             const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', { controller: mspWallet.keychain[0].address });
             expect(logsAfter.length).to.equal(logsBefore.length + 2);
         });
 
         it('should return gasUsed and timestamp', async () => {
-            const evse = new EvseBuilder().build();
+            const evse = new EvseBuilder().withBasePrice(1).build();
             await shareCharge.evses.useWallet(cpoWallet).create(evse);
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 60, 0);
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0, 0);
 
             const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', { controller: mspWallet.keychain[0].address });
             expect(logsAfter[0].gasUsed).to.not.be.undefined;

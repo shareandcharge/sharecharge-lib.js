@@ -14,25 +14,25 @@ export class ChargingService {
     useWallet(wallet: Wallet, keyIndex: number = 0) {
         const key = wallet.keychain[keyIndex];
         return {
-            requestStart: async (evse: Evse, secondsToRent: number, energyToRent: number) => {
+            requestStart: async (evse: Evse, secondsToRent: number, kwhToRent: number) => {
                 const contract = this.contract;
-                await contract.send("requestStart", [evse.id, secondsToRent, energyToRent], key);
+                await contract.send("requestStart", [evse.id, secondsToRent, kwhToRent], key);
             },
-            confirmStart: async (evse: Evse, controller: string) => {
+            confirmStart: async (evse: Evse) => {
                 const contract = this.contract;
-                await contract.send("confirmStart", [evse.id, controller], key);
+                await contract.send("confirmStart", [evse.id], key);
             },
             requestStop: async (evse: Evse) => {
                 const contract = this.contract;
                 await contract.send("requestStop", [evse.id], key);
             },
-            confirmStop: async (evse: Evse, controller: string, startTime: number, stopTime: number, totalEnergy: number) => {
+            confirmStop: async (evse: Evse, startTime: number, stopTime: number, totalEnergy: number) => {
                 const contract = this.contract;
-                await contract.send("confirmStop", [evse.id, controller, startTime, stopTime, totalEnergy], key);
+                await contract.send("confirmStop", [evse.id, startTime, stopTime, totalEnergy], key);
             },
-            error: async (evse: Evse, controller: string, errorCode: number) => {
+            error: async (evse: Evse, errorCode: number) => {
                 const contract = this.contract;
-                await contract.send("logError", [evse.id, controller, errorCode], key);
+                await contract.send("logError", [evse.id, errorCode], key);
             }
         };
     }
