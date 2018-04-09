@@ -415,9 +415,9 @@ The following events are subscribable:
 
     Request a stop at a evse
 
-- ``useWallet(wallet: Wallet).confirmStop(evse: Evse)``
+- ``useWallet(wallet: Wallet).confirmStop(evse: Evse, startTime: number, stopTime: number, energyRented: number)``
 
-    Confirm a stop on a evse.
+    Confirm a stop on a evse with given CDR parameters.
 
 - ``useWallet(wallet: Wallet).error(evse: Evse, errorCode: number)``
 
