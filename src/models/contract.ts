@@ -24,7 +24,7 @@ export class Contract {
     async getLogs(eventName: string, filter = {}, fromBlock = 0): Promise<any[]> {
         let logs = await this.native.getPastEvents(eventName, { fromBlock });
         for (const [key, value] of Object.entries(filter)) {
-            logs = logs.filter(log => log.returnValues[key].toLowerCase() === value)
+            logs = logs.filter(log => log.returnValues[key].toLowerCase() === value);
         }
         return Promise.all(logs.map(async filtered => {
             const receipt = await this.web3.eth.getTransactionReceipt(filtered.transactionHash);
