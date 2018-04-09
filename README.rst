@@ -19,19 +19,23 @@ An Ethereum client should be running in the background. A popular choice for dev
     ganache-cli
 
 
-**sharecharge-contracts**
+..
 
-The Share & Charge library depends on `sharecharge-contracts <https://github.com/motionwerkGmbH/sharecharge-contracts>`__. These are Ethereum smart contracts which enable the storing of Charing Poles on the Share & Charge EV network as well as interacting with them, for example, initiating charging sessions. This repository also provides a configuration for the aforementioned ``geth`` in development mode which can be run using ``npm run geth-dev``. The setup instructions for the smart contracts are as follows:
+    **sharecharge-contracts**
 
-::
+    The Share & Charge library depends on `sharecharge-contracts <https://github.com/motionwerkGmbH/sharecharge-contracts>`__. These are Ethereum smart contracts which enable the storing of Charing Poles on the Share & Charge EV network as well as interacting with them, for example, initiating charging sessions. This repository also provides a configuration for the aforementioned ``geth`` in development mode which can be run using ``npm run geth-dev``. The setup instructions for the smart contracts are as follows:
 
-    git clone git@github.com:motionwerkGmbH/sharecharge-contracts.git
-    cd sharecharge-contracts
-    npm install
-    truffle migrate
+    ::
+
+        git clone git@github.com:motionwerkGmbH/sharecharge-contracts.git
+        cd sharecharge-contracts
+        npm install
+        truffle migrate
 
 
-This should output the definitions of the contracts to ``$HOME/.sharecharge/contract.defs.<ENV>.json``. This file is necessary to run the library against the correct version of the smart contracts.
+    This should output the definitions of the contracts to ``$HOME/.sharecharge/contract.defs.<ENV>.json``. This file is necessary to run the library against the correct version of the smart contracts.
+
+..
 
 **sharecharge-lib**
 
@@ -40,6 +44,7 @@ This should output the definitions of the contracts to ``$HOME/.sharecharge/cont
     git clone git@github.com:motionwerkGmbH/sharecharge-lib.git
     cd sharecharge-lib
     npm install
+    npm run patch-contract
     npm test
 
 Assuming the tests passed, the library is now ready to interact with the Share & Charge EV Network.
@@ -110,9 +115,8 @@ The module requires a configuration object which lets the library know how to in
 
     import { ShareCharge, Station, Evse } from 'sharecharge-lib';
 
-    const sc = new ShareCharge(config);
+    const sc = ShareCharge.getInstance();
     const wallet = new Wallet('seed');
-
 
     // initialise new station
     const station = new Station();
@@ -120,14 +124,12 @@ The module requires a configuration object which lets the library know how to in
     // set parameters
     station.latitude = 52.6743;
 
-    // create the station on the network
-    sc.stations.useWallet(wallet).create(station);
-
     // initialise new evse
     const evse = new Evse();
 
-    // link the evse to the station
-    evse.stationId = station.id;
+    // set up evse
+    evse.currency = 'EUR';
+    evse.basePrice = 1.50;
 
     // create the evse on the network
     sc.evses.useWallet(wallet).create(evse);
@@ -144,16 +146,16 @@ The module requires a configuration object which lets the library know how to in
         sc.charging.useWallet(wallet).requestStart(evse, 5);
 
         // confirm to the network that the charge started
-        sc.charging.useWallet(wallet).confirmStart(evse, addressOfDriver);
+        sc.charging.useWallet(wallet).confirmStart(evse);
 
         // request stop at the evse
         sc.charging.useWallet(wallet).requestStop(evse);
 
         // confirm to the network that the charge stopped
-        sc.charging.useWallet(wallet).confirmStop(evse, addressOfDriver);
+        sc.charging.useWallet(wallet).confirmStop(evse);
 
         // notify network of error during charge session
-        await sc.charging.useWallet(wallet).error(evse, controller, 1 /* error code*/);
+        await sc.charging.useWallet(wallet).error(evse, 1 /* error code*/);
 
     });
 
@@ -173,8 +175,8 @@ The module requires a configuration object which lets the library know how to in
 
         // obtain values from StartRequested Event
         const evseId = request.evseId;
-        const driver = request.controller;
         const secondsToRent = request.secondsToRent;
+        const kwhToRent = request.kwhToRent;
 
         // filter by evseId
         if (myListOfEvses.includes(evseId)) {
@@ -185,7 +187,7 @@ The module requires a configuration object which lets the library know how to in
             const evse = await sc.evses.getById(evseId);
 
             // if start was successful, send a confirmation to the network
-            await sc.charging.useWallet(wallet).confirmStart(evse, controller);
+            await sc.charging.useWallet(wallet).confirmStart(evse);
         }
 
     });
@@ -254,6 +256,10 @@ The following events are subscribable:
 
         The time to charge in seconds specified by the driver
 
+    - ``kwhToRent``
+
+        The number of kWh the driver has specified, should the EVSE be kWh based
+
 - ``StartConfirmed``
 
     Broadcast when a CPO has successfully confirmed a charging session
@@ -296,6 +302,41 @@ The following events are subscribable:
 
         The Ethereum address of the driver whose charging session has ended
 
+
+- ``ChargeDetailRecord``
+
+    Broadcast when a CPO has succesfully confirmed the end of charging session
+    
+    Values:
+
+    - ``startTime``
+
+        In Unix timestamp format
+
+    - ``stopTime``
+
+        In Unix timestamp format
+
+    - ``evseId``
+
+        The blockchain specific id of the EVSE
+
+    - ``controller``
+
+        The Ethereum address of the driver whose charging session has ended
+
+    - ``currency``
+
+        ISO 4217 3-character currency code e.g. 'EUR'
+
+    - ``price``
+
+        The final price paid for the charge
+
+    - ``totalEnergy``
+
+        The energy consumed during the charge in Watts
+
 - ``Error``
 
     Broadcast when a CPO has successfully notified the network that a charge failed
@@ -326,10 +367,6 @@ The following events are subscribable:
 
     Returns station object for given unique station identifier
 
-- ``isPersisted(station: Station)``
-
-    Returns true if station exists on network
-
 - ``useWallet(wallet: Wallet).create(station: Station)``
 
     Creates station on network
@@ -354,10 +391,6 @@ The following events are subscribable:
 
     Returns true if any evse on the station is available
 
-- ``isPersisted(evse: Evse)``
-
-    Returns true if evse exists on network
-
 - ``useWallet(wallet: Wallet).create(evse: Evse)``
 
     Creates evse on network
@@ -374,21 +407,21 @@ The following events are subscribable:
 
     Request a start at a evse for a specified number of seconds
 
-- ``useWallet(wallet: Wallet).confirmStart(evse: Evse, controller: string)``
+- ``useWallet(wallet: Wallet).confirmStart(evse: Evse)``
 
-    Confirm a start on a evse for a certain driver. The controller (driver) will be broadcast in the StartRequested event.
+    Confirm a start on a evse.
 
 - ``useWallet(wallet: Wallet).requestStop(evse: Evse)``
 
     Request a stop at a evse
 
-- ``useWallet(wallet: Wallet).confirmStop(evse: Evse, controller, string)``
+- ``useWallet(wallet: Wallet).confirmStop(evse: Evse)``
 
-    Confirm a stop on a evse for a certain driver. The controller (driver) will be broadcast in the StopRequested event.
+    Confirm a stop on a evse.
 
-- ``useWallet(wallet: Wallet).error(evse: Evse, controller: string, errorCode: number)``
+- ``useWallet(wallet: Wallet).error(evse: Evse, errorCode: number)``
 
-    Notify the network that an error occurred with the charging session for a given evse and controller. Error codes are TBC.
+    Notify the network that an error occurred with the charging session for a given evse. Error codes are TBC.
 
 ----
 
@@ -451,18 +484,25 @@ The Evse module allows you to build evse objects. They are configurable but are 
     const evse = new Evse();
 
     // set a parameter
-    evse.stationId = '0x01';
+    evse.currency = 'EUR';
 
     // get a parameter
-    evse.stationId
-    // '0x01'
+    evse.currency
+    // 'EUR'
 
 
 Properties:
 
+    private _tariffId: number = Tariff.FLAT;
+    private _available: boolean = true;
+
 - ``id [string]``
 
     Unique identifier of the evse (generated by Share & Charge)
+
+- ``uid [string]``
+
+    Unique identifier for CPO and MPS
 
 - ``owner [string]``
 
@@ -472,9 +512,17 @@ Properties:
 
     The unique identifier of the station that the evse belongs to
 
-- ``plugMask [number]``
+- ``currency [string]``
 
-    A mask of plug types supported by the evse (TODO: plugMask format documentation)
+    ISO 4217 compliant currency code
+
+- ``basePrice [number]``
+
+    Floating point number in highest denomination of currency (i.e. 1.50 EUR) denoting price per hour or per kwh.
+
+- ``tariffId [number]``
+
+    Enum value for tariff type (0 = kWh; 1 = flat; 2 = parking; 3 = time). [TODO: Tariff enum interface)
 
 - ``available [boolean]``
 
