@@ -54,9 +54,7 @@ export class EvseService {
         return result;
     }
 
-    async
-
-    useWallet(wallet: Wallet, keyIndex: number = 0) {
+    async useWallet(wallet: Wallet, keyIndex: number = 0) {
         const key = wallet.keychain[keyIndex];
         return {
             create: this.create(key),
