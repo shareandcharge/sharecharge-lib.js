@@ -68,7 +68,7 @@ async function main() {
             const success = true;
             const evse = await sc.evses.getById(evseId);
             if (success) {
-                sc.charging.useWallet(wallet).confirmStop(evse, start, start + (duration * 1000), 22000);
+                sc.charging.useWallet(wallet).confirmStop(evse, start, start + (duration * 1000), 18);
             } else {
                 sc.charging.useWallet(wallet).error(evse, 1);
             }

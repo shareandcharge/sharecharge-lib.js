@@ -38,7 +38,7 @@ export class EvseService {
         return evses;
     }
 
-    async getSession(evse: Evse): Promise<string> {
+    async getSession(evse: Evse): Promise<{ controller: string, sessionPrice: number }> {
         const result = await this.contract.call("getSessionById", evse.id);
         return result;
     }
