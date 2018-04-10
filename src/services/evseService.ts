@@ -8,7 +8,7 @@ import { Key } from '../models/key';
 
 export class EvseService {
 
-    public readonly contract;
+    public readonly contract: Contract;
 
     constructor(private contractProvider: ContractProvider) {
         this.contract = this.contractProvider.obtain('EvseStorage');
