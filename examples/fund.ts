@@ -3,7 +3,7 @@ import { Key } from '../src/models/key';
 import { TestHelper } from '../test/testHelper';
 
 const Web3 = require('web3');
-const def = require('../node_modules/sharecharge-contracts/contract.defs.local.json').MSPToken;
+const def = require('../node_modules/@motionwerk/sharecharge-contracts/contract.defs.local.json').MSPToken;
 
 async function main() {
 
