@@ -77,7 +77,7 @@ export class Evse {
         evse._stationId = payload["stationId"];
         evse._currency = ToolKit.hexToString(payload["currency"]);
         evse._basePrice = payload["basePrice"] / 100;
-        evse._tariffId = payload["tariffId"];
+        evse._tariffId = parseInt(payload["tariffId"]);
         evse._available = payload["available"];
         return evse;
     }
