@@ -15,9 +15,9 @@ export class ContractProvider {
         this.definitions = ToolKit.contractDefsForStage(config.stage);
     }
 
-    obtain(key: string): Contract {
-        const contractDef = this.definitions[key];
-        if (key == 'MSPToken') {
+    obtain(contractDefKey: string): Contract {
+        const contractDef = this.definitions[contractDefKey];
+        if (contractDefKey == 'MSPToken') {
             contractDef.address = this.config.tokenAddress;
         }
         return new Contract(this.web3, {
@@ -44,6 +44,5 @@ export class ContractProvider {
         this.config.tokenAddress = receipt.contractAddress;
         return this.obtain(contractDefKey);
     }
-
 
 }
