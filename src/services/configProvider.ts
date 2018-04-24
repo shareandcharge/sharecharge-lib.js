@@ -4,7 +4,7 @@ export class ConfigProvider {
     public readonly provider: string;
     public readonly gasPrice: number;
     public readonly pollingInterval: number;
-    public readonly tokenAddress: string;
+    public tokenAddress: string;
 
     constructor(config: any = {}) {
         this.stage = config.stage || 'local';
