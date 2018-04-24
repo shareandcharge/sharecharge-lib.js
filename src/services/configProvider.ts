@@ -4,11 +4,13 @@ export class ConfigProvider {
     public readonly provider: string;
     public readonly gasPrice: number;
     public readonly pollingInterval: number;
+    public readonly tokenAddress: string;
 
     constructor(config: any = {}) {
         this.stage = config.stage || 'local';
         this.provider = config.provider || 'http://localhost:8545';
         this.gasPrice = config.gasPrice || 18000000000;
         this.pollingInterval = config.pollingInterval || 1000;
+        this.tokenAddress = config.tokenAddress || "";
     }
 }
