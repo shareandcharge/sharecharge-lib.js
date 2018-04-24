@@ -15,14 +15,13 @@ describe('TokenService', function () {
 
     const defs = ToolKit.contractDefsForStage(config.stage);
 
-    let tokenService: TokenService, wallet: Wallet, contract: Contract, web3, coinbase;
+    let tokenService: TokenService, wallet: Wallet, contract: Contract, web3;
 
     wallet = Wallet.generate().wallet;
 
     before(async () => {
         web3 = new Web3(config.provider);
-        TestHelper.ensureFunds(web3, wallet.keychain[0]);
-        coinbase = await web3.eth.getCoinbase();
+        await TestHelper.ensureFunds(web3, wallet.keychain[0]);
     });
 
     beforeEach(async () => {
