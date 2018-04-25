@@ -14,9 +14,9 @@ export class ChargingService {
     useWallet(wallet: Wallet, keyIndex: number = 0) {
         const key = wallet.keychain[keyIndex];
         return {
-            requestStart: async (evse: Evse, secondsToRent: number, kwhToRent: number) => {
+            requestStart: async (evse: Evse, estimatedPrice: number) => {
                 const contract = this.contract;
-                await contract.send("requestStart", [evse.id, secondsToRent, kwhToRent], key);
+                await contract.send("requestStart", [evse.id, estimatedPrice], key);
             },
             confirmStart: async (evse: Evse) => {
                 const contract = this.contract;
