@@ -29,7 +29,7 @@ async function main() {
         if (result.evseId === selectedevseId && result.controller.toLowerCase() === key.address) {
             const currency = ToolKit.hexToString(result.currency);
             console.log(`Price of charge: ${result.price / 100} ${currency}`);
-            const balance = await sc.token.balance(wallet);
+            const balance = await sc.token.balance(wallet.keychain[0].address);
             console.log(`Remaining balance: ${balance / 100} ${currency}`);
             sc.stopListening();
         }

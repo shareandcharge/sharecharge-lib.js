@@ -27,9 +27,13 @@ export class TokenService {
                 this.contract = await this.contractProvider.deploy('MSPToken', [name, symbol], key);
                 return this.contract.native.options.address;
             },
-            mint: async(address: string, value: number): Promise<void> => {
+            setAccess: async (chargingContractAddress: string): Promise<any> => {
                 const key = wallet.keychain[keyIndex];
-                await this.contract.send('mint', [address, value], key);
+                return this.contract.send('setAccess', [chargingContractAddress], key);
+            },
+            mint: async(address: string, value: number): Promise<any> => {
+                const key = wallet.keychain[keyIndex];
+                return this.contract.send('mint', [address, value], key);
             }
         };
     }
