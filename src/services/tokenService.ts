@@ -11,6 +11,10 @@ export class TokenService {
         this.contract = this.contractProvider.obtain('MSPToken');
     }
 
+    get address(): string {
+        return this.contract.native.options.address;
+    }
+
     async getName(): Promise<string> {
         return this.contract.call('name');
     }
@@ -33,7 +37,7 @@ export class TokenService {
             deploy: async (name: string, symbol: string): Promise<string> => {
                 const key = wallet.keychain[keyIndex];
                 this.contract = await this.contractProvider.deploy('MSPToken', [name, symbol], key);
-                return this.contract.native.options.address;
+                return this.address;
             },
             setAccess: async (chargingContractAddress: string): Promise<any> => {
                 const key = wallet.keychain[keyIndex];

@@ -17,8 +17,8 @@ export class ContractProvider {
 
     obtain(contractDefKey: string): Contract {
         const contractDef = this.definitions[contractDefKey];
-        if (contractDefKey == 'MSPToken') {
-            contractDef.address = this.config.tokenAddress;
+        if (contractDefKey === 'MSPToken') {
+            contractDef.address = this.config.tokenAddress || contractDef.address;
         }
         return new Contract(this.web3, {
             abi: contractDef.abi,

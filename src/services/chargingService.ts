@@ -11,28 +11,32 @@ export class ChargingService {
         this.contract = this.contractProvider.obtain('Charging');
     }
 
+    get address(): string {
+        return this.contract.native.options.address;
+    }
+
     useWallet(wallet: Wallet, keyIndex: number = 0) {
         const key = wallet.keychain[keyIndex];
         return {
-            requestStart: async (evse: Evse, estimatedPrice: number) => {
+            requestStart: async (evse: Evse, tokenAddress: string, estimatedPrice: number) => {
                 const contract = this.contract;
-                await contract.send("requestStart", [evse.id, estimatedPrice], key);
+                return contract.send("requestStart", [evse.id, tokenAddress, estimatedPrice], key);
             },
             confirmStart: async (evse: Evse) => {
                 const contract = this.contract;
-                await contract.send("confirmStart", [evse.id], key);
+                return contract.send("confirmStart", [evse.id], key);
             },
             requestStop: async (evse: Evse) => {
                 const contract = this.contract;
-                await contract.send("requestStop", [evse.id], key);
+                return contract.send("requestStop", [evse.id], key);
             },
             confirmStop: async (evse: Evse) => {
                 const contract = this.contract;
-                await contract.send("confirmStop", [evse.id], key);
+                return contract.send("confirmStop", [evse.id], key);
             },
             chargeDetailRecord: async (evse: Evse, finalPrice: number) => {
                 const contract = this.contract;
-                await contract.send("chargeDetailRecord", [evse.id, finalPrice], key);
+                return contract.send("chargeDetailRecord", [evse.id, finalPrice], key);
             },
             error: async (evse: Evse, errorCode: number) => {
                 const contract = this.contract;

@@ -26,7 +26,7 @@ describe('TokenService', function () {
 
     beforeEach(async () => {
         contract = await TestHelper.createContract(web3, config, defs["MSPToken"], ["MSPToken", "MSP"]);
-        tokenService = new TokenService(new ContractProvider(new ConfigProvider()));
+        tokenService = new TokenService(new ContractProvider(new ConfigProvider({ tokenAddress: contract.address })));
     });
 
     it('should deploy new MSP token', async () => {

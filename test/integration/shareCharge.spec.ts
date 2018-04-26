@@ -33,13 +33,19 @@ describe('ShareCharge', function () {
 
     const seed1 = 'filter march urge naive sauce distance under copy payment slow just warm';
     const seed2 = 'filter march urge naive sauce distance under copy payment slow just cool';
+    const seed3 = 'filter march urge naive sauce distance under copy payment slow just cold';
 
-    let shareCharge: ShareCharge, cpoWallet: Wallet, cpoKey: Key, mspWallet: Wallet, mspKey: Key, web3;
+    let shareCharge: ShareCharge;
+    let cpoWallet: Wallet, cpoKey: Key;
+    let mspWallet: Wallet, mspKey: Key;
+    let driverWallet: Wallet, driverKey: Key;
     let stationService: StationService;
     let evseService: EvseService;
     let chargingService: ChargingService;
     let tokenService: TokenService;
+    let tokenAddress: string;
     let eventPoller: EventPoller;
+    let web3;
 
     before(async () => {
 
@@ -51,9 +57,12 @@ describe('ShareCharge', function () {
         mspWallet = new Wallet(seed2);
         mspKey = mspWallet.keychain[0];
 
+        driverWallet = new Wallet(seed3);
+        driverKey = driverWallet.keychain[0];
 
         await TestHelper.ensureFunds(web3, cpoKey);
         await TestHelper.ensureFunds(web3, mspKey);
+        await TestHelper.ensureFunds(web3, driverKey);
 
         const coinbase = await web3.eth.getCoinbase();
 
@@ -78,27 +87,21 @@ describe('ShareCharge', function () {
             }
         });
 
-        const tokenContract = await TestHelper.createContract(web3, config, contractDefs["MSPToken"], ["MSPToken", "MSP"]);
-        tokenService = new TokenService(<ContractProvider>{
-            obtain(key: string): Contract {
-                return tokenContract;
-            }
-        });
+        const tokenContract = await TestHelper.createContract(web3, config, contractDefs["MSPToken"], ["S&C Token", "SCT"]);
+        tokenService = new TokenService(new ContractProvider(new ConfigProvider({ tokenAddress: tokenContract.address })));
 
         await chargingContract.native.methods["setEvsesAddress"](evseContract.address).send({ from: coinbase });
-        await chargingContract.native.methods["setTokenAddress"](tokenContract.address).send({ from: coinbase });
-
         await evseContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
-        await tokenContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
-
-        // mint 100 euros worth of stable tokens for the msp user
-        await tokenContract.native.methods["mint"](mspKey.address, 10000).send({ from: coinbase });
 
         eventPoller = new EventPoller(config);
+
+        shareCharge = new ShareCharge(stationService, evseService, chargingService, tokenService, eventPoller);
+        tokenAddress = await shareCharge.token.useWallet(mspWallet).deploy('MSP Token', 'MSP');
+        await shareCharge.token.useWallet(mspWallet).setAccess(shareCharge.charging.address);
+        await shareCharge.token.useWallet(mspWallet).mint(driverKey.address, 1000);
     });
 
     beforeEach(async () => {
-        shareCharge = new ShareCharge(stationService, evseService, chargingService, tokenService, eventPoller);
     });
 
     afterEach(async () => {
@@ -110,7 +113,6 @@ describe('ShareCharge', function () {
         it('should broadcast start confirmed to msp', async () => {
             const evse = new EvseBuilder()
                 .withIsAvailable(true)
-                .withBasePrice(1)
                 .build();
 
             await shareCharge.evses.useWallet(cpoWallet).create(evse);
@@ -120,21 +122,20 @@ describe('ShareCharge', function () {
 
             await shareCharge.on("StartConfirmed", async (result) => {
                 if (result.evseId === evse.id
-                    && result.controller.toLowerCase() === mspKey.address) {
+                    && result.controller.toLowerCase() === driverKey.address) {
 
                     evseId = result.evseId;
                     controller = result.controller;
                 }
             });
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, tokenAddress, 100);
             await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse);
 
             await eventPoller.poll();
 
             expect(evseId).to.equal(evse.id);
-            expect(controller.toLowerCase()).to.equal(mspKey.address);
-
+            expect(controller.toLowerCase()).to.equal(driverKey.address);
         });
 
         it('should broadcast stop confirmed to msp', async () => {
@@ -148,7 +149,7 @@ describe('ShareCharge', function () {
 
             await shareCharge.on("StopConfirmed", async (result) => {
                 if (result.evseId === evse.id
-                    && result.controller.toLowerCase() === mspKey.address) {
+                    && result.controller.toLowerCase() === driverKey.address) {
 
                     evseId = result.evseId;
                     controller = result.controller;
@@ -156,31 +157,31 @@ describe('ShareCharge', function () {
             });
 
             await shareCharge.on("ChargeDetailRecord", async (result) => {
-                cdr = result.id;
+                cdr = result.evseId;
                 finalPrice = result.finalPrice;
             });
-            
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 300);
-            
+
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 300);
+
             await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse);
-            await shareCharge.charging.useWallet(mspWallet).requestStop(evse);
+            await shareCharge.charging.useWallet(driverWallet).requestStop(evse);
             await shareCharge.charging.useWallet(cpoWallet).confirmStop(evse);
-            
+
             await eventPoller.poll();
-            
+
             await shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord(evse, finalPrice);
             await eventPoller.poll();
-        
+
             expect(evseId).to.equal(evse.id);
-            expect(controller.toLowerCase()).to.equal(mspKey.address);
-            
+            expect(controller.toLowerCase()).to.equal(driverKey.address);
+
             expect(cdr).to.equal(evse.id);
             expect(Number(finalPrice)).to.equal(200);
-            
+
         });
 
         it('should broadcast error to msp', async () => {
-            const evse = new EvseBuilder().withBasePrice(1).build();
+            const evse = new EvseBuilder().build();
             await shareCharge.evses.useWallet(cpoWallet).create(evse);
 
             let evseId = "";
@@ -189,20 +190,20 @@ describe('ShareCharge', function () {
 
             await shareCharge.on("Error", async (result) => {
                 if (result.evseId === evse.id
-                    && result.controller.toLowerCase() === mspKey.address) {
+                    && result.controller.toLowerCase() === driverKey.address) {
                     evseId = result.evseId;
                     controller = result.controller;
                     errorCode = parseInt(result.errorCode);
                 }
             });
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 0);
             await shareCharge.charging.useWallet(cpoWallet).error(evse, 0);
 
             await eventPoller.poll();
 
             expect(evseId).to.equal(evse.id);
-            expect(controller.toLowerCase()).to.equal(mspKey.address);
+            expect(controller.toLowerCase()).to.equal(driverKey.address);
             expect(errorCode).to.equal(0);
 
         });
@@ -220,9 +221,9 @@ describe('ShareCharge', function () {
                 }
             });
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 0);
             await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse);
-            await shareCharge.charging.useWallet(mspWallet).requestStop(evse);
+            await shareCharge.charging.useWallet(driverWallet).requestStop(evse);
 
             await eventPoller.poll();
 
@@ -243,12 +244,12 @@ describe('ShareCharge', function () {
                 }
             });
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 0);
 
             await eventPoller.poll();
 
             expect(evseId).to.equal(evse.id);
-            expect(controller.toLowerCase()).to.equal(mspKey.address);
+            expect(controller.toLowerCase()).to.equal(driverKey.address);
         });
 
         it('should broadcast evse created and updated events', async () => {
@@ -316,9 +317,9 @@ describe('ShareCharge', function () {
 
             const logsBefore = await shareCharge.charging.contract.getLogs('StartRequested');
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0);
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0);
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 0);
 
             const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested');
             expect(logsAfter.length).to.equal(logsBefore.length + 3);
@@ -331,20 +332,20 @@ describe('ShareCharge', function () {
 
             const logsBefore = await shareCharge.charging.contract.getLogs('StartRequested');
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0);
-            await shareCharge.charging.useWallet(cpoWallet).requestStart(evse, 0);
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(cpoWallet).requestStart(evse, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 0);
 
-            const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', { controller: mspWallet.keychain[0].address });
+            const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', { controller: driverKey.address });
             expect(logsAfter.length).to.equal(logsBefore.length + 2);
         });
 
         it('should return gasUsed and timestamp', async () => {
             const evse = new EvseBuilder().withBasePrice(1).build();
             await shareCharge.evses.useWallet(cpoWallet).create(evse);
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 0);
 
-            const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', { controller: mspWallet.keychain[0].address });
+            const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', { controller: driverKey.address });
             expect(logsAfter[0].gasUsed).to.not.be.undefined;
             expect(logsAfter[0].timestamp).to.not.be.undefined;
         });

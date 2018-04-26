@@ -13,6 +13,7 @@ const sc: ShareCharge = ShareCharge.getInstance({ tokenAddress: '' });
 
 const cpoWallet = new Wallet('filter march urge naive sauce distance under copy payment slow just warm');
 const mspWallet = new Wallet('filter march urge naive sauce distance under copy payment slow just cool');
+const driverWallet = new Wallet('filter march urge naive sauce distance under copy payment slow just cold');
 
 // no token currently - will throw error when interacting with it
 // sc.token.balance(wallet.keychain[0].address).then(console.log).catch(err => console.log('error obtaining balance'));
@@ -21,7 +22,8 @@ sc.token.useWallet(mspWallet).deploy("GenericMSPToken", "GMT")
     .then(async (address) => {
         await TestHelper.ensureFunds(web3, cpoWallet.keychain[0]);
         await TestHelper.ensureFunds(web3, mspWallet.keychain[0]);
-        console.log('Funded CPO and MSP wallets');
+        await TestHelper.ensureFunds(web3, driverWallet.keychain[0]);
+        console.log('Funded CPO, MSP and driver wallets');
 
         console.log(`MSPToken Contract created at ${address}`);
 
