@@ -20,13 +20,20 @@ const mspWallet = new Wallet('filter march urge naive sauce distance under copy 
 sc.token.useWallet(mspWallet).deploy("GenericMSPToken", "GMT")
     .then(async (address) => {
         await TestHelper.ensureFunds(web3, cpoWallet.keychain[0]);
-        console.log('Funded CPO Wallet');
         await TestHelper.ensureFunds(web3, mspWallet.keychain[0]);
-        console.log('Funded MSP Wallet');
+        console.log('Funded CPO and MSP wallets');
 
         console.log(`MSPToken Contract created at ${address}`);
-        const owner = await sc.token.owner();
-        console.log(`Owner of MSPToken: ${owner}`);
+
+        const owner = await sc.token.getOwner();
+        console.log(`Owner:\t${owner}`);
+
+        const name = await sc.token.getName();
+        console.log(`Name:\t${name}`);
+
+        const symbol = await sc.token.getSymbol();
+        console.log(`Symbol:\t${symbol}`);
+
         await sc.token.useWallet(mspWallet).setAccess(chargingAddress);
         console.log('Granted Charging Contract access to MSP Token');
     }).catch(err => {

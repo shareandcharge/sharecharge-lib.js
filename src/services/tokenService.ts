@@ -11,11 +11,19 @@ export class TokenService {
         this.contract = this.contractProvider.obtain('MSPToken');
     }
 
-    async owner(): Promise<string> {
+    async getName(): Promise<string> {
+        return this.contract.call('name');
+    }
+
+    async getSymbol(): Promise<string> {
+        return this.contract.call('symbol');
+    }
+
+    async getOwner(): Promise<string> {
         return this.contract.call('owner');
     }
 
-    async balance(address: string): Promise<number> {
+    async getBalance(address: string): Promise<number> {
         const result = await this.contract.call("balanceOf", address);
         return parseInt(result);
     }

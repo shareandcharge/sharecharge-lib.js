@@ -32,7 +32,7 @@ describe('TokenService', function () {
     it('should deploy new MSP token', async () => {
         const address = await tokenService.useWallet(wallet).deploy('My special MSP Token', 'MSP');
         expect(address).to.not.equal(undefined);
-        const owner = await tokenService.owner();
+        const owner = await tokenService.getOwner();
         expect(owner.toLowerCase()).to.equal(wallet.keychain[0].address);
     });
 
@@ -41,7 +41,7 @@ describe('TokenService', function () {
         const address = wallet2.keychain[0].address;
         await tokenService.useWallet(wallet).deploy('My special MSP Token', 'MSP');
         await tokenService.useWallet(wallet).mint(address, 10);
-        const balance = await tokenService.balance(address);
+        const balance = await tokenService.getBalance(address);
         expect(balance).to.equal(10);
     });
 
