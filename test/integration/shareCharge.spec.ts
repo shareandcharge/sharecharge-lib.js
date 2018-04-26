@@ -31,8 +31,8 @@ describe('ShareCharge', function () {
 
     const contractDefs = ToolKit.contractDefsForStage(config.stage);
 
-    const seed1 = 'filter march urge naive sauce distance under copy payment slow just cool';
-    const seed2 = 'filter march urge naive sauce distance under copy payment slow just warm';
+    const seed1 = 'filter march urge naive sauce distance under copy payment slow just warm';
+    const seed2 = 'filter march urge naive sauce distance under copy payment slow just cool';
 
     let shareCharge: ShareCharge, cpoWallet: Wallet, cpoKey: Key, mspWallet: Wallet, mspKey: Key, web3;
     let stationService: StationService;
@@ -50,6 +50,7 @@ describe('ShareCharge', function () {
 
         mspWallet = new Wallet(seed2);
         mspKey = mspWallet.keychain[0];
+
 
         await TestHelper.ensureFunds(web3, cpoKey);
         await TestHelper.ensureFunds(web3, mspKey);
@@ -143,7 +144,7 @@ describe('ShareCharge', function () {
             let evseId = "";
             let controller = "";
 
-            await shareCharge.on("StopConfirmed", async (result) => {
+            await shareCharge.on("StopConfirmed", async (result) => {                     
                 if (result.evseId === evse.id
                     && result.controller.toLowerCase() === mspKey.address) {
 
@@ -156,9 +157,7 @@ describe('ShareCharge', function () {
             
             await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse);
             await shareCharge.charging.useWallet(mspWallet).requestStop(evse);
-            console.log("first !");
-            await shareCharge.charging.useWallet(cpoWallet).confirmStop(evse, Date.now(), Date.now() + 3600, 18000);
-            console.log("second !");
+            await shareCharge.charging.useWallet(cpoWallet).confirmStop(evse);
 
             await eventPoller.poll();
 
