@@ -143,6 +143,8 @@ describe('ShareCharge', function () {
 
             let evseId = "";
             let controller = "";
+            let cdr = "";
+            let finalPrice = 200;
 
             await shareCharge.on("StopConfirmed", async (result) => {
                 if (result.evseId === evse.id
@@ -153,17 +155,28 @@ describe('ShareCharge', function () {
                 }
             });
 
-            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 100);
-
+            await shareCharge.on("ChargeDetailRecord", async (result) => {
+                cdr = result.id;
+                finalPrice = result.finalPrice;
+            });
+            
+            await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 300);
+            
             await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse);
             await shareCharge.charging.useWallet(mspWallet).requestStop(evse);
             await shareCharge.charging.useWallet(cpoWallet).confirmStop(evse);
-
+            
             await eventPoller.poll();
-
+            
+            await shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord(evse, finalPrice);
+            await eventPoller.poll();
+        
             expect(evseId).to.equal(evse.id);
             expect(controller.toLowerCase()).to.equal(mspKey.address);
-
+            
+            expect(cdr).to.equal(evse.id);
+            expect(Number(finalPrice)).to.equal(200);
+            
         });
 
         it('should broadcast error to msp', async () => {

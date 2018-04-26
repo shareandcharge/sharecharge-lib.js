@@ -30,6 +30,10 @@ export class ChargingService {
                 const contract = this.contract;
                 await contract.send("confirmStop", [evse.id], key);
             },
+            chargeDetailRecord: async (evse: Evse, finalPrice: number) => {
+                const contract = this.contract;
+                await contract.send("chargeDetailRecord", [evse.id, finalPrice], key);
+            },
             error: async (evse: Evse, errorCode: number) => {
                 const contract = this.contract;
                 await contract.send("logError", [evse.id, errorCode], key);
