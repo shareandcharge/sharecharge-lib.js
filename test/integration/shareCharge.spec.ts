@@ -144,7 +144,7 @@ describe('ShareCharge', function () {
             let evseId = "";
             let controller = "";
 
-            await shareCharge.on("StopConfirmed", async (result) => {                     
+            await shareCharge.on("StopConfirmed", async (result) => {
                 if (result.evseId === evse.id
                     && result.controller.toLowerCase() === mspKey.address) {
 
@@ -152,9 +152,9 @@ describe('ShareCharge', function () {
                     controller = result.controller;
                 }
             });
-            
+
             await shareCharge.charging.useWallet(mspWallet).requestStart(evse, 100);
-            
+
             await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse);
             await shareCharge.charging.useWallet(mspWallet).requestStop(evse);
             await shareCharge.charging.useWallet(cpoWallet).confirmStop(evse);

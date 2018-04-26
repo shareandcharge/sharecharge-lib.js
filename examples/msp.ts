@@ -43,7 +43,7 @@ async function main() {
     selectedevseId = evse.id;
     console.log('Found', selectedevseId);
 
-    await sc.charging.useWallet(wallet).requestStart(evse, 2000, 0);
+    await sc.charging.useWallet(wallet).requestStart(evse, 0);
 
     setTimeout(() => sc.charging.useWallet(wallet).requestStop(evse), 2000);
 
