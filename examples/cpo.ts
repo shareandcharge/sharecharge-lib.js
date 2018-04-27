@@ -69,7 +69,7 @@ async function main() {
             const evse = await sc.evses.getById(evseId);
             if (success) {
                 await sc.charging.useWallet(wallet).confirmStop(evse);
-                await sc.charging.useWallet(wallet).chargeDetailRecord(evse, 100);
+                await sc.charging.useWallet(wallet).chargeDetailRecord(evse, 100, 1524690000);
             } else {
                 await sc.charging.useWallet(wallet).error(evse, 1);
             }

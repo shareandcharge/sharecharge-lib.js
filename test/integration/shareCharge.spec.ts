@@ -310,7 +310,6 @@ describe('ShareCharge', function () {
             await eventPoller.poll();
 
             expect(stationCreatedId).to.equal(station.id);
-            // expect(stationUpdatedId).to.equal(station.id);
         });
     });
 
@@ -329,6 +328,31 @@ describe('ShareCharge', function () {
             const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested');
             expect(logsAfter.length).to.equal(logsBefore.length + 3);
             expect(logsAfter[0].blockNumber).to.be.greaterThan(0);
+        });
+
+        it('should filter logs', async () => {
+            let timestamp: number;
+            let finalPrice = 150;
+
+            const evse = new EvseBuilder().withBasePrice(1).build();
+            await shareCharge.evses.useWallet(cpoWallet).create(evse);
+
+            const logsBefore = await shareCharge.charging.contract.getLogs('ChargeDetailRecord');
+            await shareCharge.on("ChargeDetailRecord", async (result) => {
+                timestamp = result.timestamp;
+                finalPrice = result.finalPrice;
+            });
+            
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 200);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStop(evse);
+            await shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord(evse, finalPrice, timestamp);
+
+            const logsAfter = await shareCharge.charging.contract.getLogs('ChargeDetailRecord', { 
+                controller: driverKey.address, 
+                timestamp: { start: 152469000, end: 3524843383145 }
+            });
+            expect(logsAfter.length).to.equal(logsBefore.length + 1);
         });
 
         it('should filter contract events', async () => {
