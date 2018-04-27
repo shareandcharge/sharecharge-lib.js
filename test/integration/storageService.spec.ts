@@ -18,7 +18,7 @@ import { Ipfs } from '../../src/models/ipfs';
 const config = new ConfigProvider();
 const ocpiLocation = require('../data/ocpiLocation.json');
 
-describe.only('StorageService', function () {
+describe('StorageService', function () {
 
     this.timeout(10 * 1000);
     const batchTimeout = 500;

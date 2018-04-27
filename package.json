@@ -1,6 +1,6 @@
 {
   "name": "@motionwerk/sharecharge-lib",
-  "version": "0.0.11",
+  "version": "0.0.14",
   "description": "Share & Charge EV Network Library",
   "repository": {
     "type": "git",
@@ -28,7 +28,7 @@
     "patch-contract": "cp ~/.sharecharge/contract.defs.local.json node_modules/sharecharge-contracts/contract.defs.local.json"
   },
   "dependencies": {
-    "@motionwerk/sharecharge-contracts": "^0.0.18",
+    "@motionwerk/sharecharge-contracts": "^0.0.19",
     "@types/node": "^9.4.7",
     "bip39": "^2.5.0",
     "bs58": "^4.0.1",

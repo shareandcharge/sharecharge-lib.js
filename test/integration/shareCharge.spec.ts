@@ -21,6 +21,9 @@ import { ConfigProvider } from "../../src/services/configProvider";
 import { Key } from '../../src/models/key';
 import { ContractProvider } from '../../src/services/contractProvider';
 import { TokenService } from '../../src/services/tokenService';
+import { StorageService } from '../../src/services/storageService';
+import { IpfsProvider } from '../../src/services/ipfsProvider';
+import { Ipfs } from '../../src/models/ipfs';
 
 const config = new ConfigProvider();
 
@@ -43,6 +46,7 @@ describe('ShareCharge', function () {
     let evseService: EvseService;
     let chargingService: ChargingService;
     let tokenService: TokenService;
+    let storageService: StorageService;
     let tokenAddress: string;
     let eventPoller: EventPoller;
     let web3;
@@ -80,6 +84,17 @@ describe('ShareCharge', function () {
             }
         });
 
+        const storageContract = await TestHelper.createContract(web3, config, contractDefs["ExternalStorage"]);
+        storageService = new StorageService(<ContractProvider>{
+            obtain(key: string): Contract {
+                return storageContract;
+            }
+        }, <IpfsProvider>{
+            obtain(): any {
+                return {};
+            }
+        });
+
         const chargingContract = await TestHelper.createContract(web3, config, contractDefs["Charging"]);
         chargingService = new ChargingService(<ContractProvider>{
             obtain(key: string): Contract {
@@ -95,7 +110,7 @@ describe('ShareCharge', function () {
 
         eventPoller = new EventPoller(config);
 
-        shareCharge = new ShareCharge(stationService, evseService, chargingService, tokenService, eventPoller);
+        shareCharge = new ShareCharge(stationService, evseService, chargingService, tokenService, storageService, eventPoller);
         tokenAddress = await shareCharge.token.useWallet(mspWallet).deploy('MSP Token', 'MSP');
         await shareCharge.token.useWallet(mspWallet).setAccess(shareCharge.charging.address);
         await shareCharge.token.useWallet(mspWallet).mint(driverKey.address, 1000);
@@ -164,24 +179,24 @@ describe('ShareCharge', function () {
                 timestamp = result.timestamp;
                 token = result.tokenAddress;
             });
-            
+
             await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 300);
-            
+
             await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse);
             await shareCharge.charging.useWallet(driverWallet).requestStop(evse);
             await shareCharge.charging.useWallet(cpoWallet).confirmStop(evse);
-            
+
             await eventPoller.poll();
-            
+
             await shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord(evse, finalPrice, timestamp);
             await eventPoller.poll();
-            
+
             expect(evseId).to.equal(evse.id);
             expect(controller.toLowerCase()).to.equal(driverKey.address);
-            
+
             expect(cdr).to.equal(evse.id);
             expect(Number(finalPrice)).to.equal(200);
-            
+
             expect(token).to.equal(shareCharge.token.address);
         });
 

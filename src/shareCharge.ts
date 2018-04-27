@@ -6,6 +6,8 @@ import { EventPoller } from './services/eventPoller';
 import { EventDispatcher } from './services/eventDispatcher';
 import { ConfigProvider } from './services/configProvider';
 import { ContractProvider } from './services/contractProvider';
+import { StorageService } from './services/storageService';
+import { IpfsProvider } from './services/ipfsProvider';
 
 export class ShareCharge {
 
@@ -15,22 +17,26 @@ export class ShareCharge {
     public readonly evses: EvseService;
     public readonly charging: ChargingService;
     public readonly token: TokenService;
+    public readonly store: StorageService;
 
     constructor(stationService: StationService,
                 evseService: EvseService,
                 chargingService: ChargingService,
                 tokenService: TokenService,
+                storageService: StorageService,
                 private eventPoller: EventPoller) {
         this.stations = stationService;
         this.evses = evseService;
         this.charging = chargingService;
         this.token = tokenService;
+        this.store = storageService;
 
         // EventPoller.instance.monitor('ConnectorStorage', this.connectors.contract);
         eventPoller.monitor('StationStorage', this.stations.contract);
         eventPoller.monitor('EvseStorage', this.evses.contract);
         eventPoller.monitor('Charging', this.charging.contract);
         eventPoller.monitor('MSPToken', this.token.contract);
+        eventPoller.monitor('ExternalStorage', this.store.contract);
 
         eventPoller.events.subscribe(events => events.forEach(item => {
             const returnValues = {
@@ -62,12 +68,14 @@ export class ShareCharge {
         if (!ShareCharge.instance) {
             const configProvider = new ConfigProvider(config);
             const contractProvider = new ContractProvider(configProvider);
+            const ipfsProvider = new IpfsProvider(configProvider);
             const eventPoller = new EventPoller(configProvider);
             const stationService = new StationService(contractProvider);
             const evseService = new EvseService(contractProvider);
             const chargingService = new ChargingService(contractProvider);
             const tokenService = new TokenService(contractProvider);
-            ShareCharge.instance = new ShareCharge(stationService, evseService, chargingService, tokenService, eventPoller);
+            const storageService = new StorageService(contractProvider, ipfsProvider);
+            ShareCharge.instance = new ShareCharge(stationService, evseService, chargingService, tokenService, storageService, eventPoller);
         }
         return ShareCharge.instance;
     }

@@ -4,7 +4,7 @@ import { IpfsProvider } from '../../src/services/ipfsProvider';
 import { ConfigProvider } from '../../src/services/configProvider';
 import { ToolKit } from '../../src/utils/toolKit';
 
-describe.only('Ipfs', () => {
+describe('Ipfs', () => {
 
     const ipfs = new Ipfs(new IpfsProvider(new ConfigProvider()));
     const exampleHash = 'QmU8Hhfz8MxPakRAazGUY2DA9EtQpTvVPVf51KgRd8x5yA';
