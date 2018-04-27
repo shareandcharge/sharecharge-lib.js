@@ -53,7 +53,7 @@ export class StorageService {
             await this.contract.send('addLocation', [globalId, hash['solidity']], key);
             return {
                 globalId,
-                ipfs: hash['hash']
+                ipfs: hash['ipfs']
             };
         };
     }
