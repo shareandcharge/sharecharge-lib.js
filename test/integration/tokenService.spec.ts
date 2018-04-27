@@ -20,7 +20,7 @@ describe('TokenService', function () {
     wallet = Wallet.generate().wallet;
 
     before(async () => {
-        web3 = new Web3(config.provider);
+        web3 = new Web3(config.ethProvider);
         await TestHelper.ensureFunds(web3, wallet.keychain[0]);
     });
 

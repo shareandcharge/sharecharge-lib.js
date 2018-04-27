@@ -30,7 +30,7 @@ describe('EvseService', function () {
     let evseService: EvseService, wallet: Wallet, key: Key, web3;
 
     before(async () => {
-        web3 = new Web3(config.provider);
+        web3 = new Web3(config.ethProvider);
         wallet = new Wallet(seed);
         key = wallet.keychain[0];
 
@@ -157,7 +157,7 @@ describe('EvseService', function () {
         });
     });
 
-    context('#getByUid', ()=> {
+    context('#getByUid', () => {
         it('should get evse by uid', async () => {
             const evse = new EvseBuilder().build();
             await evseService.useWallet(wallet).create(evse);

@@ -11,7 +11,7 @@ export class ContractProvider {
     private definitions;
 
     constructor(private config: ConfigProvider) {
-        this.web3 = new Web3(config.provider);
+        this.web3 = new Web3(config.ethProvider);
         this.definitions = ToolKit.contractDefsForStage(config.stage);
     }
 

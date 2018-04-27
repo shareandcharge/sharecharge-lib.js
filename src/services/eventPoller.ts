@@ -15,7 +15,7 @@ export class EventPoller {
     public readonly events = new Subject<any[]>();
 
     public constructor(private config: ConfigProvider) {
-        this.web3 = new Web3(config.provider);
+        this.web3 = new Web3(config.ethProvider);
         this.intervalMillis = config.pollingInterval;
     }
 

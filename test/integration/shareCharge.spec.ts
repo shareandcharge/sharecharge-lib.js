@@ -49,7 +49,7 @@ describe('ShareCharge', function () {
 
     before(async () => {
 
-        web3 = new Web3(config.provider);
+        web3 = new Web3(config.ethProvider);
 
         cpoWallet = new Wallet(seed1);
         cpoKey = cpoWallet.keychain[0];

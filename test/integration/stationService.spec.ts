@@ -29,7 +29,7 @@ describe('StationService', function () {
     let stationService: StationService, wallet: Wallet, key: Key, web3;
 
     before(async () => {
-        web3 = new Web3(config.provider);
+        web3 = new Web3(config.ethProvider);
         wallet = new Wallet(seed);
         key = wallet.keychain[0];
 
