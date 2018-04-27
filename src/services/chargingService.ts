@@ -34,9 +34,10 @@ export class ChargingService {
                 const contract = this.contract;
                 return contract.send("confirmStop", [evse.id], key);
             },
-            chargeDetailRecord: async (evse: Evse, finalPrice: number) => {
+            chargeDetailRecord: async (evse: Evse, finalPrice: number, timestamp: number) => {
+                const time = Date.now();
                 const contract = this.contract;
-                return contract.send("chargeDetailRecord", [evse.id, finalPrice], key);
+                return contract.send("chargeDetailRecord", [evse.id, finalPrice, time], key);
             },
             error: async (evse: Evse, errorCode: number) => {
                 const contract = this.contract;

@@ -146,6 +146,8 @@ describe('ShareCharge', function () {
             let controller = "";
             let cdr = "";
             let finalPrice = 200;
+            let timestamp: number;
+            let token: string;
 
             await shareCharge.on("StopConfirmed", async (result) => {
                 if (result.evseId === evse.id
@@ -159,25 +161,28 @@ describe('ShareCharge', function () {
             await shareCharge.on("ChargeDetailRecord", async (result) => {
                 cdr = result.evseId;
                 finalPrice = result.finalPrice;
+                timestamp = result.timestamp;
+                token = result.tokenAddress;
             });
-
+            
             await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 300);
-
+            
             await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse);
             await shareCharge.charging.useWallet(driverWallet).requestStop(evse);
             await shareCharge.charging.useWallet(cpoWallet).confirmStop(evse);
-
+            
             await eventPoller.poll();
-
-            await shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord(evse, finalPrice);
+            
+            await shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord(evse, finalPrice, timestamp);
             await eventPoller.poll();
-
+            
             expect(evseId).to.equal(evse.id);
             expect(controller.toLowerCase()).to.equal(driverKey.address);
-
+            
             expect(cdr).to.equal(evse.id);
             expect(Number(finalPrice)).to.equal(200);
-
+            
+            expect(token).to.equal(shareCharge.token.address);
         });
 
         it('should broadcast error to msp', async () => {
