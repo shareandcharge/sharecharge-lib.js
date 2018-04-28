@@ -79,4 +79,14 @@ describe('StorageService', function () {
 
     });
 
+    context('#updateLocation', () => {
+        it('should update location in storage', async () => {
+            const result = await storageService.useWallet(wallet).addLocation(ocpiLocation);
+            ocpiLocation.id = 'LOC2';
+            const result2 = await storageService.useWallet(wallet).updateLocation(result.globalId, ocpiLocation);
+            expect(result2.globalId).to.equal(result.globalId);
+            expect(result2.ipfs).to.not.equal(undefined);
+        });
+    });
+
 });

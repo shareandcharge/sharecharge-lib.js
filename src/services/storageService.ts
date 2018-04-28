@@ -38,6 +38,7 @@ export class StorageService {
         const key = wallet.keychain[keyIndex];
         return {
             addLocation: this.addLocation(key),
+            updateLocation: this.updateLocation(key),
             batch: () => {
                 return {
                     addLocations: this.batchAddLocation(key),
@@ -51,6 +52,17 @@ export class StorageService {
             const globalId = ToolKit.randomBytes32String();
             const hash = await this.ipfs.add(location);
             await this.contract.send('addLocation', [globalId, hash['solidity']], key);
+            return {
+                globalId,
+                ipfs: hash['ipfs']
+            };
+        };
+    }
+
+    private updateLocation(key: Key) {
+        return async (globalId: string, location: any) => {
+            const hash = await this.ipfs.add(location);
+            const result = await this.contract.send('updateLocation', [globalId, hash['solidity']], key);
             return {
                 globalId,
                 ipfs: hash['ipfs']
