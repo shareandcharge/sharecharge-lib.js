@@ -17,6 +17,7 @@ import { Ipfs } from '../../src/models/ipfs';
 
 const config = new ConfigProvider();
 const ocpiLocation = require('../data/ocpiLocation.json');
+const ocpiTariffs = require('../data/ocpiTariffs.json');
 
 describe('StorageService', function () {
 
@@ -79,13 +80,31 @@ describe('StorageService', function () {
 
     });
 
-    context('#updateLocation', () => {
+    context('#updateLocation()', () => {
         it('should update location in storage', async () => {
             const result = await storageService.useWallet(wallet).addLocation(ocpiLocation);
             ocpiLocation.id = 'LOC2';
             const result2 = await storageService.useWallet(wallet).updateLocation(result.globalId, ocpiLocation);
             expect(result2.globalId).to.equal(result.globalId);
             expect(result2.ipfs).to.not.equal(undefined);
+        });
+    });
+
+    context('#addTariffs()', () => {
+        it('should add tariffs to storage', async () => {
+            const result = await storageService.useWallet(wallet).addTariffs(ocpiTariffs);
+            expect(result).to.not.equal(undefined);
+            const result2 = await storageService.getTariffsByCPO(key.address);
+            expect(result2['id']).to.not.equal(undefined);
+        });
+    });
+
+    context('#updateTariffs()', () => {
+        it('should update tariffs in storage', async () => {
+            await storageService.useWallet(wallet).addTariffs(ocpiTariffs);
+            ocpiTariffs.id = '12';
+            const result = await storageService.useWallet(wallet).updateTariffs(ocpiTariffs);
+            expect(result).to.not.equal(undefined);
         });
     });
 

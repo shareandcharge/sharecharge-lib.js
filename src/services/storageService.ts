@@ -20,18 +20,23 @@ export class StorageService {
         return this.contract.native.options.address;
     }
 
-    async getLocationById(cpoID: string, locationID: string): Promise<any> {
-        const hash = await this.contract.call('getLocationById', cpoID, locationID);
+    async getLocationById(cpoId: string, locationId: string): Promise<any> {
+        const hash = await this.contract.call('getLocationById', cpoId, locationId);
         return this.ipfs.get(hash);
     }
 
-    async getLocationsByCPO(cpoID: string): Promise<object[]> {
-        const locationIDs = await this.contract.call('getGlobalIDsByCPO', cpoID);
-        const promisedLocations = await locationIDs.map(async locationID => {
-            return this.getLocationById(cpoID, locationID);
+    async getLocationsByCPO(cpoId: string): Promise<object[]> {
+        const locationIds = await this.contract.call('getGlobalIdsByCPO', cpoId);
+        const promisedLocations = await locationIds.map(async locationID => {
+            return this.getLocationById(cpoId, locationID);
         });
         const resolvedLocations = await Promise.all(promisedLocations);
         return resolvedLocations;
+    }
+
+    async getTariffsByCPO(cpoId): Promise<object[]> {
+        const hash = await this.contract.call('getTariffsByCPO', cpoId);
+        return this.ipfs.get(hash);
     }
 
     useWallet(wallet: Wallet, keyIndex = 0) {
@@ -39,6 +44,8 @@ export class StorageService {
         return {
             addLocation: this.addLocation(key),
             updateLocation: this.updateLocation(key),
+            addTariffs: this.addTariffs(key),
+            updateTariffs: this.updateTariffs(key),
             batch: () => {
                 return {
                     addLocations: this.batchAddLocation(key),
@@ -59,14 +66,30 @@ export class StorageService {
         };
     }
 
+    private addTariffs(key: Key) {
+        return async (tariffs: any) => {
+            const hash = await this.ipfs.add(tariffs);
+            await this.contract.send('addTariffs', [hash['solidity']], key);
+            return hash['ipfs'];
+        };
+    }
+
     private updateLocation(key: Key) {
         return async (globalId: string, location: any) => {
             const hash = await this.ipfs.add(location);
-            const result = await this.contract.send('updateLocation', [globalId, hash['solidity']], key);
+            await this.contract.send('updateLocation', [globalId, hash['solidity']], key);
             return {
                 globalId,
                 ipfs: hash['ipfs']
             };
+        };
+    }
+
+    private updateTariffs(key: Key) {
+        return async (tariffs: any) => {
+            const hash = await this.ipfs.add(tariffs);
+            await this.contract.send('updateTariffs', [hash['solidity']], key);
+            return hash['ipfs'];
         };
     }
 
