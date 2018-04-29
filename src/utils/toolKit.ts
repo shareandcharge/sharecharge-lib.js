@@ -1,4 +1,5 @@
 import * as crypto from 'crypto';
+import * as sjcl from 'sjcl';
 import * as bs58 from 'bs58';
 const web3Utils = require('web3').utils;
 
@@ -32,6 +33,14 @@ export class ToolKit {
         bytes = bytes.slice(2, 66);
         bytes = '1220' + bytes;
         return bs58.encode(Buffer.from(bytes, 'hex'));
+    }
+
+    static encrypt(data: any, password: string): string {
+        return sjcl.encrypt(password, JSON.stringify(data));
+    }
+
+    static decrypt(data: string, password: string): object {
+        return JSON.parse(sjcl.decrypt(password, data));
     }
 
     static contractDefsForStage(stage: string, verbose: boolean = false) {

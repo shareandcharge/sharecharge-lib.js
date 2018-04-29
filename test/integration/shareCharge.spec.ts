@@ -357,14 +357,14 @@ describe('ShareCharge', function () {
                 timestamp = result.timestamp;
                 finalPrice = result.finalPrice;
             });
-            
+
             await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 200);
             await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse);
             await shareCharge.charging.useWallet(cpoWallet).confirmStop(evse);
             await shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord(evse, finalPrice, timestamp);
 
-            const logsAfter = await shareCharge.charging.contract.getLogs('ChargeDetailRecord', { 
-                controller: driverKey.address, 
+            const logsAfter = await shareCharge.charging.contract.getLogs('ChargeDetailRecord', {
+                controller: driverKey.address,
                 timestamp: { start: 152469000, end: 3524843383145 }
             });
             expect(logsAfter.length).to.equal(logsBefore.length + 1);

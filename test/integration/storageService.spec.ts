@@ -18,6 +18,7 @@ import { Ipfs } from '../../src/models/ipfs';
 const config = new ConfigProvider();
 const ocpiLocation = require('../data/ocpiLocation.json');
 const ocpiTariffs = require('../data/ocpiTariffs.json');
+const encLocation = require('../data/encLocation.json');
 
 describe('StorageService', function () {
 
@@ -53,7 +54,7 @@ describe('StorageService', function () {
                                 solidity: '0x5b550af4e10a5631201589b74703d5d2217efbfadc4a8816eee55696f3b4cc40'
                             };
                         },
-                        get: async (hash: string) => { return ocpiLocation; }
+                        get: async (hash: string) => { return JSON.stringify(encLocation); }
                     };
                 }
             }

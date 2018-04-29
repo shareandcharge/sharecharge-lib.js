@@ -28,7 +28,7 @@
     "patch-contract": "cp ~/.sharecharge/contract.defs.local.json node_modules/sharecharge-contracts/contract.defs.local.json"
   },
   "dependencies": {
-    "@motionwerk/sharecharge-contracts": "^0.0.21",
+    "@motionwerk/sharecharge-contracts": "^0.0.22",
     "@types/node": "^9.4.7",
     "bip39": "^2.5.0",
     "bs58": "^4.0.1",
@@ -36,6 +36,7 @@
     "ethereumjs-wallet": "^0.6.0",
     "ipfs-api": "^20.0.1",
     "rxjs": "^5.5.7",
+    "sjcl": "^1.0.7",
     "web3": "1.0.0-beta.34"
   },
   "devDependencies": {
