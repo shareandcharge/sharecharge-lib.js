@@ -8,6 +8,7 @@ import { ConfigProvider } from './services/configProvider';
 import { ContractProvider } from './services/contractProvider';
 import { StorageService } from './services/storageService';
 import { IpfsProvider } from './services/ipfsProvider';
+import { ToolKit } from './utils/toolKit';
 
 export class ShareCharge {
 
@@ -39,6 +40,10 @@ export class ShareCharge {
         eventPoller.monitor('ExternalStorage', this.store.contract);
 
         eventPoller.events.subscribe(events => events.forEach(item => {
+            if (item.returnValues.evseId) {
+                item.returnValues.evseId = ToolKit.hexToString(item.returnValues.evseId);
+            }
+
             const returnValues = {
                 ...item.returnValues,
                 transactionHash: item.transactionHash,

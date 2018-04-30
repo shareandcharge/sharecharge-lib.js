@@ -2,6 +2,7 @@ import { Evse } from "../models/evse";
 import { Contract } from "../models/contract";
 import { Wallet } from "../models/wallet";
 import { ContractProvider } from "./contractProvider";
+import { ToolKit } from '../utils/toolKit';
 
 export class ChargingService {
 
@@ -19,23 +20,23 @@ export class ChargingService {
         const key = wallet.keychain[keyIndex];
         return {
             requestStart: async (scId: string, evseId: string, tokenAddress: string, estimatedPrice: number) => {
-                return this.contract.send("requestStart", [scId, evseId, tokenAddress, estimatedPrice], key);
+                return this.contract.send("requestStart", [scId, ToolKit.asciiToHex(evseId), tokenAddress, estimatedPrice], key);
             },
             confirmStart: async (scId: string, evseId: string, sessionId: string) => {
-                return this.contract.send("confirmStart", [scId, evseId, sessionId], key);
+                return this.contract.send("confirmStart", [scId, ToolKit.asciiToHex(evseId), sessionId], key);
             },
             requestStop: async (scId: string, evseId: string) => {
-                return this.contract.send("requestStop", [scId, evseId], key);
+                return this.contract.send("requestStop", [scId, ToolKit.asciiToHex(evseId)], key);
             },
             confirmStop: async (scId: string, evseId: string) => {
-                return this.contract.send("confirmStop", [scId, evseId], key);
+                return this.contract.send("confirmStop", [scId, ToolKit.asciiToHex(evseId)], key);
             },
             chargeDetailRecord: async (scId: string, evseId: string, finalPrice: number) => {
                 const timestamp = Date.now();
-                return this.contract.send("chargeDetailRecord", [scId, evseId, finalPrice, timestamp], key);
+                return this.contract.send("chargeDetailRecord", [scId, ToolKit.asciiToHex(evseId), finalPrice, timestamp], key);
             },
             error: async (scId: string, evseId: string, errorCode: number) => {
-                return this.contract.send("logError", [scId, evseId, errorCode], key);
+                return this.contract.send("logError", [scId, ToolKit.asciiToHex(evseId), errorCode], key);
             }
         };
     }

@@ -26,10 +26,13 @@ export class StorageService {
         return ToolKit.decrypt(data, cpoId);
     }
 
-    async getLocationsByCPO(cpoId: string): Promise<object[]> {
-        const locationIds = await this.contract.call('getShareAndChargeIdsByCPO', cpoId);
-        const promisedLocations = await locationIds.map(async locationID => {
-            return this.getLocationById(cpoId, locationID);
+    async getLocationsByCPO(cpoId: string): Promise<{ scId: string, data: any }[]> {
+        const scIds = await this.contract.call('getShareAndChargeIdsByCPO', cpoId);
+        const promisedLocations: { scId: string, data: any }[] = await scIds.map(async scId => {
+            return {
+                scId,
+                data: await this.getLocationById(cpoId, scId)
+            };
         });
         const resolvedLocations = await Promise.all(promisedLocations);
         return resolvedLocations;

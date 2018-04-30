@@ -3,23 +3,10 @@ import { Evse } from '../src/models/evse';
 import { Wallet } from '../src/models/wallet';
 import { Station } from '../src/models/station';
 
+const ocpiLocation = require('../test/data/ocpiLocation');
+
 function concat(id) {
     return id.substr(0, 7) + '...' + id.substr(id.length - 5, id.length);
-}
-
-async function bulkCreate(wallet, sc: ShareCharge, total) {
-    for (let i = 0; i < total; i++) {
-        const station = new Station();
-        await sc.stations.useWallet(wallet).create(station);
-        console.log(`Created new station with id: ${concat(station.id)}`);
-
-        const evse = new Evse();
-        evse.stationId = station.id;
-        evse.available = true;
-        const evseId = evse.id;
-        await sc.evses.useWallet(wallet).create(evse);
-        console.log(`Created new evse with id: ${concat(evseId)}`);
-    }
 }
 
 async function main() {
@@ -28,56 +15,41 @@ async function main() {
     const key = wallet.keychain[0];
     const sc: ShareCharge = ShareCharge.getInstance();
 
-    // how to do this fast?
-    // await bulkCreate(wallet, sc, 250);
-    const station = new Station();
-    station.latitude = 52.5200;
-    station.longitude = 13.4050;
-    await sc.stations.useWallet(wallet).create(station);
-    console.log(`Created new station with id: ${concat(station.id)}`);
-
-    const evse = new Evse();
-    evse.uid = "FR138E1ETG5578567YU8D";
-    evse.stationId = station.id;
-    evse.available = true;
-    evse.basePrice = 1;
-    const evseId = evse.id;
-    await sc.evses.useWallet(wallet).create(evse);
-    console.log(`Created new evse with id: ${concat(evseId)}`);
+    const location = await sc.store.useWallet(wallet).addLocation(ocpiLocation);
+    console.log(`Created new location with share&charge Id ${concat(location.scId)}`);
 
     sc.on("StartRequested", async (result) => {
-        if (result.evseId == evseId) {
-            console.log(`Start requested on ${concat(evseId)}`);
+        if (result.scId == location.scId) {
+            console.log(`Start requested on ${concat(result.scId)}`);
 
             // send start request to device... we assume success in this example!
             const success = true;
-            const evse = await sc.evses.getById(evseId);
+            const evse = await sc.store.getLocationById(key.address, location.scId);
             if (success) {
-                await sc.charging.useWallet(wallet).confirmStart(evse);
+                await sc.charging.useWallet(wallet).confirmStart(location.scId, result.evseId, '0x01');
             } else {
-                await sc.charging.useWallet(wallet).error(evse, 0);
+                await sc.charging.useWallet(wallet).error(location.scId, result.evseId, 0);
             }
         }
     });
 
     sc.on("StopRequested", async (result) => {
-        if (result.evseId == evseId) {
-            console.log(`Stop requested on ${concat(evseId)}`);
+        if (result.scId == location.scId) {
+            console.log(`Stop requested on ${concat(result.scId)}`);
 
             // send stop request to device... we assume success in this example!
             const success = true;
-            const evse = await sc.evses.getById(evseId);
             if (success) {
-                await sc.charging.useWallet(wallet).confirmStop(evse);
-                await sc.charging.useWallet(wallet).chargeDetailRecord(evse, 100, 1524690000);
+                await sc.charging.useWallet(wallet).confirmStop(result.scId, result.evseId);
+                await sc.charging.useWallet(wallet).chargeDetailRecord(result.scId, result.evseId, 100);
             } else {
-                await sc.charging.useWallet(wallet).error(evse, 1);
+                await sc.charging.useWallet(wallet).error(result.scId, result.evseId, 1);
             }
         }
     });
 
     sc.on("ChargeDetailRecord", async (result) => {
-        if (result.evseId == evseId) {
+        if (result.scId == location.scId) {
             console.log(`Received ${result.finalPrice} tokens`);
         }
     });
