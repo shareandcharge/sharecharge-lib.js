@@ -54,6 +54,8 @@ describe('ShareCharge', function () {
     let eventPoller: EventPoller;
     let web3;
 
+    const evseId = 'BE-BEC-E041503001';
+
     before(async () => {
 
         web3 = new Web3(config.ethProvider);
@@ -126,7 +128,6 @@ describe('ShareCharge', function () {
 
         it('should broadcast start confirmed to msp', async () => {
             const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            const evseId = ToolKit.randomBytes32String();
 
             let controller = "";
 
@@ -147,7 +148,6 @@ describe('ShareCharge', function () {
 
         it('should broadcast stop confirmed to msp', async () => {
             const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            const evseId = ToolKit.randomBytes32String();
 
             let controller = "";
             let finalPrice = 200;
@@ -185,7 +185,6 @@ describe('ShareCharge', function () {
 
         it('should broadcast error to msp', async () => {
             const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            const evseId = ToolKit.randomBytes32String();
 
             let controller = "";
             let errorCode = -1;
@@ -210,7 +209,6 @@ describe('ShareCharge', function () {
 
         it('should broadcast charge stop requested to cpo', async () => {
             const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            const evseId = ToolKit.randomBytes32String();
 
             let eventEvseId = "";
 
@@ -231,7 +229,6 @@ describe('ShareCharge', function () {
 
         it('should broadcast charge start requested to cpo', async () => {
             const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            const evseId = ToolKit.randomBytes32String();
 
             let eventEvseId = "";
             let controller = "";
@@ -304,8 +301,6 @@ describe('ShareCharge', function () {
             const location2 = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
             const location3 = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
 
-            const evseId = ToolKit.randomBytes32String();
-
             const logsBefore = await shareCharge.charging.contract.getLogs('StartRequested');
 
             await shareCharge.charging.useWallet(driverWallet).requestStart(location1.scId, evseId, shareCharge.token.address, 0);
@@ -321,7 +316,6 @@ describe('ShareCharge', function () {
             let finalPrice = 150;
 
             const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            const evseId = ToolKit.randomBytes32String();
 
             const logsBefore = await shareCharge.charging.contract.getLogs('ChargeDetailRecord');
             await shareCharge.on("ChargeDetailRecord", async (result) => {
@@ -343,7 +337,6 @@ describe('ShareCharge', function () {
 
         it('should return gasUsed and timestamp', async () => {
             const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            const evseId = ToolKit.randomBytes32String();
             await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, shareCharge.token.address, 0);
 
             const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', { controller: driverKey.address });
