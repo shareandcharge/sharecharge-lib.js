@@ -19,7 +19,7 @@ import { ContractProvider } from '../../src/services/contractProvider';
 
 const config = new ConfigProvider();
 
-describe('EvseService', function () {
+describe.skip('EvseService', function () {
 
     this.timeout(10 * 1000);
     const batchTimeout = 500;

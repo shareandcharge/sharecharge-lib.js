@@ -15,7 +15,7 @@ function expectDefault(hours) {
     expect(formatHours(hours.sunday)).to.equal('00:00 to 24:00');
 }
 
-describe('OpeningHours', function () {
+describe.skip('OpeningHours', function () {
 
     it('should create a default opening hours', () => {
         const hours = new OpeningHours();

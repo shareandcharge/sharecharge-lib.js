@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { Evse } from '../../src/models/evse';
 import { Tariff } from '../../src/models/tariff';
 
-describe('Evse', function () {
+describe.skip('Evse', function () {
 
     it('should deserialize correctly', () => {
         const payload = {

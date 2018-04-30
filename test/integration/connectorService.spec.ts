@@ -20,7 +20,7 @@ import { ContractProvider } from '../../src/services/contractProvider';
 
 const config = new ConfigProvider();
 
-describe('ConnectorService', function () {
+describe.skip('ConnectorService', function () {
 
     this.timeout(10 * 1000);
     const batchTimeout = 500;

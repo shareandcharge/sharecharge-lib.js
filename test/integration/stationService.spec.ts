@@ -18,7 +18,7 @@ import { Key } from '../../src/models/key';
 
 const config = new ConfigProvider();
 
-describe('StationService', function () {
+describe.skip('StationService', function () {
 
     this.timeout(10 * 1000);
     const batchTimeout = 500;
