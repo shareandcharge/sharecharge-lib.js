@@ -14,6 +14,7 @@ import { ContractProvider } from '../../src/services/contractProvider';
 import { StorageService } from '../../src/services/storageService';
 import { IpfsProvider } from '../../src/services/ipfsProvider';
 import { Ipfs } from '../../src/models/ipfs';
+import IpfsMock from '../ipfsMock';
 
 const config = new ConfigProvider();
 const ocpiLocation = require('../data/ocpiLocation.json');
@@ -45,26 +46,14 @@ describe('StorageService', function () {
                 obtain(key: string): Contract {
                     return contract;
                 }
-            }, <IpfsProvider>{
-                obtain(): any {
-                    return {
-                        add: async (content: any) => {
-                            return {
-                                ipfs: 'QmUVB2FKuQ66s5Fueu6BBX5Nsxf1eVXcif5dq3qPKeRFLj',
-                                solidity: '0x5b550af4e10a5631201589b74703d5d2217efbfadc4a8816eee55696f3b4cc40'
-                            };
-                        },
-                        get: async (hash: string) => { return JSON.stringify(encLocation); }
-                    };
-                }
-            }
+            }, <IpfsProvider>IpfsMock
         );
     });
 
     context('#addLocation()', () => {
         it('should add location to storage', async () => {
             const result = await storageService.useWallet(wallet).addLocation(ocpiLocation);
-            const location = await storageService.getLocationById(key.address, result.globalId);
+            const location = await storageService.getLocationById(key.address, result.scId);
             expect(location.id).to.equal(ocpiLocation.id);
         });
 
@@ -85,8 +74,8 @@ describe('StorageService', function () {
         it('should update location in storage', async () => {
             const result = await storageService.useWallet(wallet).addLocation(ocpiLocation);
             ocpiLocation.id = 'LOC2';
-            const result2 = await storageService.useWallet(wallet).updateLocation(result.globalId, ocpiLocation);
-            expect(result2.globalId).to.equal(result.globalId);
+            const result2 = await storageService.useWallet(wallet).updateLocation(result.scId, ocpiLocation);
+            expect(result2.scId).to.equal(result.scId);
             expect(result2.ipfs).to.not.equal(undefined);
         });
     });

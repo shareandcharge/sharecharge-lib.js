@@ -18,30 +18,24 @@ export class ChargingService {
     useWallet(wallet: Wallet, keyIndex: number = 0) {
         const key = wallet.keychain[keyIndex];
         return {
-            requestStart: async (evse: Evse, tokenAddress: string, estimatedPrice: number) => {
-                const contract = this.contract;
-                return contract.send("requestStart", [evse.id, tokenAddress, estimatedPrice], key);
+            requestStart: async (scId: string, evseId: string, tokenAddress: string, estimatedPrice: number) => {
+                return this.contract.send("requestStart", [scId, evseId, tokenAddress, estimatedPrice], key);
             },
-            confirmStart: async (evse: Evse) => {
-                const contract = this.contract;
-                return contract.send("confirmStart", [evse.id], key);
+            confirmStart: async (scId: string, evseId: string, sessionId: string) => {
+                return this.contract.send("confirmStart", [scId, evseId, sessionId], key);
             },
-            requestStop: async (evse: Evse) => {
-                const contract = this.contract;
-                return contract.send("requestStop", [evse.id], key);
+            requestStop: async (scId: string, evseId: string) => {
+                return this.contract.send("requestStop", [scId, evseId], key);
             },
-            confirmStop: async (evse: Evse) => {
-                const contract = this.contract;
-                return contract.send("confirmStop", [evse.id], key);
+            confirmStop: async (scId: string, evseId: string) => {
+                return this.contract.send("confirmStop", [scId, evseId], key);
             },
-            chargeDetailRecord: async (evse: Evse, finalPrice: number, timestamp: number) => {
-                const time = Date.now();
-                const contract = this.contract;
-                return contract.send("chargeDetailRecord", [evse.id, finalPrice, time], key);
+            chargeDetailRecord: async (scId: string, evseId: string, finalPrice: number) => {
+                const timestamp = Date.now();
+                return this.contract.send("chargeDetailRecord", [scId, evseId, finalPrice, timestamp], key);
             },
-            error: async (evse: Evse, errorCode: number) => {
-                const contract = this.contract;
-                await contract.send("logError", [evse.id, errorCode], key);
+            error: async (scId: string, evseId: string, errorCode: number) => {
+                return this.contract.send("logError", [scId, evseId, errorCode], key);
             }
         };
     }

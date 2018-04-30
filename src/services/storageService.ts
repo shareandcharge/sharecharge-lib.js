@@ -27,7 +27,7 @@ export class StorageService {
     }
 
     async getLocationsByCPO(cpoId: string): Promise<object[]> {
-        const locationIds = await this.contract.call('getGlobalIdsByCPO', cpoId);
+        const locationIds = await this.contract.call('getShareAndChargeIdsByCPO', cpoId);
         const promisedLocations = await locationIds.map(async locationID => {
             return this.getLocationById(cpoId, locationID);
         });
@@ -58,12 +58,12 @@ export class StorageService {
 
     private addLocation(key: Key) {
         return async (location: any) => {
-            const globalId = ToolKit.randomBytes32String();
+            const scId = ToolKit.randomBytes32String();
             const data = ToolKit.encrypt(location, key.address);
             const hash = await this.ipfs.add(data);
-            await this.contract.send('addLocation', [globalId, hash['solidity']], key);
+            await this.contract.send('addLocation', [scId, hash['solidity']], key);
             return {
-                globalId,
+                scId,
                 ipfs: hash['ipfs']
             };
         };
@@ -79,12 +79,12 @@ export class StorageService {
     }
 
     private updateLocation(key: Key) {
-        return async (globalId: string, location: any) => {
+        return async (scId: string, location: any) => {
             const data = ToolKit.encrypt(location, key.address);
             const hash = await this.ipfs.add(data);
-            await this.contract.send('updateLocation', [globalId, hash['solidity']], key);
+            await this.contract.send('updateLocation', [scId, hash['solidity']], key);
             return {
-                globalId,
+                scId,
                 ipfs: hash['ipfs']
             };
         };
@@ -100,18 +100,18 @@ export class StorageService {
     }
 
     private batchAddLocation(key: Key) {
-        return async (...locations: object[]): Promise<{id: string, ipfs: string}[]> => {
+        return async (...locations: object[]): Promise<{scId: string, ipfs: string}[]> => {
             const batch = this.contract.newBatch();
             key.nonce = await this.contract.getNonce(key);
-            const trackedLocations: {id: string, ipfs: string}[] = [];
+            const trackedLocations: {scId: string, ipfs: string}[] = [];
             for (const location of locations) {
-                const id = ToolKit.randomBytes32String();
+                const scId = ToolKit.randomBytes32String();
                 const data = ToolKit.encrypt(location, key.address);
                 const hash = await this.ipfs.add(data);
-                const tx = await this.contract.request('addLocation', [id, hash['solidity']], key);
+                const tx = await this.contract.request('addLocation', [scId, hash['solidity']], key);
                 batch.add(tx);
                 key.nonce++;
-                trackedLocations.push({ id, ipfs: hash['ipfs'] });
+                trackedLocations.push({ scId, ipfs: hash['ipfs'] });
             }
             batch.execute();
             return trackedLocations;

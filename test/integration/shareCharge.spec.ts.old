@@ -7,8 +7,8 @@ const Web3 = require('web3');
 
 import { Evse } from './../../src/models/evse';
 import { ShareCharge } from './../../src/shareCharge';
-// import { StationBuilder } from '../stationBuilder';
-// import { EvseBuilder } from '../evseBuilder';
+import { StationBuilder } from '../stationBuilder';
+import { EvseBuilder } from '../evseBuilder';
 import { TestHelper } from '../testHelper';
 import { Wallet } from '../../src/models/wallet';
 import { Contract } from '../../src/models/contract';
@@ -16,7 +16,7 @@ import { EventPoller } from '../../src/services/eventPoller';
 import { ChargingService } from '../../src/services/chargingService';
 import { EvseService } from '../../src/services/evseService';
 import { StationService } from '../../src/services/stationService';
-// import { Station } from '../../src/models/station';
+import { Station } from '../../src/models/station';
 import { ConfigProvider } from "../../src/services/configProvider";
 import { Key } from '../../src/models/key';
 import { ContractProvider } from '../../src/services/contractProvider';
@@ -24,13 +24,10 @@ import { TokenService } from '../../src/services/tokenService';
 import { StorageService } from '../../src/services/storageService';
 import { IpfsProvider } from '../../src/services/ipfsProvider';
 import { Ipfs } from '../../src/models/ipfs';
-import IpfsMock from '../ipfsMock';
-
-const ocpiLocation = require('../data/ocpiLocation.json');
 
 const config = new ConfigProvider();
 
-describe('ShareCharge', function () {
+describe.only('ShareCharge', function () {
 
     this.timeout(20 * 1000);
     const batchTimeout = 500;
@@ -92,7 +89,11 @@ describe('ShareCharge', function () {
             obtain(key: string): Contract {
                 return storageContract;
             }
-        }, <IpfsProvider>IpfsMock);
+        }, <IpfsProvider>{
+            obtain(): any {
+                return {};
+            }
+        });
 
         const chargingContract = await TestHelper.createContract(web3, config, contractDefs["Charging"]);
         chargingService = new ChargingService(<ContractProvider>{
@@ -104,8 +105,8 @@ describe('ShareCharge', function () {
         const tokenContract = await TestHelper.createContract(web3, config, contractDefs["MSPToken"], ["S&C Token", "SCT"]);
         tokenService = new TokenService(new ContractProvider(new ConfigProvider({ tokenAddress: tokenContract.address })));
 
-        await chargingContract.native.methods["setStorageAddress"](storageContract.address).send({ from: coinbase });
-        // await evseContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
+        await chargingContract.native.methods["setEvsesAddress"](evseContract.address).send({ from: coinbase });
+        await evseContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
 
         eventPoller = new EventPoller(config);
 
@@ -122,157 +123,177 @@ describe('ShareCharge', function () {
         // eventPoller.reset();
     });
 
-    context('#charging', async () => {
+    context('#stations', async () => {
 
         it('should broadcast start confirmed to msp', async () => {
-            const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            const evseId = ToolKit.randomBytes32String();
+            const evse = new EvseBuilder()
+                .withIsAvailable(true)
+                .build();
 
+            await shareCharge.evses.useWallet(cpoWallet).create(evse);
+
+            let evseId = "";
             let controller = "";
 
             await shareCharge.on("StartConfirmed", async (result) => {
-                if (result.scId === location.scId
+                if (result.evseId === evse.id
                     && result.controller.toLowerCase() === driverKey.address) {
 
+                    evseId = result.evseId;
                     controller = result.controller;
                 }
             });
 
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, tokenAddress, 100);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStart(location.scId, evseId, '0x01');
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, tokenAddress, 100);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse);
 
             await eventPoller.poll();
+
+            expect(evseId).to.equal(evse.id);
             expect(controller.toLowerCase()).to.equal(driverKey.address);
         });
 
         it('should broadcast stop confirmed to msp', async () => {
-            const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            const evseId = ToolKit.randomBytes32String();
+            const evse = new EvseBuilder().withBasePrice(1).build();
+            await shareCharge.evses.useWallet(cpoWallet).create(evse);
 
+            let evseId = "";
             let controller = "";
+            let cdr = "";
             let finalPrice = 200;
             let timestamp: number;
             let token: string;
 
             await shareCharge.on("StopConfirmed", async (result) => {
-                if (result.scId === location.scId
+                if (result.evseId === evse.id
                     && result.controller.toLowerCase() === driverKey.address) {
 
+                    evseId = result.evseId;
                     controller = result.controller;
                 }
             });
 
             await shareCharge.on("ChargeDetailRecord", async (result) => {
+                cdr = result.evseId;
                 finalPrice = result.finalPrice;
                 timestamp = result.timestamp;
                 token = result.tokenAddress;
             });
 
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, shareCharge.token.address, 300);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStart(location.scId, evseId, '0x01');
-            await shareCharge.charging.useWallet(driverWallet).requestStop(location.scId, evseId);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStop(location.scId, evseId);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 300);
+
+            await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse);
+            await shareCharge.charging.useWallet(driverWallet).requestStop(evse);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStop(evse);
 
             await eventPoller.poll();
 
-            await shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord(location.scId, evseId, finalPrice);
+            await shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord(evse, finalPrice, timestamp);
             await eventPoller.poll();
 
+            expect(evseId).to.equal(evse.id);
             expect(controller.toLowerCase()).to.equal(driverKey.address);
+
+            expect(cdr).to.equal(evse.id);
             expect(Number(finalPrice)).to.equal(200);
+
             expect(token).to.equal(shareCharge.token.address);
         });
 
         it('should broadcast error to msp', async () => {
-            const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            const evseId = ToolKit.randomBytes32String();
+            const evse = new EvseBuilder().build();
+            await shareCharge.evses.useWallet(cpoWallet).create(evse);
 
+            let evseId = "";
             let controller = "";
             let errorCode = -1;
 
             await shareCharge.on("Error", async (result) => {
-                if (result.scId === location.scId
+                if (result.evseId === evse.id
                     && result.controller.toLowerCase() === driverKey.address) {
+                    evseId = result.evseId;
                     controller = result.controller;
                     errorCode = parseInt(result.errorCode);
                 }
             });
 
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, shareCharge.token.address, 0);
-            await shareCharge.charging.useWallet(cpoWallet).error(location.scId, evseId, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(cpoWallet).error(evse, 0);
 
             await eventPoller.poll();
 
+            expect(evseId).to.equal(evse.id);
             expect(controller.toLowerCase()).to.equal(driverKey.address);
             expect(errorCode).to.equal(0);
+
         });
 
 
         it('should broadcast charge stop requested to cpo', async () => {
-            const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            const evseId = ToolKit.randomBytes32String();
+            const evse = new EvseBuilder().withBasePrice(1).build();
+            await shareCharge.evses.useWallet(cpoWallet).create(evse);
 
-            let eventEvseId = "";
+            let evseId = "";
 
             await shareCharge.on("StopRequested", async (result) => {
-                if (result.scId == location.scId) {
-                    eventEvseId = result.evseId;
+                if (result.evseId == evse.id) {
+                    evseId = result.evseId;
                 }
             });
 
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, shareCharge.token.address, 0);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStart(location.scId, evseId, '0x01');
-            await shareCharge.charging.useWallet(driverWallet).requestStop(location.scId, evseId);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse);
+            await shareCharge.charging.useWallet(driverWallet).requestStop(evse);
 
             await eventPoller.poll();
 
-            expect(eventEvseId).to.equal(evseId);
+            expect(evseId).to.equal(evse.id);
         });
 
         it('should broadcast charge start requested to cpo', async () => {
-            const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            const evseId = ToolKit.randomBytes32String();
+            const evse = new EvseBuilder().withBasePrice(1).build();
+            await shareCharge.evses.useWallet(cpoWallet).create(evse);
 
-            let eventEvseId = "";
+            let evseId = "";
             let controller = "";
 
             await shareCharge.on("StartRequested", async (result) => {
-                if (result.scId == location.scId) {
-                    eventEvseId = result.evseId;
+                if (result.evseId == evse.id) {
+                    evseId = result.evseId;
                     controller = result.controller;
                 }
             });
 
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 0);
 
             await eventPoller.poll();
 
-            expect(eventEvseId).to.equal(evseId);
+            expect(evseId).to.equal(evse.id);
             expect(controller.toLowerCase()).to.equal(driverKey.address);
         });
 
-    });
+        it('should broadcast evse created and updated events', async () => {
+            let evseCreatedId = "";
+            let evseUpdatedId = "";
 
-    context('store', () => {
-
-        it('should broadcast location created and updated events', async () => {
-            let locationAddedId = "";
-            let locationUpdatedId = "";
-
-            shareCharge.on("LocationAdded", (result) => {
-                locationAddedId = result.scId;
+            shareCharge.on("EvseCreated", (result) => {
+                evseCreatedId = result.evseId;
             });
 
-            shareCharge.on("LocationUpdated", (result) => {
-                locationUpdatedId = result.evseId;
+            shareCharge.on("EvseUpdated", (result) => {
+                evseUpdatedId = result.evseId;
             });
 
-            const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            await shareCharge.store.useWallet(cpoWallet).updateLocation(location.scId, ocpiLocation);
+            const evse = new EvseBuilder().withBasePrice(1).build();
+
+            await shareCharge.evses.useWallet(cpoWallet).create(evse);
+
+            evse.available = !evse.available;
+            await shareCharge.evses.useWallet(cpoWallet).update(evse);
 
             await eventPoller.poll();
 
-            expect(locationAddedId).to.equal(location.scId);
+            expect(evseCreatedId).to.equal(evse.id);
 
             // expect(evseUpdatedId).to.equal(evse.id);
 
@@ -281,47 +302,55 @@ describe('ShareCharge', function () {
             return new Promise((resolve, reject) => setTimeout(() => resolve(), batchTimeout));
         });
 
+        it('should broadcast station created and updated events', async () => {
+            let stationCreatedId = "";
+            let stationUpdatedId = "";
+
+            shareCharge.on("StationCreated", (result) => {
+                stationCreatedId = result.stationId;
+            });
+
+            shareCharge.on("StationUpdated", (result) => {
+                stationUpdatedId = result.stationId;
+            });
+
+            const station = new StationBuilder().build();
+            await shareCharge.stations.useWallet(cpoWallet).create(station);
+
+            station.latitude = station.latitude - 1;
+            station.longitude = station.longitude + 1;
+
+            await shareCharge.stations.useWallet(cpoWallet).update(station);
+
+            await eventPoller.poll();
+
+            expect(stationCreatedId).to.equal(station.id);
+        });
     });
 
     context('#GetLogs()', () => {
 
         it('should retrieve all contract events of a particular type', async () => {
-            const logsBefore = await shareCharge.store.contract.getLogs('LocationUpdated');
+            const evse = new EvseBuilder().withBasePrice(1).build();
+            await shareCharge.evses.useWallet(cpoWallet).create(evse);
 
-            const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            await shareCharge.store.useWallet(cpoWallet).updateLocation(location.scId, ocpiLocation);
-            await shareCharge.store.useWallet(cpoWallet).updateLocation(location.scId, ocpiLocation);
-            await shareCharge.store.useWallet(cpoWallet).updateLocation(location.scId, ocpiLocation);
+            const logsBefore = await shareCharge.charging.contract.getLogs('StartRequested');
 
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 0);
 
-            const logsAfter = await shareCharge.store.contract.getLogs('LocationUpdated');
+            const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested');
             expect(logsAfter.length).to.equal(logsBefore.length + 3);
             expect(logsAfter[0].blockNumber).to.be.greaterThan(0);
         });
 
-        it('should filter contract events by equal value', async () => {
-            const location1 = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            const location2 = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            const location3 = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-
-            const evseId = ToolKit.randomBytes32String();
-
-            const logsBefore = await shareCharge.charging.contract.getLogs('StartRequested');
-
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location1.scId, evseId, shareCharge.token.address, 0);
-            await shareCharge.charging.useWallet(cpoWallet).requestStart(location2.scId, evseId, shareCharge.token.address, 0);
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location3.scId, evseId, shareCharge.token.address, 0);
-
-            const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', { controller: driverKey.address });
-            expect(logsAfter.length).to.equal(logsBefore.length + 2);
-        });
-
-        it('should filter charge detail record events by timestamp start and end', async () => {
+        it('should filter logs', async () => {
             let timestamp: number;
             let finalPrice = 150;
 
-            const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            const evseId = ToolKit.randomBytes32String();
+            const evse = new EvseBuilder().withBasePrice(1).build();
+            await shareCharge.evses.useWallet(cpoWallet).create(evse);
 
             const logsBefore = await shareCharge.charging.contract.getLogs('ChargeDetailRecord');
             await shareCharge.on("ChargeDetailRecord", async (result) => {
@@ -329,10 +358,10 @@ describe('ShareCharge', function () {
                 finalPrice = result.finalPrice;
             });
 
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, shareCharge.token.address, 200);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStart(location.scId, evseId, '0x01');
-            await shareCharge.charging.useWallet(cpoWallet).confirmStop(location.scId, evseId);
-            await shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord(location.scId, evseId, finalPrice);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 200);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStart(evse);
+            await shareCharge.charging.useWallet(cpoWallet).confirmStop(evse);
+            await shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord(evse, finalPrice, timestamp);
 
             const logsAfter = await shareCharge.charging.contract.getLogs('ChargeDetailRecord', {
                 controller: driverKey.address,
@@ -341,10 +370,24 @@ describe('ShareCharge', function () {
             expect(logsAfter.length).to.equal(logsBefore.length + 1);
         });
 
+        it('should filter contract events', async () => {
+            const evse = new EvseBuilder().withBasePrice(1).build();
+            await shareCharge.evses.useWallet(cpoWallet).create(evse);
+
+            const logsBefore = await shareCharge.charging.contract.getLogs('StartRequested');
+
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(cpoWallet).requestStart(evse, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 0);
+
+            const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', { controller: driverKey.address });
+            expect(logsAfter.length).to.equal(logsBefore.length + 2);
+        });
+
         it('should return gasUsed and timestamp', async () => {
-            const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            const evseId = ToolKit.randomBytes32String();
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, shareCharge.token.address, 0);
+            const evse = new EvseBuilder().withBasePrice(1).build();
+            await shareCharge.evses.useWallet(cpoWallet).create(evse);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(evse, shareCharge.token.address, 0);
 
             const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', { controller: driverKey.address });
             expect(logsAfter[0].gasUsed).to.not.be.undefined;

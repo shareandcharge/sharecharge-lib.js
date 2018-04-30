@@ -26,13 +26,13 @@ export class Contract {
         for (const [key, value] of Object.entries(filter)) {
             if (key === 'timestamp') {
                 logs = logs.filter(log => {
-                    return log.returnValues[key] > value['start'] && log.returnValues[key] < value['end']
-                })
+                    return log.returnValues[key] > value['start'] && log.returnValues[key] < value['end'];
+                });
             } else {
                 logs = logs.filter(log => log.returnValues[key].toLowerCase() === value);
             }
         }
-        
+
         return Promise.all(logs.map(async filtered => {
             const receipt = await this.web3.eth.getTransactionReceipt(filtered.transactionHash);
             const block = await this.web3.eth.getBlock(filtered.blockHash);
