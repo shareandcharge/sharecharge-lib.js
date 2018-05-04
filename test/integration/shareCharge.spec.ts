@@ -5,18 +5,12 @@ import { expect } from 'chai';
 
 const Web3 = require('web3');
 
-import { Evse } from './../../src/models/evse';
 import { ShareCharge } from './../../src/shareCharge';
-// import { StationBuilder } from '../stationBuilder';
-// import { EvseBuilder } from '../evseBuilder';
 import { TestHelper } from '../testHelper';
 import { Wallet } from '../../src/models/wallet';
 import { Contract } from '../../src/models/contract';
 import { EventPoller } from '../../src/services/eventPoller';
 import { ChargingService } from '../../src/services/chargingService';
-import { EvseService } from '../../src/services/evseService';
-import { StationService } from '../../src/services/stationService';
-// import { Station } from '../../src/models/station';
 import { ConfigProvider } from "../../src/services/configProvider";
 import { Key } from '../../src/models/key';
 import { ContractProvider } from '../../src/services/contractProvider';
@@ -45,8 +39,6 @@ describe('ShareCharge', function () {
     let cpoWallet: Wallet, cpoKey: Key;
     let mspWallet: Wallet, mspKey: Key;
     let driverWallet: Wallet, driverKey: Key;
-    let stationService: StationService;
-    let evseService: EvseService;
     let chargingService: ChargingService;
     let tokenService: TokenService;
     let storageService: StorageService;
@@ -75,20 +67,6 @@ describe('ShareCharge', function () {
 
         const coinbase = await web3.eth.getCoinbase();
 
-        const evseContract = await TestHelper.createContract(web3, config, contractDefs["EvseStorage"]);
-        evseService = new EvseService(<ContractProvider>{
-            obtain(key: string): Contract {
-                return evseContract;
-            }
-        });
-
-        const stationContract = await TestHelper.createContract(web3, config, contractDefs["StationStorage"]);
-        stationService = new StationService(<ContractProvider>{
-            obtain(key: string): Contract {
-                return stationContract;
-            }
-        });
-
         const storageContract = await TestHelper.createContract(web3, config, contractDefs["ExternalStorage"]);
         storageService = new StorageService(<ContractProvider>{
             obtain(key: string): Contract {
@@ -111,7 +89,7 @@ describe('ShareCharge', function () {
 
         eventPoller = new EventPoller(config);
 
-        shareCharge = new ShareCharge(stationService, evseService, chargingService, tokenService, storageService, eventPoller);
+        shareCharge = new ShareCharge(chargingService, tokenService, storageService, eventPoller);
         tokenAddress = await shareCharge.token.useWallet(mspWallet).deploy('MSP Token', 'MSP');
         await shareCharge.token.useWallet(mspWallet).setAccess(shareCharge.charging.address);
         await shareCharge.token.useWallet(mspWallet).mint(driverKey.address, 1000);
