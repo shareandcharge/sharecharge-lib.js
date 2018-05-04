@@ -21,6 +21,10 @@ An Ethereum client should be running in the background. A popular choice for dev
 
 ..
 
+**IPFS**
+
+An ipfs client should also be running in the background. You can find installation instructions `here <https://ipfs.io/docs/getting-started/>`__.
+
 **sharecharge-contracts**
 
 The Share & Charge library depends on `@motionwerk/sharecharge-contracts <https://github.com/motionwerkGmbH/sharecharge-contracts>`__. This package provides definitions of the smart contracts used to store and interact with Charge Points on the Share & Charge EV network. Definitions can be overwritten to point the library to a different network, for example your local development environment. 
