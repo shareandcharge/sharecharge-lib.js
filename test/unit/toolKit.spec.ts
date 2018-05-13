@@ -10,7 +10,12 @@ describe('ToolKit', () => {
     const address = wallet.keychain[0].address;
 
     it('should generate bytes32 string', () => {
-        const bytes32 = ToolKit.randomBytes32String();
+        const bytes32 = ToolKit.randomByteString(32);
+        expect(bytes32.length).to.equal(66);
+    });
+
+    it('should generate emtpy bytes32 string', () => {
+        const bytes32 = ToolKit.emptyByteString(32);
         expect(bytes32.length).to.equal(66);
     });
 

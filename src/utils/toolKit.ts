@@ -5,13 +5,21 @@ const web3Utils = require('web3').utils;
 
 export class ToolKit {
 
-    static randomBytes32String(): string {
-        return '0x' + crypto.randomBytes(32).toString('hex');
+    static randomByteString(length: number): string {
+        return '0x' + crypto.randomBytes(length).toString('hex');
         // let bytes = '';
         // for (let i = 0; i < 6; i++) {
         //     bytes += Math.random().toString(16).substr(2);
         // }
         // return '0x' + bytes.substr(0, 64);
+    }
+
+    static emptyByteString(length: number): string {
+        let bytes = '0x';
+        for (let i = 0; i < length * 2; i++) {
+            bytes += '0';
+        }
+        return bytes;
     }
 
     static hexToString(val: string): string {

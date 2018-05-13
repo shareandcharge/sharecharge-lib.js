@@ -40,8 +40,12 @@ export class StorageService {
 
     async getTariffsByCPO(cpoId): Promise<any> {
         const hash = await this.contract.call('getTariffsByCPO', cpoId);
-        const data = await this.ipfs.get(hash);
-        return ToolKit.decrypt(data, cpoId);
+        if (hash !== ToolKit.emptyByteString(32)) {
+            const data = await this.ipfs.get(hash);
+            return ToolKit.decrypt(data, cpoId);
+        } else {
+            return [];
+        }
     }
 
     useWallet(wallet: Wallet, keyIndex = 0) {
@@ -61,7 +65,7 @@ export class StorageService {
 
     private addLocation(key: Key) {
         return async (location: any) => {
-            const scId = ToolKit.randomBytes32String();
+            const scId = ToolKit.randomByteString(32);
             const data = ToolKit.encrypt(location, key.address);
             const hash = await this.ipfs.add(data);
             await this.contract.send('addLocation', [scId, hash['solidity']], key);
@@ -108,7 +112,7 @@ export class StorageService {
             key.nonce = await this.contract.getNonce(key);
             const trackedLocations: {scId: string, ipfs: string}[] = [];
             for (const location of locations) {
-                const scId = ToolKit.randomBytes32String();
+                const scId = ToolKit.randomByteString(32);
                 const data = ToolKit.encrypt(location, key.address);
                 const hash = await this.ipfs.add(data);
                 const tx = await this.contract.request('addLocation', [scId, hash['solidity']], key);
