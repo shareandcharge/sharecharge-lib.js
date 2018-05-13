@@ -22,7 +22,7 @@ export class StorageService {
 
     async getLocationById(cpoId: string, locationId: string): Promise<any> {
         const hash = await this.contract.call('getLocationById', cpoId, locationId);
-        const data = await this.ipfs.get(hash);
+        const data = await this.ipfs.cat(hash);
         return ToolKit.decrypt(data, cpoId);
     }
 
@@ -41,7 +41,7 @@ export class StorageService {
     async getTariffsByCPO(cpoId): Promise<any> {
         const hash = await this.contract.call('getTariffsByCPO', cpoId);
         if (hash !== ToolKit.emptyByteString(32)) {
-            const data = await this.ipfs.get(hash);
+            const data = await this.ipfs.cat(hash);
             return ToolKit.decrypt(data, cpoId);
         } else {
             return [];

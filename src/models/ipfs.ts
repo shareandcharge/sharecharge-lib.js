@@ -14,10 +14,10 @@ export class Ipfs {
         };
     }
 
-    async get(bytes32: string): Promise<string> {
+    async cat(bytes32: string): Promise<string> {
         const hash = ToolKit.bytes32ToIpfsHash(bytes32);
-        const result = await this.ipfs.files.get(hash);
-        return result[0].content.toString();
+        const result = await this.ipfs.files.cat(hash);
+        return JSON.parse(result.toString());
     }
 
 }

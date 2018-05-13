@@ -1,4 +1,3 @@
-import { Evse } from "../models/evse";
 import { Contract } from "../models/contract";
 import { Wallet } from "../models/wallet";
 import { ContractProvider } from "./contractProvider";
