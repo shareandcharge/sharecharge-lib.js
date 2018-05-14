@@ -8,22 +8,16 @@ import { Key } from '../models/key';
 
 export class StorageService {
 
-    public readonly contract: Contract;
-    public readonly ipfs: Ipfs;
-
     /**
-     * Get past logs for a specific event
-     * @param eventName specify event name to get past logs for
-     * @param filter object containing properties to filter by [optional]
-     * @param fromBlock block number to get past logs from
-     * @returns array of past event logs
+     * Access to generic contract functions (e.g. getLogs)
      */
-    public readonly getLogs: (eventName: string, filter?: {}, fromBlock?: number) => Promise<any[]>;
+    public readonly contract: Contract;
+
+    private readonly ipfs: Ipfs;
 
     constructor(private contractProvider: ContractProvider, private ipfsProvider: IpfsProvider) {
         this.contract = this.contractProvider.obtain('ExternalStorage');
         this.ipfs = this.ipfsProvider.obtain();
-        this.getLogs = this.contract.getLogs;
     }
 
     /**

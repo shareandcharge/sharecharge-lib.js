@@ -5,20 +5,13 @@ import { ToolKit } from '../utils/toolKit';
 
 export class ChargingService {
 
-    public readonly contract: Contract;
-
     /**
-     * Get past logs for a specific event
-     * @param eventName specify event name to get past logs for
-     * @param filter object containing properties to filter by [optional]
-     * @param fromBlock block number to get past logs from
-     * @returns array of past event logs
+     * Access to generic contract functions (e.g. getLogs)
      */
-    public readonly getLogs: (eventName: string, filter?: {}, fromBlock?: number) => Promise<any[]>;
+    public readonly contract: Contract;
 
     constructor(private contractProvider: ContractProvider) {
         this.contract = this.contractProvider.obtain('Charging');
-        this.getLogs = this.contract.getLogs;
     }
 
     /**

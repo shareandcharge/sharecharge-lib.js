@@ -228,7 +228,7 @@ describe('ShareCharge', function () {
 
     });
 
-    context('store', () => {
+    context('#store', () => {
 
         it('should broadcast location created and updated events', async () => {
             let locationAddedId = "";
@@ -258,7 +258,7 @@ describe('ShareCharge', function () {
 
     });
 
-    context('#GetLogs()', () => {
+    context('#getLogs()', () => {
 
         it('should retrieve all contract events of a particular type', async () => {
             const logsBefore = await shareCharge.store.contract.getLogs('LocationUpdated');

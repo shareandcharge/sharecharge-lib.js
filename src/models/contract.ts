@@ -21,6 +21,13 @@ export class Contract {
         return this.web3.eth.getBalance(key.address);
     }
 
+    /**
+     * Get past logs for a specific event
+     * @param eventName specify event name to get past logs for
+     * @param filter object containing properties to filter by [optional]
+     * @param fromBlock block number to get past logs from
+     * @returns array of past event logs
+     */
     async getLogs(eventName: string, filter = {}, fromBlock = 0): Promise<any[]> {
         let logs = await this.native.getPastEvents(eventName, { fromBlock });
         for (const [key, value] of Object.entries(filter)) {
