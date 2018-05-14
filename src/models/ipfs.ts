@@ -1,11 +1,10 @@
-import * as bs58 from 'bs58';
 import { ToolKit } from '../utils/toolKit';
 
 export class Ipfs {
 
     constructor(private ipfs) {}
 
-    async add(content: string): Promise<object> {
+    async add(content: string): Promise<{ ipfs: string, solidity: string }> {
         const contentBuffer = Buffer.from(content);
         const result = await this.ipfs.files.add(contentBuffer);
         return {

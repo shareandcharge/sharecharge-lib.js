@@ -5,7 +5,7 @@ import { ToolKit } from '../utils/toolKit';
 
 export class ChargingService {
 
-    public readonly contract;
+    public readonly contract: Contract;
 
     constructor(private contractProvider: ContractProvider) {
         this.contract = this.contractProvider.obtain('Charging');

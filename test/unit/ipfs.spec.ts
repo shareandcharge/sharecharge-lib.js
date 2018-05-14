@@ -15,7 +15,8 @@ describe('Ipfs', () => {
         expect(ipfs).to.equal(exampleHash);
     });
 
-    it('should cat from bytes32 string', async () => {
+    // requires IPFS node running
+    it.skip('should cat from bytes32 string', async () => {
         const bytes = ToolKit.ipfsHashToBytes32(exampleHash);
         const content = await ipfs.cat(bytes);
         expect(content['a']).to.equal(123);
