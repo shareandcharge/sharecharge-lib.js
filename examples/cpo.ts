@@ -1,7 +1,5 @@
 import { ShareCharge } from '../src/shareCharge';
-import { Evse } from '../src/models/evse';
 import { Wallet } from '../src/models/wallet';
-import { Station } from '../src/models/station';
 
 const ocpiLocation = require('../test/data/ocpiLocation');
 
@@ -30,6 +28,7 @@ async function main() {
             } else {
                 await sc.charging.useWallet(wallet).error(location.scId, result.evseId, 0);
             }
+
         }
     });
 

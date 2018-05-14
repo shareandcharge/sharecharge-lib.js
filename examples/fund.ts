@@ -17,4 +17,3 @@ TestHelper.ensureFunds(web3, cpoWallet.keychain[0])
     .then(() => TestHelper.ensureFunds(web3, mspWallet.keychain[0])
     .then(() => TestHelper.ensureFunds(web3, driverWallet.keychain[0])
     .then(() => console.log('Funded CPO, MSP and Driver wallets'))));
-

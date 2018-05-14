@@ -16,7 +16,7 @@ export class Ipfs {
     async cat(bytes32: string): Promise<string> {
         const hash = ToolKit.bytes32ToIpfsHash(bytes32);
         const result = await this.ipfs.files.cat(hash);
-        return JSON.parse(result.toString());
+        return result.toString();
     }
 
 }
