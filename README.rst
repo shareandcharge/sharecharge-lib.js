@@ -124,7 +124,7 @@ The module has a default configuration object:
         ipfsProvider: '/ip4/127.0.0.1/tcp/5001';
         gasPrice: 18000000000;
         pollingInterval: 1000;
-        this.tokenAddress: "";
+        tokenAddress: "";
     }
 
 *Retrieving instance*
