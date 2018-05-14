@@ -6,6 +6,13 @@ This is the Library for interacting with the Share & Charge EV Network. It can b
 
 ----
 
+Usage
+-----
+
+See the `examples <https://github.com/motionwerkGmbH/sharecharge-lib/tree/domain/examples>`__ directory for eMobility Service Provider and Charge Point Operator-specific usage.
+
+----
+
 Setup
 -----
 
