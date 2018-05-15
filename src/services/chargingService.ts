@@ -81,7 +81,7 @@ export class ChargingService {
              * @returns transaction object if successful
              */
             chargeDetailRecord: async (scId: string, evseId: string, finalPrice: number) => {
-                const timestamp = Date.now();
+                const timestamp = Date.now() / 1000;
                 return this.contract.send("chargeDetailRecord", [scId, ToolKit.asciiToHex(evseId), finalPrice, timestamp], key);
             },
 
