@@ -50,7 +50,7 @@ describe('StorageService', function () {
         );
     });
 
-    context.only('#addLocation()', () => {
+    context('#addLocation()', () => {
         it('should add location to storage', async () => {
             const result = await storageService.useWallet(wallet).addLocation(ocpiLocation);
             const scIds = await storageService.getIdsByCPO(key.address);
