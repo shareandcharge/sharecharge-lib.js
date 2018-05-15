@@ -40,8 +40,17 @@ export class StorageService {
     }
 
     /**
+     * Get Share & Charge location IDs for a specific CPO
+     * @param cpoId the identity (address) of the Charge Point Operator
+     * @returns array of Share & Charge location IDs
+     */
+    async getIdsByCPO(cpoId: string): Promise<string[]> {
+        return this.contract.call('getShareAndChargeIdsByCPO', cpoId);
+    }
+
+    /**
      * Get all locations (charge points) belonging to a specific Charge Point Operator
-     * @param cpoId the identity (address) of the Charge Point Operator which owns the Charge Point
+     * @param cpoId the identity (address) of the Charge Point Operator
      * @returns array of objects containing the Share & Charge ID for the Charge Point and its data
      */
     async getLocationsByCPO(cpoId: string): Promise<{ scId: string, data: any }[]> {
