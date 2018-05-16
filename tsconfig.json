@@ -19,12 +19,10 @@
       "es2017"
     ]
   },
-  "include": [
-    "./src/**/*"
-  ],
   "exclude": [
     "node_modules",
     "logs",
-    "dist"
+    "dist",
+    "test"
   ]
 }
