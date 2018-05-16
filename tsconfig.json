@@ -23,6 +23,7 @@
     "node_modules",
     "logs",
     "dist",
-    "test"
+    "test",
+    "examples"
   ]
 }
