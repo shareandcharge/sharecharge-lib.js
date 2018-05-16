@@ -82,9 +82,9 @@ describe('ShareCharge', function () {
         });
 
         const tokenContract = await TestHelper.createContract(web3, config, contractDefs["MSPToken"], ["S&C Token", "SCT"]);
-        tokenService = new TokenService(new ContractProvider(new ConfigProvider({ tokenAddress: tokenContract.address })));
+        tokenService = new TokenService(new ContractProvider(new ConfigProvider({tokenAddress: tokenContract.address})));
 
-        await chargingContract.native.methods["setStorageAddress"](storageContract.address).send({ from: coinbase });
+        await chargingContract.native.methods["setStorageAddress"](storageContract.address).send({from: coinbase});
         // await evseContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
 
         eventPoller = new EventPoller(config);
@@ -130,7 +130,7 @@ describe('ShareCharge', function () {
             let controller = "";
             let finalPrice = 200;
             let timestamp: number;
-            let token: string;
+            let token: string = "";
 
             await shareCharge.on("StopConfirmed", async (result) => {
                 if (result.scId === location.scId
@@ -285,7 +285,7 @@ describe('ShareCharge', function () {
             await shareCharge.charging.useWallet(cpoWallet).requestStart(location2.scId, evseId, shareCharge.token.address, 0);
             await shareCharge.charging.useWallet(driverWallet).requestStart(location3.scId, evseId, shareCharge.token.address, 0);
 
-            const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', { controller: driverKey.address });
+            const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', {controller: driverKey.address});
             expect(logsAfter.length).to.equal(logsBefore.length + 2);
         });
 
@@ -308,7 +308,7 @@ describe('ShareCharge', function () {
 
             const logsAfter = await shareCharge.charging.contract.getLogs('ChargeDetailRecord', {
                 controller: driverKey.address,
-                timestamp: { start: 152469000, end: 3524843383145 }
+                timestamp: {start: 152469000, end: 3524843383145}
             });
             expect(logsAfter.length).to.equal(logsBefore.length + 1);
         });
@@ -317,7 +317,7 @@ describe('ShareCharge', function () {
             const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
             await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, shareCharge.token.address, 0);
 
-            const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', { controller: driverKey.address });
+            const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', {controller: driverKey.address});
             expect(logsAfter[0].gasUsed).to.not.be.undefined;
             expect(logsAfter[0].timestamp).to.not.be.undefined;
         });

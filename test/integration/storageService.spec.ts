@@ -61,7 +61,7 @@ describe('StorageService', function () {
         });
 
         it('should bulk add locations', async () => {
-            const locs = [];
+            const locs: any[] = [];
             for (let i = 0; i < 10; i++) {
                 locs[i] = ocpiLocation;
             }
