@@ -36,7 +36,7 @@ export class StorageService {
     async getLocationById(cpoId: string, scId: string): Promise<any> {
         const hash = await this.contract.call('getLocationById', cpoId, scId);
         const data = await this.ipfs.cat(hash);
-        return ToolKit.decrypt(data, cpoId);
+        return data;
     }
 
     /**
@@ -74,7 +74,7 @@ export class StorageService {
         const hash = await this.contract.call('getTariffsByCPO', cpoId);
         if (hash !== ToolKit.emptyByteString(32)) {
             const data = await this.ipfs.cat(hash);
-            return ToolKit.decrypt(data, cpoId);
+            return data;
         } else {
             return [];
         }
@@ -147,8 +147,7 @@ export class StorageService {
     private addLocation(key: Key) {
         return async (location: any) => {
             const scId = ToolKit.randomByteString(32);
-            const data = ToolKit.encrypt(location, key.address);
-            const hash = await this.ipfs.add(data);
+            const hash = await this.ipfs.add(location);
             await this.contract.send('addLocation', [scId, hash['solidity']], key);
             return {
                 scId,
@@ -159,8 +158,7 @@ export class StorageService {
 
     private addTariffs(key: Key) {
         return async (tariffs: any) => {
-            const data = ToolKit.encrypt(tariffs, key.address);
-            const hash = await this.ipfs.add(data);
+            const hash = await this.ipfs.add(tariffs);
             await this.contract.send('addTariffs', [hash['solidity']], key);
             return hash['ipfs'];
         };
@@ -168,8 +166,7 @@ export class StorageService {
 
     private updateLocation(key: Key) {
         return async (scId: string, location: any) => {
-            const data = ToolKit.encrypt(location, key.address);
-            const hash = await this.ipfs.add(data);
+            const hash = await this.ipfs.add(location);
             await this.contract.send('updateLocation', [scId, hash['solidity']], key);
             return {
                 scId,
@@ -180,8 +177,7 @@ export class StorageService {
 
     private updateTariffs(key: Key) {
         return async (tariffs: any) => {
-            const data = ToolKit.encrypt(tariffs, key.address);
-            const hash = await this.ipfs.add(data);
+            const hash = await this.ipfs.add(tariffs);
             await this.contract.send('updateTariffs', [hash['solidity']], key);
             return hash['ipfs'];
         };
@@ -194,8 +190,7 @@ export class StorageService {
             const trackedLocations: {scId: string, ipfs: string}[] = [];
             for (const location of locations) {
                 const scId = ToolKit.randomByteString(32);
-                const data = ToolKit.encrypt(location, key.address);
-                const hash = await this.ipfs.add(data);
+                const hash = await this.ipfs.add(location);
                 const tx = await this.contract.request('addLocation', [scId, hash['solidity']], key);
                 batch.add(tx);
                 key.nonce++;

@@ -1,4 +1,4 @@
-const encLocation = require('./data/encLocation.json');
+const location = require('./data/ocpiLocation.json');
 
 export default {
     obtain(): any {
@@ -9,7 +9,7 @@ export default {
                     solidity: '0x5b550af4e10a5631201589b74703d5d2217efbfadc4a8816eee55696f3b4cc40'
                 };
             },
-            cat: async (hash: string) => { return JSON.stringify(encLocation); }
+            cat: async (hash: string) => { return location; }
         };
     }
 };

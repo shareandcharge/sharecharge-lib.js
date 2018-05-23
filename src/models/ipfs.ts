@@ -4,8 +4,8 @@ export class Ipfs {
 
     constructor(private ipfs) {}
 
-    async add(content: string): Promise<{ ipfs: string, solidity: string }> {
-        const contentBuffer = Buffer.from(content);
+    async add(content: any): Promise<{ ipfs: string, solidity: string }> {
+        const contentBuffer = Buffer.from(JSON.stringify(content));
         const result = await this.ipfs.files.add(contentBuffer);
         return {
             ipfs: result[0].hash,
@@ -13,10 +13,10 @@ export class Ipfs {
         };
     }
 
-    async cat(bytes32: string): Promise<string> {
+    async cat(bytes32: string): Promise<any> {
         const hash = ToolKit.bytes32ToIpfsHash(bytes32);
         const result = await this.ipfs.files.cat(hash);
-        return result.toString();
+        return JSON.parse(result.toString());
     }
 
 }

@@ -19,7 +19,6 @@ import IpfsMock from '../ipfsMock';
 const config = new ConfigProvider();
 const ocpiLocation = require('../data/ocpiLocation.json');
 const ocpiTariffs = require('../data/ocpiTariffs.json');
-const encLocation = require('../data/encLocation.json');
 
 describe('StorageService', function () {
 
