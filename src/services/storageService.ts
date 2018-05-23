@@ -70,7 +70,7 @@ export class StorageService {
      * @param cpoId the identity (address) of the Charge Point Operator which owns the Charge Point
      * @returns tariffs data object
      */
-    async getTariffsByCPO(cpoId): Promise<any> {
+    async getTariffsByCPO(cpoId: string): Promise<any> {
         const hash = await this.contract.call('getTariffsByCPO', cpoId);
         if (hash !== ToolKit.emptyByteString(32)) {
             const data = await this.ipfs.cat(hash);
@@ -78,6 +78,16 @@ export class StorageService {
         } else {
             return [];
         }
+    }
+
+    /**
+     * Get the owner of a particular location by its ID
+     * @param scId the unique Share & Charge location identifier
+     * @returns owner address of the location
+     */
+    async getOwnerOfLocation(scId: string): Promise<string> {
+        const owner = await this.contract.call('ownerOf', scId);
+        return owner;
     }
 
     /**

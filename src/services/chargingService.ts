@@ -22,6 +22,22 @@ export class ChargingService {
     }
 
     /**
+     * Get current charging session details for a particular EVSE
+     *
+     * @param scId the unique Share & Charge location identifier
+     * @param evseId the EVSE of the location
+     * @returns object containing controller (driver), token and price
+     */
+    async getSession(scId: string, evseId: string): Promise<{ controller: string, token: string, price: number }> {
+        const session = await this.contract.call('getSession', scId, ToolKit.asciiToHex(evseId));
+        return {
+            controller: session.controller,
+            token: session.token,
+            price: parseInt(session.price)
+        };
+    }
+
+    /**
      * Specify a wallet to use for a transaction
      * @param wallet the Wallet object to use
      * @param keyIndex the index of the key containing the private key which will sign the transaction [default: 0]

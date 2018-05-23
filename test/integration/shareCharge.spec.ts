@@ -226,6 +226,16 @@ describe('ShareCharge', function () {
             expect(controller.toLowerCase()).to.equal(driverKey.address);
         });
 
+        it('should get session information during a charge', async () => {
+            const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, shareCharge.token.address, 0);
+            const session = await shareCharge.charging.getSession(location.scId, evseId);
+
+            expect(session.controller.toLowerCase()).to.equal(driverKey.address);
+            expect(session.token).to.equal(shareCharge.token.address);
+            expect(session.price).to.equal(0);
+        });
+
     });
 
     context('#store', () => {

@@ -101,4 +101,10 @@ describe('StorageService', function () {
         });
     });
 
+    it('should get owner of a registered location', async () => {
+        const result = await storageService.useWallet(wallet).addLocation(ocpiLocation);
+        const owner = await storageService.getOwnerOfLocation(result.scId);
+        expect(owner.toLowerCase()).to.equal(wallet.keychain[0].address);
+    });
+
 });
