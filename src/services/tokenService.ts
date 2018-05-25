@@ -21,6 +21,10 @@ export class TokenService {
         return this.contract.native.options.address;
     }
 
+    set address(newAddress: string) {
+        this.contractProvider.obtain('MSPToken', newAddress);
+    }
+
     /**
      * Get the name of the MSP token
      */

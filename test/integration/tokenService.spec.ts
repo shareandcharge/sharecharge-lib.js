@@ -45,4 +45,13 @@ describe('TokenService', function () {
         expect(balance).to.equal(10);
     });
 
+    it('should re-initialise the ShareCharge instance with a new token address', async () => {
+        const address = tokenService.address;
+        const address2 = await tokenService.useWallet(wallet).deploy('MSPToken', 'MSP');
+        tokenService.address = address2;
+        const address3 = tokenService.address;
+        expect(address3).to.equal(address2);
+        expect(address3).to.not.equal(address);
+    });
+
 });

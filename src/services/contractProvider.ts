@@ -15,10 +15,11 @@ export class ContractProvider {
         this.definitions = ToolKit.contractDefsForStage(config.stage);
     }
 
-    obtain(contractDefKey: string): Contract {
+    obtain(contractDefKey: string, address?: string): Contract {
         const contractDef = this.definitions[contractDefKey];
         if (contractDefKey === 'MSPToken') {
-            contractDef.address = this.config.tokenAddress || contractDef.address;
+            // use the address parameter, else from the config, else the default
+            contractDef.address = address || this.config.tokenAddress || contractDef.address;
         }
         return new Contract(this.web3, {
             abi: contractDef.abi,
