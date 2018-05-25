@@ -269,7 +269,16 @@ describe('ShareCharge', function () {
     });
 
     context('#token', () => {
-        
+
+        it('should set the token address for subsequent instances', async () => {
+            const address = shareCharge.token.address;
+            const address2 = await shareCharge.token.useWallet(mspWallet).deploy('MSPToken', 'MSP');
+            expect(shareCharge.token.address).to.not.equal(address);
+            shareCharge.token.address = address;
+            expect(shareCharge.token.address).to.equal(address);
+            const sc2 = ShareCharge.getInstance();
+            expect(sc2.token.address).to.equal(address);
+        });
     });
 
     context('#getLogs()', () => {
