@@ -21,8 +21,11 @@ export class TokenService {
         return this.contract.native.options.address;
     }
 
+    /**
+     * Set the token service to use a different eMobility Service Provider token contract
+     */
     set address(newAddress: string) {
-        this.contractProvider.obtain('MSPToken', newAddress);
+        this.contract = this.contractProvider.obtain('MSPToken', newAddress);
     }
 
     /**

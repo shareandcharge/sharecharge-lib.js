@@ -268,6 +268,10 @@ describe('ShareCharge', function () {
 
     });
 
+    context('#token', () => {
+        
+    });
+
     context('#getLogs()', () => {
 
         it('should retrieve all contract events of a particular type', async () => {
