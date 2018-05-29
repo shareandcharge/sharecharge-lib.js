@@ -10,7 +10,7 @@ export class ConfigProvider {
     constructor(config: any = {}) {
         this.stage = config.stage || 'local';
         this.ethProvider = config.ethProvider || 'http://localhost:8545';
-        this.ipfsProvider = config.ipfs || {
+        this.ipfsProvider = config.ipfsProvider || {
             host: '127.0.0.1',
             port: '5001',
             protocol: 'http'
