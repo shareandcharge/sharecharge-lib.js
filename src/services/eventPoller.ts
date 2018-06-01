@@ -1,4 +1,4 @@
-import { Subject } from "rxjs/Subject";
+import { Subject } from "rxjs";
 import { ConfigProvider } from "./configProvider";
 import { Contract } from "../models/contract";
 
