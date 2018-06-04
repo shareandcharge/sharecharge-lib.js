@@ -102,6 +102,10 @@ export class ChargingService {
                 return this.contract.send("chargeDetailRecord", [scId, ToolKit.asciiToHex(evseId), finalPrice, timestamp], key);
             },
 
+            reset: async (scId: string, evseId: string) => {
+                return this.contract.send("reset", [scId, ToolKit.asciiToHex(evseId)], key);
+            },
+
             /**
              * Log an error that has occurred at a particular EVSE
              * @param scId the unique Share & Charge location identity string
