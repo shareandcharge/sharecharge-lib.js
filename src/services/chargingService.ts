@@ -28,9 +28,10 @@ export class ChargingService {
      * @param evseId the EVSE of the location
      * @returns object containing controller (driver), token and price
      */
-    async getSession(scId: string, evseId: string): Promise<{ controller: string, token: string, price: number }> {
+    async getSession(scId: string, evseId: string): Promise<{ sessionId: string, controller: string, token: string, price: number }> {
         const session = await this.contract.call('getSession', scId, ToolKit.asciiToHex(evseId));
         return {
+            sessionId: session.sessionId,
             controller: session.controller,
             token: session.token,
             price: parseInt(session.price)
