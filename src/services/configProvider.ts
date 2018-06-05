@@ -14,7 +14,7 @@ export class ConfigProvider {
             host: '127.0.0.1',
             port: '5001',
             protocol: 'http'
-        },
+        };
         this.gasPrice = config.gasPrice || 18000000000;
         this.pollingInterval = config.pollingInterval || 1000;
         this.tokenAddress = config.tokenAddress || "";
