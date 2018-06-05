@@ -30,13 +30,14 @@ export class StorageService {
     /**
      * Get location (charge point) data based on its unique Share & Charge location identity
      * @param cpoId the identity (address) of the Charge Point Operator which owns the Charge Point
-     * @param locationId the unique Share & Charge location identity
+     * @param scId the unique Share & Charge location identity
      * @returns charge point (location) object in OCPI(?) format
      */
     async getLocationById(cpoId: string, scId: string): Promise<any> {
         const hash = await this.contract.call('getLocationById', cpoId, scId);
-        const data = await this.ipfs.cat(hash);
-        return data;
+        if (hash !== ToolKit.emptyByteString(32)) {
+            return await this.ipfs.cat(hash);
+        }
     }
 
     /**
@@ -55,13 +56,20 @@ export class StorageService {
      */
     async getLocationsByCPO(cpoId: string): Promise<{ scId: string, data: any }[]> {
         const scIds = await this.contract.call('getShareAndChargeIdsByCPO', cpoId);
-        const promisedLocations: { scId: string, data: any }[] = await scIds.map(async scId => {
-            return {
-                scId,
-                data: await this.getLocationById(cpoId, scId)
-            };
-        });
-        const resolvedLocations = await Promise.all(promisedLocations);
+        const resolvedLocations: { scId: string, data: any }[] = [];
+
+        for (const scId of scIds) {
+            const data = await this.getLocationById(cpoId, scId);
+            if (data) {
+                resolvedLocations.push({
+                    scId,
+                    data
+                })
+            }
+        }
+
+        console.log("res", resolvedLocations);
+
         return resolvedLocations;
     }
 
@@ -115,6 +123,13 @@ export class StorageService {
             updateLocation: this.updateLocation(key),
 
             /**
+             * Remove the location data of a specific Share & Charge location
+             * @param scId the unique Share & Charge location identity
+             * @returns object containing the unique Share & Charge ID of the location
+             */
+            removeLocation: this.removeLocation(key),
+
+            /**
              * Add tariffs data to the Share & Charge Network
              * @param tariffs the tariffs data to add
              * @returns the ipfs hash of the tariffs data
@@ -156,6 +171,15 @@ export class StorageService {
         };
     }
 
+    private removeLocation(key: Key) {
+        return async (scId: string) => {
+            await this.contract.send('updateLocation', [scId, ToolKit.emptyByteString(32)], key);
+            return {
+                scId
+            };
+        };
+    }
+
     private addTariffs(key: Key) {
         return async (tariffs: any) => {
             const hash = await this.ipfs.add(tariffs);
@@ -184,17 +208,17 @@ export class StorageService {
     }
 
     private batchAddLocation(key: Key) {
-        return async (...locations: object[]): Promise<{scId: string, ipfs: string}[]> => {
+        return async (...locations: object[]): Promise<{ scId: string, ipfs: string }[]> => {
             const batch = this.contract.newBatch();
             key.nonce = await this.contract.getNonce(key);
-            const trackedLocations: {scId: string, ipfs: string}[] = [];
+            const trackedLocations: { scId: string, ipfs: string }[] = [];
             for (const location of locations) {
                 const scId = ToolKit.randomByteString(32);
                 const hash = await this.ipfs.add(location);
                 const tx = await this.contract.request('addLocation', [scId, hash['solidity']], key);
                 batch.add(tx);
                 key.nonce++;
-                trackedLocations.push({ scId, ipfs: hash['ipfs'] });
+                trackedLocations.push({scId, ipfs: hash['ipfs']});
             }
             batch.execute();
             return trackedLocations;
