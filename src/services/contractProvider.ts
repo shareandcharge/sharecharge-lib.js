@@ -39,7 +39,7 @@ export class ContractProvider {
         const txData = {
             nonce: await this.web3.eth.getTransactionCount(key.address),
             data: deploymentData,
-            gas: 3000000
+            gas: 4000000
         };
         const signedTx = key.sign(txData);
         const receipt = await this.web3.eth.sendSignedTransaction('0x' + signedTx.toString('hex'));
