@@ -4,6 +4,11 @@ Share & Charge Library
 
 This is the Library for interacting with the Share & Charge EV Network. It can be implemented in a browser or server environment, for example by the Share & Charge CPO Core Client or by an eMobility Service Provider's mobile app. This is the reference implementation written in TypeScript.
 
+::
+
+    npm install @motionwerk/sharecharge-lib
+
+
 ----
 
 Usage
@@ -11,9 +16,24 @@ Usage
 
 See the `examples <https://github.com/motionwerkGmbH/sharecharge-lib/tree/domain/examples>`__ directory for eMobility Service Provider and Charge Point Operator-specific usage.
 
+**IMPORTANT**: Consider the network you wish to interact with. The node you connect to must have the same contracts as specified in the stage. For example, if you 
+are connecting to an Energy Web Foundation Tobalaba client (shown below as a locally-running node), specify the `tobalaba` stage to interact with the Share & Charge
+contracts deployed on that network. 
+
+.. code-block:: typescript
+
+    import { ShareCharge } from '@motionwerk/sharecharge-lib';
+
+    const config = {
+        stage: 'tobalaba',
+        ethProvider: 'http://localhost:8545',
+    }
+
+    const sc = ShareCharge.obtain(config);
+
 ----
 
-Setup
+Local Development Setup
 -----
 
 **Blockchain**
@@ -48,12 +68,6 @@ The Share & Charge library depends on `@motionwerk/sharecharge-contracts <https:
 ..
 
 **sharecharge-lib**
-
-Install as an NPM package:
-
-::
-
-    npm install @motionwerk/sharecharge-lib
 
 
 Install for development:
