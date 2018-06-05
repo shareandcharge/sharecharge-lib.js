@@ -107,13 +107,13 @@ A wallet can be generated using either a new or known 12 word seed phrase. This 
 
     // get generated wallet object
     let wallet = newWallet.wallet
-    wallet.keychain[0].address;
+    wallet.coinbase;
     // 0x6aded10b71224ca208f7476cebd72270771a451e
 
     // alternatively, generate from seed
     wallet = new Wallet('maid left ostrich minor ask stomach outdoor vacuum beach admit dinner avoid');
 
-    wallet.keychain[0].address;
+    wallet.coinbase;
     // 0x6aded10b71224ca208f7476cebd72270771a451e
 
     // add new key to the keychain

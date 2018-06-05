@@ -33,12 +33,12 @@ describe('TokenService', function () {
         const address = await tokenService.useWallet(wallet).deploy('My special MSP Token', 'MSP');
         expect(address).to.not.equal(undefined);
         const owner = await tokenService.getOwner();
-        expect(owner.toLowerCase()).to.equal(wallet.keychain[0].address);
+        expect(owner.toLowerCase()).to.equal(wallet.coinbase);
     });
 
     it('should mint tokens for user', async () => {
         const wallet2 = Wallet.generate().wallet;
-        const address = wallet2.keychain[0].address;
+        const address = wallet2.coinbase;
         await tokenService.useWallet(wallet).deploy('My special MSP Token', 'MSP');
         await tokenService.useWallet(wallet).mint(address, 10);
         const balance = await tokenService.getBalance(address);

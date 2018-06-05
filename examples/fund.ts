@@ -9,9 +9,9 @@ const cpoWallet = new Wallet('filter march urge naive sauce distance under copy 
 const mspWallet = new Wallet('filter march urge naive sauce distance under copy payment slow just cool');
 const driverWallet = new Wallet('filter march urge naive sauce distance under copy payment slow just cold');
 
-console.log('CPO:', cpoWallet.keychain[0].address);
-console.log('MSP:', mspWallet.keychain[0].address);
-console.log('Driver:', driverWallet.keychain[0].address);
+console.log('CPO:', cpoWallet.coinbase);
+console.log('MSP:', mspWallet.coinbase);
+console.log('Driver:', driverWallet.coinbase);
 
 TestHelper.ensureFunds(web3, cpoWallet.keychain[0])
     .then(() => TestHelper.ensureFunds(web3, mspWallet.keychain[0])

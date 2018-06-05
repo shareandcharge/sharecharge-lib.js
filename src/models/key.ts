@@ -6,7 +6,11 @@ export class Key {
     private ks: any;
 
     constructor(child: any) {
-        this.ks = child.getWallet();
+        if (child.getWallet) {
+            this.ks = child.getWallet();
+        } else {
+            this.ks = child;
+        }
     }
 
     get address(): string {

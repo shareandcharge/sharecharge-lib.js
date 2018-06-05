@@ -52,7 +52,7 @@ async function main() {
 
     sc.on("ChargeDetailRecord", async (result) => {
         if (result.scId === selected.scId && result.controller.toLowerCase() === driverKey.address) {
-            const balance = await sc.token.getBalance(driverWallet.keychain[0].address);
+            const balance = await sc.token.getBalance(driverWallet.coinbase);
             console.log(`Remaining balance: ${balance} Tokens`);
             sc.stopListening();
         }

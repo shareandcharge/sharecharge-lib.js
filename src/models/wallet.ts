@@ -1,5 +1,6 @@
 import * as bip39 from 'bip39';
 import * as hdkey from 'ethereumjs-wallet/hdkey';
+import * as ethWallet from 'ethereumjs-wallet';
 import { Key } from './key';
 
 export class Wallet {
@@ -27,6 +28,10 @@ export class Wallet {
         }
     }
 
+    get coinbase(): string {
+        return this.keychain[0].address;
+    }
+
     private getId(master: any): string {
         return master.getWallet().getAddressString();
     }
@@ -41,26 +46,27 @@ export class Wallet {
         return false;
     }
 
-    get balance(): number {
-        // TODO: return total balance across keys
-        return 0;
+    addV3Key(keystore: any, password: string): void {
+        const newKey = ethWallet.fromV3(keystore, password);
+        const key = new Key(newKey);
+        this.keychain.push(key);
+        return;
     }
 
-    balanceOf(keyIndex: number): number {
-        // TODO: get single address balance
-        return 0;
-    }
-
-    transferToKey(keyIndex: number): void {
-        // TODO: transfer all funds back to master
-    }
-
-    transfer(from: number, to: number, value: number): void {
-        // TODO: transfer funds from master to key
+    removeKey(index = 0): void {
+        this.keychain.splice(index, 1);
+        return;
     }
 
     static generate(): { seed: string, wallet: Wallet } {
         const seed: string = bip39.generateMnemonic();
         return { seed, wallet: new Wallet(seed) };
+    }
+
+    static fromV3(keystore: any, password: string): Wallet {
+        const wallet = Wallet.generate().wallet;
+        wallet.removeKey();
+        wallet.addV3Key(keystore, password);
+        return wallet;
     }
 }
