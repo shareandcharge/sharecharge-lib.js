@@ -68,8 +68,6 @@ export class StorageService {
             }
         }
 
-        console.log("res", resolvedLocations);
-
         return resolvedLocations;
     }
 
