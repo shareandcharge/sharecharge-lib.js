@@ -74,7 +74,6 @@ export class Contract {
         const tx = this.native.methods[method](...parameters);
         const gas = await tx.estimateGas({ from: key.address }) * 2;
         const data = await tx.encodeABI();
-        const nonce = await this.web3.eth.getTransactionCount(key.address);
         return {
             nonce: key.nonce,
             from: key.address,
