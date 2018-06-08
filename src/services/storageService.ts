@@ -64,7 +64,7 @@ export class StorageService {
                 resolvedLocations.push({
                     scId,
                     data
-                })
+                });
             }
         }
 
