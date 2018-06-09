@@ -1,6 +1,4 @@
-import { ToolKit } from './../src/utils/toolKit';
-import { Contract } from './../src/models/contract';
-import { Wallet } from '../src/models/wallet';
+import { Contract } from '../src/models/contract';
 import { Key } from '../src/models/key';
 
 export class TestHelper {
@@ -16,7 +14,7 @@ export class TestHelper {
         const receiver = key.address;
         const amount = web3.utils.toWei(destBalance.toString(), "ether");
         if (balance < destBalance) {
-            await web3.eth.sendTransaction({ from: coinbase, to: receiver, value: amount });
+            await web3.eth.sendTransaction({from: coinbase, to: receiver, value: amount});
         }
     }
 
@@ -36,7 +34,7 @@ export class TestHelper {
             data: config.bytecode,
             gas
         });
-        const receipt = await contract.deploy({ arguments: args }).send({ from: coinbase });
+        const receipt = await contract.deploy({arguments: args}).send({from: coinbase});
         return receipt.options.address;
     }
 

@@ -1,11 +1,11 @@
-import { ToolKit } from './../../src/utils/toolKit';
+import { ToolKit } from '../../src/utils/toolKit';
 import * as sinon from 'sinon';
 import * as mocha from 'mocha';
 import { expect } from 'chai';
 
 const Web3 = require('web3');
 
-import { ShareCharge } from './../../src/shareCharge';
+import { ShareCharge } from '../../src/shareCharge';
 import { TestHelper } from '../testHelper';
 import { Wallet } from '../../src/models/wallet';
 import { Contract } from '../../src/models/contract';
@@ -17,7 +17,6 @@ import { ContractProvider } from '../../src/services/contractProvider';
 import { TokenService } from '../../src/services/tokenService';
 import { StorageService } from '../../src/services/storageService';
 import { IpfsProvider } from '../../src/services/ipfsProvider';
-import { Ipfs } from '../../src/models/ipfs';
 import IpfsMock from '../ipfsMock';
 
 const ocpiLocation = require('../data/ocpiLocation.json');

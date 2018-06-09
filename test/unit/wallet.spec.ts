@@ -5,7 +5,7 @@ import 'mocha';
 
 const keystore = require('../data/keystore.json');
 
-describe('HD Wallet', function() {
+describe('HD Wallet', function () {
 
     it('should generate the same keys given the same seed', () => {
         const wallet1 = Wallet.generate();

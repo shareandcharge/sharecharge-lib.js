@@ -9,7 +9,9 @@ export default {
                     solidity: '0x5b550af4e10a5631201589b74703d5d2217efbfadc4a8816eee55696f3b4cc40'
                 };
             },
-            cat: async (hash: string) => { return location; }
+            cat: async (hash: string) => {
+                return location;
+            }
         };
     }
 };

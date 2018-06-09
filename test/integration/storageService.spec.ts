@@ -8,7 +8,7 @@ import { TestHelper } from '../testHelper';
 import { Wallet } from '../../src/models/wallet';
 import { Contract } from '../../src/models/contract';
 import { ConfigProvider } from "../../src/services/configProvider";
-import { ToolKit } from './../../src/utils/toolKit';
+import { ToolKit } from '../../src/utils/toolKit';
 import { Key } from '../../src/models/key';
 import { ContractProvider } from '../../src/services/contractProvider';
 import { StorageService } from '../../src/services/storageService';
