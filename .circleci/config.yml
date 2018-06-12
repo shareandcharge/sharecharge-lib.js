@@ -74,6 +74,8 @@ jobs:
 
       - checkout
 
+      - setup_remote_docker
+
       # Download and cache dependencies
       - restore_cache:
           keys:
@@ -97,7 +99,7 @@ jobs:
           name: Run geth
           background: true
           command: |
-            docker pull ethereum/client/go
+            docker pull ethereum/client-go
             docker run -p 8545:8545 ethereum/client-go --dev --dev.period 1 --rpc --rpcaddr 0.0.0.0 --rpcapi=eth,net
 
       # run tests
