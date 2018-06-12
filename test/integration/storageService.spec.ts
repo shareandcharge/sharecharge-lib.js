@@ -22,8 +22,7 @@ const ocpiTariffs = require('../data/ocpiTariffs.json');
 
 describe('StorageService', function () {
 
-    this.timeout(10 * 1000);
-    const batchTimeout = 500;
+    this.timeout(30 * 1000);
 
     let storageService: StorageService, wallet: Wallet, key: Key, web3;
 
@@ -57,17 +56,6 @@ describe('StorageService', function () {
             expect(scIds.length).to.equal(1);
             expect(scIds[0]).to.equal(result.scId);
             expect(location.id).to.equal(ocpiLocation.id);
-        });
-
-        it('should bulk add locations', async () => {
-            const locs: any[] = [];
-            for (let i = 0; i < 10; i++) {
-                locs[i] = ocpiLocation;
-            }
-            const ids = await storageService.useWallet(wallet).batch().addLocations(...locs);
-            expect(ids.length).to.equal(10);
-            const storedLocations = await storageService.getLocationsByCPO(key.address);
-            expect(storedLocations.length).to.equal(10);
         });
 
     });

@@ -25,8 +25,7 @@ const config = new ConfigProvider();
 
 describe('ShareCharge', function () {
 
-    this.timeout(20 * 1000);
-    const batchTimeout = 500;
+    this.timeout(30 * 1000);
 
     const contractDefs = ToolKit.contractDefsForStage(config.stage);
 
@@ -257,12 +256,6 @@ describe('ShareCharge', function () {
             await eventPoller.poll();
 
             expect(locationAddedId).to.equal(location.scId);
-
-            // expect(evseUpdatedId).to.equal(evse.id);
-
-            // The next test needs to wait for the update transaction to actually be mined
-            // otherwise the nonce for creating a station will be incorrect
-            return new Promise((resolve, reject) => setTimeout(() => resolve(), batchTimeout));
         });
 
     });

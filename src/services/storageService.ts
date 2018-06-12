@@ -140,20 +140,6 @@ export class StorageService {
              * @returns the ipfs hash of the new tariffs data
              */
             updateTariffs: this.updateTariffs(key),
-
-            /**
-             * Access to batch methods
-             */
-            batch: () => {
-                return {
-                    /**
-                     * Add locations to the Share & Charge Network
-                     * @param locations location objects separated by commas
-                     * @returns array of objects containing unique Share & Charge location identities and their respective ipfs hashes
-                     */
-                    addLocations: this.batchAddLocation(key),
-                };
-            }
         };
     }
 
@@ -202,24 +188,6 @@ export class StorageService {
             const hash = await this.ipfs.add(tariffs);
             await this.contract.send('updateTariffs', [hash['solidity']], key);
             return hash['ipfs'];
-        };
-    }
-
-    private batchAddLocation(key: Key) {
-        return async (...locations: object[]): Promise<{ scId: string, ipfs: string }[]> => {
-            const batch = this.contract.newBatch();
-            key.nonce = await this.contract.getNonce(key);
-            const trackedLocations: { scId: string, ipfs: string }[] = [];
-            for (const location of locations) {
-                const scId = ToolKit.randomByteString(32);
-                const hash = await this.ipfs.add(location);
-                const tx = await this.contract.request('addLocation', [scId, hash['solidity']], key);
-                batch.add(tx);
-                key.nonce++;
-                trackedLocations.push({scId, ipfs: hash['ipfs']});
-            }
-            batch.execute();
-            return trackedLocations;
         };
     }
 }

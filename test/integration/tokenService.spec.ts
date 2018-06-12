@@ -11,7 +11,9 @@ import { ContractProvider } from '../../src/services/contractProvider';
 const Web3 = require('web3');
 const config = new ConfigProvider();
 
-describe('TokenService', function () {
+describe.only('TokenService', function () {
+
+    this.timeout(30 * 1000);
 
     const defs = ToolKit.contractDefsForStage(config.stage);
 
@@ -24,7 +26,7 @@ describe('TokenService', function () {
         await TestHelper.ensureFunds(web3, wallet.keychain[0]);
     });
 
-    beforeEach(async () => {
+    before(async () => {
         contract = await TestHelper.createContract(web3, config, defs["MSPToken"], ["MSPToken", "MSP"]);
         tokenService = new TokenService(new ContractProvider(new ConfigProvider({ tokenAddress: contract.address })));
     });
