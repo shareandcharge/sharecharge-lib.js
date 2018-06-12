@@ -11,7 +11,7 @@ import { ContractProvider } from '../../src/services/contractProvider';
 const Web3 = require('web3');
 const config = new ConfigProvider();
 
-describe.only('TokenService', function () {
+describe('TokenService', function () {
 
     this.timeout(30 * 1000);
 
