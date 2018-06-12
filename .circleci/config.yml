@@ -63,7 +63,7 @@ jobs:
     docker:
       # specify the version you desire here
       - image: circleci/node:9.11
-      - image: ethereum/client-go
+      # - image: ethereum/client-go
 
     working_directory: ~/lib
 
@@ -92,11 +92,12 @@ jobs:
           paths:
             - node_modules
 
-      # run rpc
+      # run geth
       - run:
           name: Run geth
           background: true
           command: |
+            docker pull ethereum/client/go
             docker run -p 8545:8545 ethereum/client-go --dev --dev.period 1 --rpc --rpcaddr 0.0.0.0 --rpcapi=eth,net
 
       # run tests
