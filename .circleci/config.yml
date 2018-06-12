@@ -4,7 +4,10 @@
 #
 version: 2
 jobs:
-  build:
+  
+  # run integration tests against ganache
+  test:
+  
     docker:
       # specify the version you desire here
       - image: circleci/node:9.11
@@ -43,7 +46,7 @@ jobs:
 
       # run rpc
       - run:
-          name: Run test-rpc
+          name: Run ganache
           background: true
           command: |
             ./node_modules/.bin/ganache-cli
@@ -53,3 +56,61 @@ jobs:
           name: Run test
           command: |
             npm test
+
+  # run integration tests against geth dev
+  staging:  
+
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:9.11
+      - image: ethereum/client-go
+
+    working_directory: ~/lib
+
+    steps:
+      - run:
+          name: npm secret
+          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
+      - run:
+          name: Install Node Modules
+          command:
+            npm install
+
+      # update cache if needed
+      - save_cache:
+          key: v1-dependencies-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+
+      # run rpc
+      - run:
+          name: Run geth
+          background: true
+          command: |
+            docker run -p 8545:8545 ethereum/client-go --dev --dev.period 1 --rpc --rpcaddr 0.0.0.0 --rpcapi=eth,net
+
+      # run tests
+      - run:
+          name: Run test
+          command: |
+            npm test
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - test
+      - staging:
+          requires:
+            - test
+
