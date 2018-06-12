@@ -5,12 +5,24 @@ import { Key } from './key';
 
 export class Wallet {
 
+    /**
+     * the derivation path used to create new HD keys
+     */
     public readonly path: string;
+
+    /**
+     * array containing keys in the wallet
+     */
     public readonly keychain: Key[] = [];
+
     private readonly id: string;
 
-    private static container;
-
+    /**
+     * Recover a hierarchical deterministic wallet from a seed phrase
+     * @param seedPhrase a seed phrase that can be used to recover the wallet
+     * @param subAccount used to generate a different set of keys from the same seed [default: 0]
+     * @param numberOfKeys the amount of keys to populate the wallet with [default: 1]
+     */
     constructor(seedPhrase: string, subAccount: number = 0, numberOfKeys: number = 1) {
         // master / purpose' / chain_id' / account' / address_index
         // chain_id of ethereum main net is 60 (see https://github.com/satoshilabs/slips/blob/master/slip-0044.md)
@@ -28,6 +40,9 @@ export class Wallet {
         }
     }
 
+    /**
+     * Return primary address of wallet
+     */
     get coinbase(): string {
         return this.keychain[0].address;
     }
@@ -36,6 +51,11 @@ export class Wallet {
         return master.getWallet().getAddressString();
     }
 
+    /**
+     * Add a new hierarchical deterministic key to the wallet
+     * @param seedPhrase The seed phrase used to initially create the wallet
+     * @returns boolean upon success
+     */
     addKey(seedPhrase: string): boolean {
         const master = hdkey.fromMasterSeed(seedPhrase);
         if (this.getId(master) === this.id) {
@@ -46,23 +66,44 @@ export class Wallet {
         return false;
     }
 
-    addV3Key(keystore: any, password: string): void {
+    /**
+     * Add a new key to the wallet from a geth/parity JSON v3 keystore
+     * @param keystore the JSON v3 keystore object
+     * @param password the password used to encrypt the keystore
+     * @returns boolean upon success
+     */
+    addV3Key(keystore: any, password: string): boolean {
         const newKey = ethWallet.fromV3(keystore, password);
         const key = new Key(newKey);
         this.keychain.push(key);
-        return;
+        return true;
     }
 
-    removeKey(index = 0): void {
+    /**
+     * Remove a key at a certain index
+     * @param index the index of the key to remove [default: 0]
+     * @returns boolean upon success
+     */
+    removeKey(index = 0): boolean {
         this.keychain.splice(index, 1);
-        return;
+        return true;
     }
 
+    /**
+     * Generate a new hierarchical deterministic wallet from a random 12 word seed phrase
+     * @returns the seed used to create the wallet, and the wallet object itself
+     */
     static generate(): { seed: string, wallet: Wallet } {
         const seed: string = bip39.generateMnemonic();
         return { seed, wallet: new Wallet(seed) };
     }
 
+    /**
+     * Create a new wallet using a a geth/parity JSON v3 keystore
+     * @param keystore the JSON v3 keystore object
+     * @param password the password used to encrypt the keystore
+     * @returns a wallet object containing the decrypted key
+     */
     static fromV3(keystore: any, password: string): Wallet {
         const wallet = Wallet.generate().wallet;
         wallet.removeKey();
