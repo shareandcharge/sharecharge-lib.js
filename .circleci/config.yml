@@ -20,7 +20,7 @@ jobs:
     <<: *stage_defaults
 
     docker:
-      <<: *docker_defaults
+      - <<: *docker_defaults
 
     steps:
 
