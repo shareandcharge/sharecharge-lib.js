@@ -10,7 +10,7 @@ jobs:
   
     docker:
       # specify the version you desire here
-      - image: circleci/node:9.11
+      - image: circleci/node
 
     working_directory: ~/lib
 
@@ -36,7 +36,7 @@ jobs:
       - run:
           name: Install Node Modules
           command:
-            npm install
+            npm ci
 
       # update cache if needed
       - save_cache:
@@ -62,7 +62,7 @@ jobs:
 
     docker:
       # specify the version you desire here
-      - image: circleci/node:9.11
+      - image: circleci/node
       - image: ethereum/client-go
         command: [--dev, --dev.period=1, --rpc, --rpcaddr=0.0.0.0, --rpcapi=eth,net]
 
@@ -85,7 +85,7 @@ jobs:
       - run:
           name: Install Node Modules
           command:
-            npm install
+            npm ci
 
       # update cache if needed
       - save_cache:
@@ -99,13 +99,34 @@ jobs:
           command: |
             npm test
 
+  deploy:
+
+    docker:
+      - image: circleci/node
+
+    working_directory: ~/lib
+
+    steps:
+      - run:
+        name: npm secret
+        command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+
+      - checkout
+
+      - run:
+        name: npm publish
+        command: |
+          npm publish
+
 workflows:
   version: 2
   test_stages:
     jobs:
       - test
-      - staging:
-          requires:
+      - staging
+      - deploy:
+        - requires:
             - test
+            - staging
 
             
