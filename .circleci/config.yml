@@ -120,13 +120,13 @@ jobs:
 
 workflows:
   version: 2
-  test_stages:
+  test_and_deploy:
     jobs:
       - test
       - staging
       - deploy:
-        - requires:
-            - test
-            - staging
+        requires:
+          - test
+          - staging
 
             
