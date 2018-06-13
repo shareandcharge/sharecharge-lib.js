@@ -16,6 +16,8 @@ jobs:
 
   build:
 
+    <<: *stage_defaults
+
     docker:
       - <<: *docker_defaults
 
