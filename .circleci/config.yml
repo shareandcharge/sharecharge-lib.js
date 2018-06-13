@@ -3,16 +3,19 @@
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
 version: 2
+
+defaults: &defaults
+  working_directory: ~/lib
+  docker:
+    - image: circleci/node
+  
+
 jobs:
   
   # run integration tests against ganache
   test:
-  
-    docker:
-      # specify the version you desire here
-      - image: circleci/node
 
-    working_directory: ~/lib
+    <<: *defaults
 
     steps:
       - run:
@@ -44,6 +47,10 @@ jobs:
           paths:
             - node_modules
 
+      - persist_to_workspace:
+          root: ~/lib
+          paths: .
+
       # run rpc
       - run:
           name: Run ganache
@@ -60,15 +67,17 @@ jobs:
   # run integration tests against geth dev
   staging:  
 
+    <<: *defaults
+
     docker:
-      # specify the version you desire here
-      - image: circleci/node
       - image: ethereum/client-go
         command: [--dev, --dev.period=1, --rpc, --rpcaddr=0.0.0.0, --rpcapi=eth,net]
 
-    working_directory: ~/lib
-
     steps:
+
+      - attach_workspace:
+          at: ~/lib
+
       - run:
           name: npm secret
           command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
@@ -107,16 +116,18 @@ jobs:
     working_directory: ~/lib
 
     steps:
+      - attach_workspace:
+          at: ~/lib
+
       - run:
           name: npm secret
-          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/lib/.npmrc
 
       - checkout
 
       - run:
           name: npm publish
-          command: |
-            npm publish
+          command: npm publish
 
 workflows:
   version: 2

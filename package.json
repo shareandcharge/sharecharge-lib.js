@@ -8,7 +8,7 @@
   },
   "author": "MotionWerk GmbH",
   "license": "LGPL-3.0",
-  "main": "./dist/sharecharge-lib.js",
+  "main": "./dist/index.js",
   "scripts": {
     "install": "rm -rf dist && npm run build-ts",
     "build": "npm run build-ts && npm run tslint",
