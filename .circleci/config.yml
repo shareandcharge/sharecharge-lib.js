@@ -11,6 +11,11 @@ defaults:
   - &docker_defaults
     image: circleci/node
 
+  - &npm_auth
+    run:
+      name: npm secret
+      command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+
   
 jobs:
 
@@ -25,9 +30,7 @@ jobs:
 
       - checkout
 
-      - run:
-          name: npm secret
-          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+      - <<: *npm_auth
 
       # Download and cache dependencies
       - restore_cache:
@@ -98,23 +101,39 @@ jobs:
       - run:
           name: Run test
           command: npm test
+  
+  transpile:
 
-  # deploy:
+    <<: *stage_defaults
 
-  #   <<: *stage_defaults
+    docker: 
+      - <<: *docker_defaults
+    
+    steps:
 
-  #   docker:
-  #     - <<: *docker_defaults
+      - attach_workspace:
+         at: ~/lib
 
-  #   working_directory: ~/lib
+      - run:
+          name: tsc
+          command: ./node_modules/.bin/tsc
 
-  #   steps:
-  #     - attach_workspace:
-  #         at: ~/lib
+  deploy:
 
-  #     - run:
-  #         name: npm publish
-  #         command: npm publish
+    <<: *stage_defaults
+
+    docker:
+      - <<: *docker_defaults
+
+    steps:
+      - attach_workspace:
+          at: ~/lib
+
+      - <<: *npm_auth
+
+      - run:
+          name: npm publish
+          command: npm publish
 
 workflows:
   version: 2
@@ -127,7 +146,11 @@ workflows:
       - staging:
           requires:
             - build
-      # - deploy:
-      #     requires:
-      #       - test
-      #       - staging
+      - transpile:
+          requires:
+            - build
+      - deploy:
+          requires:
+            - test
+            - staging
+            - transpile
