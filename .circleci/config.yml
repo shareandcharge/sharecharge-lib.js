@@ -57,7 +57,7 @@ jobs:
           paths: .
 
 
-  integration-test:
+  test:
 
     <<: *stage_defaults
 
@@ -83,7 +83,7 @@ jobs:
             npm run integration-test
 
   # run integration tests against geth dev
-  integration-staging:  
+  staging:  
 
     <<: *stage_defaults
 
