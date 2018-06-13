@@ -110,8 +110,9 @@ workflows:
   test_and_deploy:
     jobs:
       - test
-      - staging
-      - deploy:
+      - staging:
           requires:
             - test
+      - deploy:
+          requires:
             - staging
