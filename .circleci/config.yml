@@ -108,15 +108,15 @@ jobs:
 
     steps:
       - run:
-        name: npm secret
-        command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+          name: npm secret
+          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
 
       - checkout
 
       - run:
-        name: npm publish
-        command: |
-          npm publish
+          name: npm publish
+          command: |
+            npm publish
 
 workflows:
   version: 2
@@ -125,8 +125,6 @@ workflows:
       - test
       - staging
       - deploy:
-        requires:
-          - test
-          - staging
-
-            
+          requires:
+            - test
+            - staging
