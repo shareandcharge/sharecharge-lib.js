@@ -55,24 +55,6 @@ jobs:
       - persist_to_workspace:
           root: ~/lib
           paths: .
-  
-  # run integration tests against ganache
-  unit:
-
-    <<: *stage_defaults
-
-    docker:
-      - <<: *docker_defaults
-
-    steps:
-
-      - attach_workspace:
-          at: ~/lib
-
-      # run tests
-      - run:
-          name: Run test
-          command: npm run unit-test
 
 
   integration-test:
@@ -91,13 +73,14 @@ jobs:
       - run:
           name: Run ganache
           background: true
-          command: |
-            ./node_modules/.bin/ganache-cli
+          command: ./node_modules/.bin/ganache-cli
 
       # run tests
       - run:
-          name: Run test
-          command: npm run integration-test
+          name: Run unit tests
+          command: |
+            npm run unit-test
+            npm run integration-test
 
   # run integration tests against geth dev
   integration-staging:  
@@ -140,17 +123,13 @@ workflows:
   build_test_deploy:
     jobs:
       - build
-      - unit:
+      - test:
           requires:
             - build
-      - integration-test:
-          requires:
-            - build
-      - integration-staging:
+      - staging:
           requires:
             - build
       - deploy:
           requires:
-            - unit
-            - integration-test
-            - integration-staging
+            - test
+            - staging
