@@ -85,10 +85,6 @@ jobs:
           at: ~/lib
 
       - run:
-          name: Kill ganache
-          command: pkill node
-
-      - run:
           name: Run test
           command: npm test
 
