@@ -151,5 +151,6 @@ workflows:
             - build
       - deploy:
           requires:
-            - test
-            - staging
+            - unit
+            - integration-test
+            - integration-staging
