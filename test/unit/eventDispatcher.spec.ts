@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { EventDispatcher } from '../../src/services/eventDispatcher';
+import 'mocha';
 
 describe('EventDispatcher', function () {
 

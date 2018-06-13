@@ -57,7 +57,25 @@ jobs:
           paths: .
   
   # run integration tests against ganache
-  test:
+  unit:
+
+    <<: *stage_defaults
+
+    docker:
+      - <<: *docker_defaults
+
+    steps:
+
+      - attach_workspace:
+          at: ~/lib
+
+      # run tests
+      - run:
+          name: Run test
+          command: npm run unit-test
+
+
+  integration-test:
 
     <<: *stage_defaults
 
@@ -79,10 +97,10 @@ jobs:
       # run tests
       - run:
           name: Run test
-          command: npm test
+          command: npm run integration-test
 
   # run integration tests against geth dev
-  staging:  
+  integration-staging:  
 
     <<: *stage_defaults
 
@@ -98,7 +116,7 @@ jobs:
 
       - run:
           name: Run test
-          command: npm test
+          command: npm run integration-test
 
   deploy:
 
@@ -114,10 +132,6 @@ jobs:
           at: ~/lib
 
       - run:
-          name: npm secret
-          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/.npmrc
-
-      - run:
           name: npm publish
           command: npm publish
 
@@ -126,10 +140,13 @@ workflows:
   build_test_deploy:
     jobs:
       - build
-      - test:
+      - unit:
           requires:
             - build
-      - staging:
+      - integration-test:
+          requires:
+            - build
+      - integration-staging:
           requires:
             - build
       - deploy:

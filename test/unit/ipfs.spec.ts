@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { IpfsProvider } from '../../src/services/ipfsProvider';
 import { ConfigProvider } from '../../src/services/configProvider';
 import { ToolKit } from '../../src/utils/toolKit';
+import 'mocha';
 
 describe('Ipfs', () => {
 
