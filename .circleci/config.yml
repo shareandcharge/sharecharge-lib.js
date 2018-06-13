@@ -77,10 +77,8 @@ jobs:
 
       # run tests
       - run:
-          name: Run unit tests
-          command: |
-            npm run unit-test
-            npm run integration-test
+          name: Run tests
+          command: npm test
 
   # run integration tests against geth dev
   staging:  
@@ -99,24 +97,24 @@ jobs:
 
       - run:
           name: Run test
-          command: npm run integration-test
+          command: npm test
 
-  deploy:
+  # deploy:
 
-    <<: *stage_defaults
+  #   <<: *stage_defaults
 
-    docker:
-      - <<: *docker_defaults
+  #   docker:
+  #     - <<: *docker_defaults
 
-    working_directory: ~/lib
+  #   working_directory: ~/lib
 
-    steps:
-      - attach_workspace:
-          at: ~/lib
+  #   steps:
+  #     - attach_workspace:
+  #         at: ~/lib
 
-      - run:
-          name: npm publish
-          command: npm publish
+  #     - run:
+  #         name: npm publish
+  #         command: npm publish
 
 workflows:
   version: 2
@@ -129,7 +127,7 @@ workflows:
       - staging:
           requires:
             - build
-      - deploy:
-          requires:
-            - test
-            - staging
+      # - deploy:
+      #     requires:
+      #       - test
+      #       - staging
