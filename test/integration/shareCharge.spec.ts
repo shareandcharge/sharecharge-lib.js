@@ -151,7 +151,7 @@ describe('ShareCharge', function () {
 
             await eventPoller.poll();
 
-            await shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord(location.scId, evseId, 30, (Date.now() - 30 * 60 * 1000) / 1000, finalPrice);
+            await shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord(location.scId, evseId, 30, finalPrice);
             await eventPoller.poll();
 
             expect(controller.toLowerCase()).to.equal(driverKey.address);
@@ -319,7 +319,7 @@ describe('ShareCharge', function () {
             await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, 1, 0, shareCharge.token.address, 200);
             await shareCharge.charging.useWallet(cpoWallet).confirmStart(location.scId, evseId, '0x01');
             await shareCharge.charging.useWallet(cpoWallet).confirmStop(location.scId, evseId);
-            await shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord(location.scId, evseId, 0, (Date.now() - 50000) / 1000, finalPrice);
+            await shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord(location.scId, evseId, 0, finalPrice);
 
             const logsAfter = await shareCharge.charging.contract.getLogs('ChargeDetailRecord', {
                 controller: driverKey.address,

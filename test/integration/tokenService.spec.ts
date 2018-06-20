@@ -24,9 +24,6 @@ describe('TokenService', function () {
     before(async () => {
         web3 = new Web3(config.ethProvider);
         await TestHelper.ensureFunds(web3, wallet.keychain[0]);
-    });
-
-    before(async () => {
         contract = await TestHelper.createContract(web3, config, defs["MSPToken"], ["MSPToken", "MSP"]);
         tokenService = new TokenService(new ContractProvider(new ConfigProvider({ tokenAddress: contract.address })));
     });

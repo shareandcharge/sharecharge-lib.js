@@ -64,7 +64,8 @@ export class ChargingService {
              * @returns transaction object if successful
              */
             confirmStart: async (scId: string, evseId: string, sessionId: string) => {
-                return this.contract.send("confirmStart", [scId, ToolKit.asciiToHex(evseId), sessionId], key);
+                const start = Date.now() / 1000;
+                return this.contract.send("confirmStart", [scId, ToolKit.asciiToHex(evseId), sessionId, start], key);
             },
 
             /**
@@ -95,9 +96,9 @@ export class ChargingService {
              * @param finalPrice the final price of the charging session (calculated by the Charge Point Operator)
              * @returns transaction object if successful
              */
-            chargeDetailRecord: async (scId: string, evseId: string, tariffValue: number, startTime: number, finalPrice: number) => {
+            chargeDetailRecord: async (scId: string, evseId: string, tariffValue: number, finalPrice: number) => {
                 const endTime = Date.now() / 1000;
-                return this.contract.send("chargeDetailRecord", [scId, ToolKit.asciiToHex(evseId), finalPrice, tariffValue, startTime, endTime], key);
+                return this.contract.send("chargeDetailRecord", [scId, ToolKit.asciiToHex(evseId), finalPrice, tariffValue, endTime], key);
             },
 
             reset: async (scId: string, evseId: string) => {
