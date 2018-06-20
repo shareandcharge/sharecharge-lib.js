@@ -31,7 +31,7 @@ export class Contract {
     async getLogs(eventName: string, filter = {}, fromBlock = 0): Promise<any[]> {
         let logs = await this.native.getPastEvents(eventName, { fromBlock });
         for (const [key, value] of Object.entries(filter)) {
-            if (key === 'timestamp') {
+            if (key === 'endTime') {
                 logs = logs.filter(log => {
                     return log.returnValues[key] > value['start'] && log.returnValues[key] < value['end'];
                 });

@@ -49,7 +49,7 @@ export class ShareCharge {
             }
 
             const returnValues = {
-                ...item.returnValues,
+                ...ToolKit.removeIndexKeys(item.returnValues),
                 transactionHash: item.transactionHash,
                 blockNumber: item.blockNumber,
                 address: item.address,

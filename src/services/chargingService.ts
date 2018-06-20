@@ -28,14 +28,9 @@ export class ChargingService {
      * @param evseId the EVSE of the location
      * @returns object containing controller (driver), token and price
      */
-    async getSession(scId: string, evseId: string): Promise<{ sessionId: string, controller: string, token: string, price: number }> {
-        const session = await this.contract.call('getSession', scId, ToolKit.asciiToHex(evseId));
-        return {
-            sessionId: session.sessionId,
-            controller: session.controller,
-            token: session.token,
-            price: parseInt(session.price)
-        };
+    async getSession(scId: string, evseId: string): Promise<any> {
+        const session = await this.contract.call('state', scId, ToolKit.asciiToHex(evseId));
+        return ToolKit.removeIndexKeys(session);
     }
 
     /**
@@ -51,12 +46,14 @@ export class ChargingService {
              * Request a remote start at a specific EVSE
              * @param scId the unique Share & Charge location identity string
              * @param evseId the unique identity string of the EVSE
+             * @param tariffId the enumerated value of the tariff to use (e.g. 3 if time-based)
+             * @param tariffValue the quantity of the proposed charging session based on the tariff (e.g. 60 if charging for one hour on a time-based tariff)
              * @param tokenAddress the address on the network of the eMobility Service Provider token to use
              * @param estimatedPrice the estimated price of the charging session (calculated beforehand by an eMobility Service Provider based on Charge Point Operator tariff data)
              * @returns transaction object if successful
              */
-            requestStart: async (scId: string, evseId: string, tokenAddress: string, estimatedPrice: number) => {
-                return this.contract.send("requestStart", [scId, ToolKit.asciiToHex(evseId), tokenAddress, estimatedPrice], key);
+            requestStart: async (scId: string, evseId: string, tariffId: number, tariffValue: number, tokenAddress: string, estimatedPrice: number) => {
+                return this.contract.send("requestStart", [scId, ToolKit.asciiToHex(evseId), tariffId, tariffValue, tokenAddress, estimatedPrice], key);
             },
 
             /**
@@ -94,12 +91,13 @@ export class ChargingService {
              * Issue a Charge Detail Record after the completion of a session at an EVSE
              * @param scId the unique Share & Charge location identity string
              * @param evseId the unique identity string of the EVSE
+             * @param tariffValue the final quantity of units charged based on the chosen tariff
              * @param finalPrice the final price of the charging session (calculated by the Charge Point Operator)
              * @returns transaction object if successful
              */
-            chargeDetailRecord: async (scId: string, evseId: string, finalPrice: number) => {
-                const timestamp = Date.now() / 1000;
-                return this.contract.send("chargeDetailRecord", [scId, ToolKit.asciiToHex(evseId), finalPrice, timestamp], key);
+            chargeDetailRecord: async (scId: string, evseId: string, tariffValue: number, startTime: number, finalPrice: number) => {
+                const endTime = Date.now() / 1000;
+                return this.contract.send("chargeDetailRecord", [scId, ToolKit.asciiToHex(evseId), finalPrice, tariffValue, startTime, endTime], key);
             },
 
             reset: async (scId: string, evseId: string) => {

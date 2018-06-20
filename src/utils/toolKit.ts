@@ -1,5 +1,4 @@
 import * as crypto from 'crypto';
-import * as sjcl from 'sjcl';
 import * as bs58 from 'bs58';
 const web3Utils = require('web3').utils;
 
@@ -26,12 +25,12 @@ export class ToolKit {
         return web3Utils.hexToString(val);
     }
 
-    static isAddress(val: string): boolean {
-        return web3Utils.isAddress(val);
-    }
-
     static asciiToHex(val: string): string {
         return web3Utils.asciiToHex(val);
+    }
+
+    static isAddress(val: string): boolean {
+        return web3Utils.isAddress(val);
     }
 
     static ipfsHashToBytes32(hash: string): string {
@@ -48,12 +47,13 @@ export class ToolKit {
         return bs58.encode(Buffer.from(bytes, 'hex'));
     }
 
-    static encrypt(data: any, password: string): string {
-        return sjcl.encrypt(password, JSON.stringify(data));
-    }
-
-    static decrypt(data: string, password: string): object {
-        return JSON.parse(sjcl.decrypt(password, data));
+    static removeIndexKeys(obj: any): any {
+        Object.keys(obj).map(k => {
+            if (parseInt(k) >= 0) {
+                delete obj[k];
+            }
+        });
+        return obj;
     }
 
     static contractDefsForStage(stage: string, verbose: boolean = false) {

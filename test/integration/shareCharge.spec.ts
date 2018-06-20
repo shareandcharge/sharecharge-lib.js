@@ -115,7 +115,7 @@ describe('ShareCharge', function () {
                 }
             });
 
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, tokenAddress, 100);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, 0, 20, tokenAddress, 100);
             await shareCharge.charging.useWallet(cpoWallet).confirmStart(location.scId, evseId, '0x01');
 
             await eventPoller.poll();
@@ -144,14 +144,14 @@ describe('ShareCharge', function () {
                 token = result.tokenAddress;
             });
 
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, shareCharge.token.address, 300);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, 3, 60, shareCharge.token.address, 300);
             await shareCharge.charging.useWallet(cpoWallet).confirmStart(location.scId, evseId, '0x01');
             await shareCharge.charging.useWallet(driverWallet).requestStop(location.scId, evseId);
             await shareCharge.charging.useWallet(cpoWallet).confirmStop(location.scId, evseId);
 
             await eventPoller.poll();
 
-            await shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord(location.scId, evseId, finalPrice);
+            await shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord(location.scId, evseId, 30, (Date.now() - 30 * 60 * 1000) / 1000, finalPrice);
             await eventPoller.poll();
 
             expect(controller.toLowerCase()).to.equal(driverKey.address);
@@ -173,7 +173,7 @@ describe('ShareCharge', function () {
                 }
             });
 
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, 0, 20, shareCharge.token.address, 0);
             await shareCharge.charging.useWallet(cpoWallet).error(location.scId, evseId, 0);
 
             await eventPoller.poll();
@@ -194,7 +194,7 @@ describe('ShareCharge', function () {
                 }
             });
 
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, 0, 11, shareCharge.token.address, 0);
             await shareCharge.charging.useWallet(cpoWallet).confirmStart(location.scId, evseId, '0x01');
             await shareCharge.charging.useWallet(driverWallet).requestStop(location.scId, evseId);
 
@@ -216,7 +216,7 @@ describe('ShareCharge', function () {
                 }
             });
 
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, 1, 0, shareCharge.token.address, 0);
 
             await eventPoller.poll();
 
@@ -226,12 +226,12 @@ describe('ShareCharge', function () {
 
         it('should get session information during a charge', async () => {
             const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, 1, 0, shareCharge.token.address, 0);
             const session = await shareCharge.charging.getSession(location.scId, evseId);
 
             expect(session.controller.toLowerCase()).to.equal(driverKey.address);
             expect(session.token).to.equal(shareCharge.token.address);
-            expect(session.price).to.equal(0);
+            expect(session.price).to.equal('0');
         });
 
     });
@@ -296,9 +296,9 @@ describe('ShareCharge', function () {
 
             const logsBefore = await shareCharge.charging.contract.getLogs('StartRequested');
 
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location1.scId, evseId, shareCharge.token.address, 0);
-            await shareCharge.charging.useWallet(cpoWallet).requestStart(location2.scId, evseId, shareCharge.token.address, 0);
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location3.scId, evseId, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(location1.scId, evseId, 1, 0, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(cpoWallet).requestStart(location2.scId, evseId, 1, 0, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(location3.scId, evseId, 1, 0, shareCharge.token.address, 0);
 
             const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', {controller: driverKey.address});
             expect(logsAfter.length).to.equal(logsBefore.length + 2);
@@ -316,21 +316,21 @@ describe('ShareCharge', function () {
                 finalPrice = result.finalPrice;
             });
 
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, shareCharge.token.address, 200);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, 1, 0, shareCharge.token.address, 200);
             await shareCharge.charging.useWallet(cpoWallet).confirmStart(location.scId, evseId, '0x01');
             await shareCharge.charging.useWallet(cpoWallet).confirmStop(location.scId, evseId);
-            await shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord(location.scId, evseId, finalPrice);
+            await shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord(location.scId, evseId, 0, (Date.now() - 50000) / 1000, finalPrice);
 
             const logsAfter = await shareCharge.charging.contract.getLogs('ChargeDetailRecord', {
                 controller: driverKey.address,
-                timestamp: {start: 152469000, end: 3524843383145}
+                endTime: {start: 152469000, end: 3524843383145}
             });
             expect(logsAfter.length).to.equal(logsBefore.length + 1);
         });
 
         it('should return gasUsed and timestamp', async () => {
             const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, 1, 0, shareCharge.token.address, 0);
 
             const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', {controller: driverKey.address});
             expect(logsAfter[0].gasUsed).to.not.be.undefined;
