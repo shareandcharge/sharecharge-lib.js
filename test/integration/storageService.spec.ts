@@ -94,4 +94,18 @@ describe('StorageService', function () {
         expect(owner.toLowerCase()).to.equal(wallet.coinbase);
     });
 
+    it('should get evse ids from an scId', async () => {
+        const result = await storageService.useWallet(wallet).addLocation(ocpiLocation);
+        const ids = await storageService.getEvseIds(result.scId);
+        expect(ids.length).to.equal(2);
+        expect(ids[0]).to.equal('BE-BEC-E041503001');
+    });
+
+    it('should get evses from an scId', async () => {
+        const result = await storageService.useWallet(wallet).addLocation(ocpiLocation);
+        const evses = await storageService.getEvses(result.scId);
+        expect(evses.length).to.equal(2);
+        expect(evses[0]['evse_id']).to.equal('BE-BEC-E041503001');
+    });
+
 });

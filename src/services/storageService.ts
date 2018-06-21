@@ -97,6 +97,31 @@ export class StorageService {
     }
 
     /**
+     * Find the EVSEs on a location
+     * @param scId the unique Share & Charge location identifier
+     * @returns array of EVSE IDs on the location
+     */
+    async getEvseIds(scId: string): Promise<string[]> {
+        const owner = await this.getOwnerOfLocation(scId);
+        const location = await this.getLocationById(owner, scId);
+        try {
+            return location.evses.map(evse => evse['evse_id']);
+        } catch (err) {
+            throw Error('Unable to parse location for EVSE ids. Ensure your location data is in OCPI format.');
+        }
+    }
+
+    async getEvses(scId: string): Promise<any[]> {
+        const owner = await this.getOwnerOfLocation(scId);
+        const location = await this.getLocationById(owner, scId);
+        try {
+            return location.evses;
+        } catch (err) {
+            throw Error('Unable to parse location for EVSEs. Ensure your location data is in OCPI format.');
+        }
+    }
+
+    /**
      * Specify a wallet to use for a transaction
      * @param wallet the Wallet object to use
      * @param keyIndex the index of the key containing the private key which will sign the transaction [default: 0]
