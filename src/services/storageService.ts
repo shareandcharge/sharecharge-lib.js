@@ -111,6 +111,11 @@ export class StorageService {
         }
     }
 
+    /**
+     * Find EVSEs within a location
+     * @param scId the unique Share & Charge location identifier
+     * @returns array of EVSE objects
+     */
     async getAllEvses(scId: string): Promise<any[]> {
         const owner = await this.getOwnerOfLocation(scId);
         const location = await this.getLocationById(owner, scId);
@@ -121,7 +126,13 @@ export class StorageService {
         }
     }
 
-    async getEvse(scId: string, evseId: string): Promise<any[]> {
+    /**
+     * Obtain an EVSE object from a location
+     * @param scId the unique Share & Charge location identifier
+     * @param evseId the ID of the EVSE to obtain
+     * @returns EVSE object
+     */
+    async getEvse(scId: string, evseId: string): Promise<any> {
         const owner = await this.getOwnerOfLocation(scId);
         const location = await this.getLocationById(owner, scId);
         try {
