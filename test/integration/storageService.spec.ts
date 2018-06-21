@@ -101,11 +101,17 @@ describe('StorageService', function () {
         expect(ids[0]).to.equal('BE-BEC-E041503001');
     });
 
-    it('should get evses from an scId', async () => {
+    it('should get array of all evses from an scId', async () => {
         const result = await storageService.useWallet(wallet).addLocation(ocpiLocation);
-        const evses = await storageService.getEvses(result.scId);
+        const evses = await storageService.getAllEvses(result.scId);
         expect(evses.length).to.equal(2);
         expect(evses[0]['evse_id']).to.equal('BE-BEC-E041503001');
+    });
+
+    it('should get a single evse object from an scId', async () => {
+        const result = await storageService.useWallet(wallet).addLocation(ocpiLocation);
+        const evse = await storageService.getEvse(result.scId, 'BE-BEC-E041503001');
+        expect(evse['evse_id']).to.equal('BE-BEC-E041503001');
     });
 
 });

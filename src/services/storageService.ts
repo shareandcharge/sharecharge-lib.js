@@ -111,11 +111,21 @@ export class StorageService {
         }
     }
 
-    async getEvses(scId: string): Promise<any[]> {
+    async getAllEvses(scId: string): Promise<any[]> {
         const owner = await this.getOwnerOfLocation(scId);
         const location = await this.getLocationById(owner, scId);
         try {
             return location.evses;
+        } catch (err) {
+            throw Error('Unable to parse location for EVSEs. Ensure your location data is in OCPI format.');
+        }
+    }
+
+    async getEvse(scId: string, evseId: string): Promise<any[]> {
+        const owner = await this.getOwnerOfLocation(scId);
+        const location = await this.getLocationById(owner, scId);
+        try {
+            return location.evses.filter(evse => evse['evse_id'] === evseId)[0];
         } catch (err) {
             throw Error('Unable to parse location for EVSEs. Ensure your location data is in OCPI format.');
         }
