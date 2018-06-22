@@ -1,3 +1,4 @@
+import { ILocation, IEvse, ITariff } from '@motionwerk/sharecharge-common';
 import { Contract } from "../models/contract";
 import { ContractProvider } from './contractProvider';
 import { IpfsProvider } from './ipfsProvider';
@@ -33,11 +34,14 @@ export class StorageService {
      * @param scId the unique Share & Charge location identity
      * @returns charge point (location) object in OCPI(?) format
      */
-    async getLocationById(cpoId: string, scId: string): Promise<any> {
+    async getLocationById(cpoId: string, scId: string): Promise<ILocation> {
         const hash = await this.contract.call('getLocationById', cpoId, scId);
         if (hash !== ToolKit.emptyByteString(32)) {
-            return await this.ipfs.cat(hash);
+            return this.ipfs.cat(hash);
+        } else {
+            throw Error('Location does not exist!');
         }
+
     }
 
     /**
@@ -54,7 +58,7 @@ export class StorageService {
      * @param cpoId the identity (address) of the Charge Point Operator
      * @returns array of objects containing the Share & Charge ID for the Charge Point and its data
      */
-    async getLocationsByCPO(cpoId: string): Promise<{ scId: string, data: any }[]> {
+    async getLocationsByCPO(cpoId: string): Promise<{ scId: string, data: ILocation }[]> {
         const scIds = await this.contract.call('getShareAndChargeIdsByCPO', cpoId);
         const resolvedLocations: { scId: string, data: any }[] = [];
 
@@ -101,7 +105,7 @@ export class StorageService {
      * @param scId the unique Share & Charge location identifier
      * @returns array of EVSE objects
      */
-    async getAllEvses(scId: string): Promise<any[]> {
+    async getAllEvses(scId: string): Promise<IEvse[]> {
         const owner = await this.getOwnerOfLocation(scId);
         const location = await this.getLocationById(owner, scId);
         try {
@@ -117,7 +121,7 @@ export class StorageService {
      * @param evseId the ID of the EVSE to obtain
      * @returns EVSE object
      */
-    async getEvse(scId: string, evseId: string): Promise<any> {
+    async getEvse(scId: string, evseId: string): Promise<IEvse> {
         const owner = await this.getOwnerOfLocation(scId);
         const location = await this.getLocationById(owner, scId);
         try {
@@ -130,16 +134,31 @@ export class StorageService {
     /**
      * Get tariffs data belonging to a sepcific Charge Point Operator
      * @param cpoId the identity (address) of the Charge Point Operator which owns the Charge Point
-     * @param tariffId optional tariff ID to filter by
      * @returns array of tariff objects or single tariff object if filtered by tariff ID
      */
-    async getTariffsByCPO(cpoId: string, tariffId?: string): Promise<any> {
+    async getAllTariffsByCPO(cpoId: string): Promise<ITariff[]> {
         const hash = await this.contract.call('getTariffsByCPO', cpoId);
         if (hash !== ToolKit.emptyByteString(32)) {
             const data = await this.ipfs.cat(hash);
-            return tariffId ? data.filter(tariff => tariff.id === tariffId) : data;
+            return data;
         } else {
             return [];
+        }
+    }
+
+    /**
+     * Get a specific tariff of a Charge Point Operator
+     * @param cpoId the identity (address) of the Charge Point Operator which owns the Charge Point
+     * @param tariffId optional tariff ID to filter by
+     * @returns array of tariff objects or single tariff object if filtered by tariff ID
+     */
+    async getSingleTariffByCPO(cpoId: string, tariffId: string): Promise<ITariff> {
+        const hash = await this.contract.call('getTariffsByCPO', cpoId);
+        if (hash !== ToolKit.emptyByteString(32)) {
+            const data = await this.ipfs.cat(hash);
+            return data.filter(tariff => tariff.id === tariffId)[0];
+        } else {
+            throw Error('Tariffs do not exist!');
         }
     }
 
@@ -150,12 +169,11 @@ export class StorageService {
      * @param type optional type of tariff to get (ENERGY, TIME, PARKING_TIME, or FLAT)
      * @returns filtered or unfiltered tariff object
      */
-    async getTariffByEvse(scId: string, evseId: string, type?: string): Promise<any> {
+    async getTariffByEvse(scId: string, evseId: string, type?: string): Promise<ITariff> {
         const owner = await this.getOwnerOfLocation(scId);
         const evse = await this.getEvse(scId, evseId);
         const tariffId = evse.connectors.map(conn => conn['tariff_id'])[0];
-        const tariffsArray = await this.getTariffsByCPO(owner);
-        const tariff = tariffsArray.filter(tariff => tariff.id === tariffId)[0];
+        const tariff = await this.getSingleTariffByCPO(owner, tariffId);
         if (type) {
             tariff.elements = tariff.elements.filter(el => el['price_components'][0].type === type);
         }
@@ -210,7 +228,7 @@ export class StorageService {
     }
 
     private addLocation(key: Key) {
-        return async (location: any) => {
+        return async (location: ILocation) => {
             const scId = ToolKit.randomByteString(32);
             const hash = await this.ipfs.add(location);
             await this.contract.send('addLocation', [scId, hash['solidity']], key);
@@ -231,7 +249,7 @@ export class StorageService {
     }
 
     private addTariffs(key: Key) {
-        return async (tariffs: any) => {
+        return async (tariffs: ITariff) => {
             const hash = await this.ipfs.add(tariffs);
             await this.contract.send('addTariffs', [hash['solidity']], key);
             return hash['ipfs'];
@@ -239,7 +257,7 @@ export class StorageService {
     }
 
     private updateLocation(key: Key) {
-        return async (scId: string, location: any) => {
+        return async (scId: string, location: ILocation) => {
             const hash = await this.ipfs.add(location);
             await this.contract.send('updateLocation', [scId, hash['solidity']], key);
             return {
@@ -250,7 +268,7 @@ export class StorageService {
     }
 
     private updateTariffs(key: Key) {
-        return async (tariffs: any) => {
+        return async (tariffs: ITariff) => {
             const hash = await this.ipfs.add(tariffs);
             await this.contract.send('updateTariffs', [hash['solidity']], key);
             return hash['ipfs'];

@@ -19,7 +19,7 @@ const config = new ConfigProvider();
 const ocpiLocation = require('../data/ocpiLocation.json');
 const ocpiTariffs = require('../data/ocpiTariffs.json');
 
-describe.only('StorageService', function () {
+describe('StorageService', function () {
 
     this.timeout(30 * 1000);
 
@@ -73,7 +73,7 @@ describe.only('StorageService', function () {
         it('should add tariffs to storage', async () => {
             const result = await storageService.useWallet(wallet).addTariffs(ocpiTariffs);
             expect(result).to.not.equal(undefined);
-            const result2 = await storageService.getTariffsByCPO(key.address);
+            const result2 = await storageService.getAllTariffsByCPO(key.address);
             expect(result2[0].currency).to.equal('EUR');
         });
     });
@@ -115,10 +115,10 @@ describe.only('StorageService', function () {
 
     it('should get tariff of particular ID by CPO', async () => {
         const result = await storageService.useWallet(wallet).addTariffs(ocpiTariffs);
-        const tariff = await storageService.getTariffsByCPO(wallet.coinbase, '1');
-        expect(tariff[0].currency).to.equal('EUR');
-        const tariff2 = await storageService.getTariffsByCPO(wallet.coinbase, '2');
-        expect(tariff2[0]).to.equal(undefined);
+        const tariff = await storageService.getSingleTariffByCPO(wallet.coinbase, '1');
+        expect(tariff.currency).to.equal('EUR');
+        const tariff2 = await storageService.getSingleTariffByCPO(wallet.coinbase, '2');
+        expect(tariff2).to.equal(undefined);
     });
 
     it('should get the tariff for an EVSE', async () => {
