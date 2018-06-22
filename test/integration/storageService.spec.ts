@@ -13,14 +13,13 @@ import { Key } from '../../src/models/key';
 import { ContractProvider } from '../../src/services/contractProvider';
 import { StorageService } from '../../src/services/storageService';
 import { IpfsProvider } from '../../src/services/ipfsProvider';
-import { Ipfs } from '../../src/models/ipfs';
 import IpfsMock from '../ipfsMock';
 
 const config = new ConfigProvider();
 const ocpiLocation = require('../data/ocpiLocation.json');
 const ocpiTariffs = require('../data/ocpiTariffs.json');
 
-describe('StorageService', function () {
+describe.only('StorageService', function () {
 
     this.timeout(30 * 1000);
 
@@ -75,7 +74,7 @@ describe('StorageService', function () {
             const result = await storageService.useWallet(wallet).addTariffs(ocpiTariffs);
             expect(result).to.not.equal(undefined);
             const result2 = await storageService.getTariffsByCPO(key.address);
-            expect(result2['id']).to.not.equal(undefined);
+            expect(result2[0].currency).to.equal('EUR');
         });
     });
 
@@ -112,6 +111,28 @@ describe('StorageService', function () {
         const result = await storageService.useWallet(wallet).addLocation(ocpiLocation);
         const evse = await storageService.getEvse(result.scId, 'BE-BEC-E041503001');
         expect(evse['evse_id']).to.equal('BE-BEC-E041503001');
+    });
+
+    it('should get tariff of particular ID by CPO', async () => {
+        const result = await storageService.useWallet(wallet).addTariffs(ocpiTariffs);
+        const tariff = await storageService.getTariffsByCPO(wallet.coinbase, '1');
+        expect(tariff[0].currency).to.equal('EUR');
+        const tariff2 = await storageService.getTariffsByCPO(wallet.coinbase, '2');
+        expect(tariff2[0]).to.equal(undefined);
+    });
+
+    it('should get the tariff for an EVSE', async () => {
+        const result = await storageService.useWallet(wallet).addLocation(ocpiLocation);
+        const result2 = await storageService.useWallet(wallet).addTariffs(ocpiTariffs);
+        const tariff = await storageService.getTariffByEvse(result.scId, 'BE-BEC-E041503001');
+        expect(tariff.currency).to.equal('EUR');
+    });
+
+    it('should get tariff of a particular type for an EVSE', async () => {
+        const result = await storageService.useWallet(wallet).addLocation(ocpiLocation);
+        const result2 = await storageService.useWallet(wallet).addTariffs(ocpiTariffs);
+        const tariff = await storageService.getTariffByEvse(result.scId, 'BE-BEC-E041503001', 'TIME');
+        expect(tariff.currency).to.equal('EUR');
     });
 
 });

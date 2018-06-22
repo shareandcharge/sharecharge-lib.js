@@ -72,21 +72,6 @@ export class StorageService {
     }
 
     /**
-     * Get tariffs data belonging to a sepcific Charge Point Operator
-     * @param cpoId the identity (address) of the Charge Point Operator which owns the Charge Point
-     * @returns tariffs data object
-     */
-    async getTariffsByCPO(cpoId: string): Promise<any> {
-        const hash = await this.contract.call('getTariffsByCPO', cpoId);
-        if (hash !== ToolKit.emptyByteString(32)) {
-            const data = await this.ipfs.cat(hash);
-            return data;
-        } else {
-            return [];
-        }
-    }
-
-    /**
      * Get the owner of a particular location by its ID
      * @param scId the unique Share & Charge location identifier
      * @returns owner address of the location
@@ -140,6 +125,41 @@ export class StorageService {
         } catch (err) {
             throw Error('Unable to parse location for EVSEs. Ensure your location data is in OCPI format.');
         }
+    }
+
+    /**
+     * Get tariffs data belonging to a sepcific Charge Point Operator
+     * @param cpoId the identity (address) of the Charge Point Operator which owns the Charge Point
+     * @param tariffId optional tariff ID to filter by
+     * @returns array of tariff objects or single tariff object if filtered by tariff ID
+     */
+    async getTariffsByCPO(cpoId: string, tariffId?: string): Promise<any> {
+        const hash = await this.contract.call('getTariffsByCPO', cpoId);
+        if (hash !== ToolKit.emptyByteString(32)) {
+            const data = await this.ipfs.cat(hash);
+            return tariffId ? data.filter(tariff => tariff.id === tariffId) : data;
+        } else {
+            return [];
+        }
+    }
+
+    /**
+     * Get tariffs relating to a certain EVSE
+     * @param scId the unique Share & Charge location identifier
+     * @param evseId the EVSE ID to get tariffs for
+     * @param type optional type of tariff to get (ENERGY, TIME, PARKING_TIME, or FLAT)
+     * @returns filtered or unfiltered tariff object
+     */
+    async getTariffByEvse(scId: string, evseId: string, type?: string): Promise<any> {
+        const owner = await this.getOwnerOfLocation(scId);
+        const evse = await this.getEvse(scId, evseId);
+        const tariffId = evse.connectors.map(conn => conn['tariff_id'])[0];
+        const tariffsArray = await this.getTariffsByCPO(owner);
+        const tariff = tariffsArray.filter(tariff => tariff.id === tariffId)[0];
+        if (type) {
+            tariff.elements = tariff.elements.filter(el => el['price_components'][0].type === type);
+        }
+        return tariff;
     }
 
     /**
