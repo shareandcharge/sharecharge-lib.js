@@ -63,12 +63,16 @@ export class StorageService {
         const resolvedLocations: { scId: string, data: any }[] = [];
 
         for (const scId of scIds) {
-            const data = await this.getLocationById(cpoId, scId);
-            if (data) {
-                resolvedLocations.push({
-                    scId,
-                    data
-                });
+            try {
+                const data = await this.getLocationById(cpoId, scId);
+                if (data) {
+                    resolvedLocations.push({
+                        scId,
+                        data
+                    });
+                }
+            } catch (err) {
+                console.log('scId does not exist:', scId);
             }
         }
 
