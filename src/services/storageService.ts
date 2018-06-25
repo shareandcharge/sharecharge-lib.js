@@ -168,7 +168,7 @@ export class StorageService {
         const hash = await this.contract.call('getTariffsByCPO', cpoId);
         if (hash !== ToolKit.emptyByteString(32)) {
             const data = await this.ipfs.cat(hash);
-            return data.filter(tariff => tariff.id === tariffId)[0];
+            return data.filter((tariff: ITariff) => tariff.id === tariffId)[0];
         } else {
             throw Error('Tariffs do not exist!');
         }
