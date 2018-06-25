@@ -50,7 +50,15 @@ export class StorageService {
      * @returns array of Share & Charge location IDs
      */
     async getIdsByCPO(cpoId: string): Promise<string[]> {
-        return this.contract.call('getShareAndChargeIdsByCPO', cpoId);
+        const ids = await this.contract.call('getShareAndChargeIdsByCPO', cpoId);
+        const extantIds: string[] = [];
+        for (const id of ids) {
+            const hash = await this.contract.call('getLocationById', cpoId, id);
+            if (hash !== ToolKit.emptyByteString(32)) {
+                extantIds.push(id);
+            }
+        }
+        return extantIds;
     }
 
     /**
