@@ -74,7 +74,7 @@ describe('StorageService', function () {
             const result = await storageService.useWallet(wallet).addTariffs(ocpiTariffs);
             expect(result).to.not.equal(undefined);
             const result2 = await storageService.getAllTariffsByCPO(key.address);
-            expect(result2[0].currency).to.equal('EUR');
+            expect(result2['1'].currency).to.equal('EUR');
         });
     });
 
@@ -115,10 +115,9 @@ describe('StorageService', function () {
 
     it('should get tariff of particular ID by CPO', async () => {
         const result = await storageService.useWallet(wallet).addTariffs(ocpiTariffs);
-        const tariff = await storageService.getSingleTariffByCPO(wallet.coinbase, '1');
-        expect(tariff.currency).to.equal('EUR');
-        const tariff2 = await storageService.getSingleTariffByCPO(wallet.coinbase, '2');
-        expect(tariff2).to.equal(undefined);
+        const tariff = await storageService.getAllTariffsByCPO(wallet.coinbase);
+        expect(tariff['1'].currency).to.equal('EUR');
+        expect(tariff['2']).to.equal(undefined);
     });
 
     it('should get the tariff for an EVSE', async () => {

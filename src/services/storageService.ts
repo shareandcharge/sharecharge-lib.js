@@ -1,4 +1,5 @@
 import { ILocation, IEvse, ITariff } from '@motionwerk/sharecharge-common';
+import { Tariff } from '../models/tariff';
 import { Contract } from "../models/contract";
 import { ContractProvider } from './contractProvider';
 import { IpfsProvider } from './ipfsProvider';
@@ -148,29 +149,13 @@ export class StorageService {
      * @param cpoId the identity (address) of the Charge Point Operator which owns the Charge Point
      * @returns array of tariff objects or single tariff object if filtered by tariff ID
      */
-    async getAllTariffsByCPO(cpoId: string): Promise<ITariff[]> {
+    async getAllTariffsByCPO(cpoId: string): Promise<{ [key: string]: Tariff }> {
         const hash = await this.contract.call('getTariffsByCPO', cpoId);
         if (hash !== ToolKit.emptyByteString(32)) {
             const data = await this.ipfs.cat(hash);
-            return data;
+            return Tariff.deserialize(data);
         } else {
-            return [];
-        }
-    }
-
-    /**
-     * Get a specific tariff of a Charge Point Operator
-     * @param cpoId the identity (address) of the Charge Point Operator which owns the Charge Point
-     * @param tariffId optional tariff ID to filter by
-     * @returns array of tariff objects or single tariff object if filtered by tariff ID
-     */
-    async getSingleTariffByCPO(cpoId: string, tariffId: string): Promise<ITariff> {
-        const hash = await this.contract.call('getTariffsByCPO', cpoId);
-        if (hash !== ToolKit.emptyByteString(32)) {
-            const data = await this.ipfs.cat(hash);
-            return data.filter((tariff: ITariff) => tariff.id === tariffId)[0];
-        } else {
-            throw Error('Tariffs do not exist!');
+            return {};
         }
     }
 
@@ -181,15 +166,12 @@ export class StorageService {
      * @param type optional type of tariff to get (ENERGY, TIME, PARKING_TIME, or FLAT)
      * @returns filtered or unfiltered tariff object
      */
-    async getTariffByEvse(scId: string, evseId: string, type?: string): Promise<ITariff> {
+    async getTariffByEvse(scId: string, evseId: string, type?: string): Promise<Tariff> {
         const owner = await this.getOwnerOfLocation(scId);
         const evse = await this.getEvse(scId, evseId);
         const tariffId = evse.connectors.map(conn => conn['tariff_id'])[0];
-        const tariff = await this.getSingleTariffByCPO(owner, tariffId);
-        if (type) {
-            tariff.elements = tariff.elements.filter(el => el['price_components'][0].type === type);
-        }
-        return tariff;
+        const tariffs = await this.getAllTariffsByCPO(owner);
+        return tariffs[tariffId];
     }
 
     /**

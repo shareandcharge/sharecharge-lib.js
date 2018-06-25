@@ -4,7 +4,7 @@ import { TariffElement } from '../../src/models/tariffElement';
 const tariffsObject = require('../data/ocpiTariffs');
 import 'mocha';
 
-describe.only('Tariff', () => {
+describe('Tariff', () => {
 
     it('should deserialize tariffElements correctly', () => {
         const tariffElement = TariffElement.deserialize(tariffsObject[0].elements);
