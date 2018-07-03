@@ -72,7 +72,11 @@ export class Contract {
 
     private async createUnsignedTx(method: string, parameters: any[], key: Key): Promise<any> {
         const tx = this.native.methods[method](...parameters);
-        const gas = await tx.estimateGas({ from: key.address }) * 2;
+
+        // ESTIMATEGAS RESULTS IN TX EXECUTION ERROR ON TOBALABA
+        // const gas = await tx.estimateGas({ from: key.address }) * 2;
+        const gas = 300000;
+
         const data = await tx.encodeABI();
         return {
             nonce: key.nonce,
