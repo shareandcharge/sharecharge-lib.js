@@ -137,7 +137,6 @@ The module has a default configuration object:
         ethProvider: 'http://localhost:8545';
         ipfsProvider: '/ip4/127.0.0.1/tcp/5001';
         gasPrice: 18000000000;
-        pollingInterval: 1000;
         tokenAddress: "";
     }
 
