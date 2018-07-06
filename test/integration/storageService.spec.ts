@@ -1,5 +1,4 @@
-import * as sinon from 'sinon';
-import * as mocha from 'mocha';
+import 'mocha';
 import { expect } from 'chai';
 
 const Web3 = require('web3');
