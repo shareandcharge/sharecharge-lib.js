@@ -1,6 +1,6 @@
+import { ILocation } from '@motionwerk/sharecharge-common/dist/common';
 import { ToolKit } from '../../src/utils/toolKit';
-import * as sinon from 'sinon';
-import * as mocha from 'mocha';
+import 'mocha';
 import { expect } from 'chai';
 
 const Web3 = require('web3');
@@ -19,7 +19,7 @@ import { StorageService } from '../../src/services/storageService';
 import { IpfsProvider } from '../../src/services/ipfsProvider';
 import IpfsMock from '../ipfsMock';
 
-const ocpiLocation = require('../data/ocpiLocation.json');
+const ocpiLocation: ILocation = require('../data/ocpiLocation.json');
 
 const config = new ConfigProvider();
 
@@ -94,6 +94,11 @@ describe('ShareCharge', function () {
     });
 
     beforeEach(async () => {
+        const lat = ocpiLocation.coordinates.latitude;
+        ocpiLocation.coordinates.latitude = lat.slice(0, 3) + Math.round(Math.random() * 10000000);
+
+        const lng = ocpiLocation.coordinates.longitude;
+        ocpiLocation.coordinates.longitude = lng.slice(0, 2) + Math.round(Math.random() * 10000000);
     });
 
     afterEach(async () => {
@@ -290,15 +295,13 @@ describe('ShareCharge', function () {
         });
 
         it('should filter contract events by equal value', async () => {
-            const location1 = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            const location2 = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            const location3 = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
+            const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
 
             const logsBefore = await shareCharge.charging.contract.getLogs('StartRequested');
 
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location1.scId, evseId, 1, 0, shareCharge.token.address, 0);
-            await shareCharge.charging.useWallet(cpoWallet).requestStart(location2.scId, evseId, 1, 0, shareCharge.token.address, 0);
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location3.scId, evseId, 1, 0, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, 1, 0, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(cpoWallet).requestStart(location.scId, evseId, 1, 0, shareCharge.token.address, 0);
+            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, 1, 0, shareCharge.token.address, 0);
 
             const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', {controller: driverKey.address});
             expect(logsAfter.length).to.equal(logsBefore.length + 2);

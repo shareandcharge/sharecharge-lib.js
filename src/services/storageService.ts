@@ -56,7 +56,7 @@ export class StorageService {
         for (const id of ids) {
             const hash = await this.contract.call('getLocationById', cpoId, id);
             if (hash !== ToolKit.emptyByteString(32)) {
-                extantIds.push(id);
+                extantIds.push(ToolKit.hexToScId(id));
             }
         }
         return extantIds;
@@ -76,7 +76,7 @@ export class StorageService {
                 const data = await this.getLocationById(cpoId, scId);
                 if (data) {
                     resolvedLocations.push({
-                        scId,
+                        scId: ToolKit.hexToScId(scId),
                         data
                     });
                 }
@@ -223,7 +223,7 @@ export class StorageService {
 
     private addLocation(key: Key) {
         return async (location: ILocation) => {
-            const scId = ToolKit.randomByteString(32);
+            const scId = ToolKit.geolocationToScId(location.coordinates);
             const hash = await this.ipfs.add(location);
             await this.contract.send('addLocation', [scId, hash['solidity']], key);
             return {

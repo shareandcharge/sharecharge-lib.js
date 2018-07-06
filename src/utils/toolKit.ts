@@ -47,6 +47,25 @@ export class ToolKit {
         return bs58.encode(Buffer.from(bytes, 'hex'));
     }
 
+    static geolocationToScId(coordinates: { latitude: string, longitude: string }): string {
+        const geoString = `${coordinates.latitude},${coordinates.longitude}`;
+        return '0x' + Buffer.from(geoString).toString('hex');
+    }
+
+    static hexToScId(hex: string): string {
+        const geolocationString = ToolKit.hexToString(hex);
+        return '0x' + Buffer.from(geolocationString).toString('hex');
+    }
+
+    static scIdToGeolocation(scId: string): { latitude: string, longitude: string } {
+        const geoString = ToolKit.hexToString(scId);
+        const geoArray = geoString.split(',');
+        return {
+            latitude: geoArray[0],
+            longitude: geoArray[1]
+        };
+    }
+
     static removeIndexKeys(obj: any): any {
         Object.keys(obj).map(k => {
             if (parseInt(k) >= 0) {
