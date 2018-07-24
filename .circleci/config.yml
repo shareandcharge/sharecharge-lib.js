@@ -139,7 +139,8 @@ workflows:
   version: 2
   build_test_deploy:
     jobs:
-      - build
+      - build:
+          context: npm-access
       - test:
           requires:
             - build
@@ -150,6 +151,7 @@ workflows:
           requires:
             - build
       - deploy:
+          context: npm-access
           requires:
             - test
             - staging
