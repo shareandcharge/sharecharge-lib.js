@@ -51,9 +51,10 @@ export class StorageService {
      * @returns array of Share & Charge location IDs
      */
     async getIdsByCPO(cpoId: string): Promise<string[]> {
-        const ids = await this.contract.call('getShareAndChargeIdsByCPO', cpoId);
+        const ids: string[] = await this.contract.call('getShareAndChargeIdsByCPO', cpoId);
+        const uniqueIds = new Set(ids);
         const extantIds: string[] = [];
-        for (const id of ids) {
+        for (const id of Array.from(uniqueIds)) {
             const hash = await this.contract.call('getLocationById', cpoId, id);
             if (hash !== ToolKit.emptyByteString(32)) {
                 extantIds.push(ToolKit.hexToScId(id));
@@ -68,10 +69,10 @@ export class StorageService {
      * @returns array of objects containing the Share & Charge ID for the Charge Point and its data
      */
     async getLocationsByCPO(cpoId: string): Promise<{ scId: string, data: ILocation }[]> {
-        const scIds = await this.contract.call('getShareAndChargeIdsByCPO', cpoId);
+        const scIds: string[] = await this.contract.call('getShareAndChargeIdsByCPO', cpoId);
+        const uniqueIds = new Set(scIds);
         const resolvedLocations: { scId: string, data: any }[] = [];
-
-        for (const scId of scIds) {
+        for (const scId of Array.from(uniqueIds)) {
             try {
                 const data = await this.getLocationById(cpoId, scId);
                 if (data) {
