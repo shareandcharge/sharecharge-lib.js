@@ -91,7 +91,7 @@ jobs:
     docker:
       - <<: *docker_defaults
       - image: ethereum/client-go
-        command: [--dev, --dev.period=1, --rpc, --rpcaddr=0.0.0.0, --rpcapi=eth,net]
+        command: [--dev, --dev.period=1, --rpc, --rpcaddr=0.0.0.0]
 
     steps:
 
