@@ -119,7 +119,7 @@ jobs:
           command: ./node_modules/.bin/tsc
       
       - persist_to_workspace:
-          root: ~/client
+          root: ~/lib
           paths: .
 
   deploy:
