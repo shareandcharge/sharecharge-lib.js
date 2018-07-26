@@ -117,6 +117,10 @@ jobs:
       - run:
           name: tsc
           command: ./node_modules/.bin/tsc
+      
+      - persist_to_workspace:
+          root: ~/client
+          paths: .
 
   deploy:
 
