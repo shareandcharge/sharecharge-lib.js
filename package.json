@@ -1,6 +1,6 @@
 {
   "name": "@motionwerk/sharecharge-lib",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "description": "Share & Charge EV Network Library",
   "repository": {
     "type": "git",
@@ -28,7 +28,7 @@
     "ethereumjs-wallet": "^0.6.0",
     "ipfs-api": "^22.0.2",
     "rxjs": "^6.2.1",
-    "web3": "1.0.0-beta.33"
+    "web3": "1.0.0-beta.35"
   },
   "devDependencies": {
     "@types/chai": "^4.1.4",
@@ -36,8 +36,8 @@
     "chai": "^4.1.2",
     "mocha": "^5.2.0",
     "ts-loader": "^4.4.1",
-    "ts-node": "^6.1.1",
+    "ts-node": "^7.0.0",
     "tslint": "^5.10.0",
-    "typescript": "^2.9.2"
+    "typescript": "^3.0.0"
   }
 }

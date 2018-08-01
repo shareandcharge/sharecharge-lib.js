@@ -1,5 +1,5 @@
 import * as bip39 from 'bip39';
-import * as hdkey from 'ethereumjs-wallet/hdkey';
+import * as hdkey from 'ethereumjs-wallet/dist/hdkey';
 import * as ethWallet from 'ethereumjs-wallet';
 import { Key } from './key';
 
