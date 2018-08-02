@@ -45,14 +45,12 @@ describe('TokenService', function () {
     });
 
     it('should burn tokens from user wallet', async () => {
-        const wallet2 = Wallet.generate().wallet;
-        TestHelper.ensureFunds(web3, wallet2.keychain[0]);
         await tokenService.useWallet(wallet).deploy('MSP Token', 'MSP');
-        await tokenService.useWallet(wallet).mint(wallet2.coinbase, 5000);
-        const balanceBefore = await tokenService.getBalance(wallet2.coinbase);
+        await tokenService.useWallet(wallet).mint(wallet.coinbase, 5000);
+        const balanceBefore = await tokenService.getBalance(wallet.coinbase);
         expect(balanceBefore).to.equal(5000);
-        await tokenService.useWallet(wallet2).burn(1000);
-        const balanceAfter = await tokenService.getBalance(wallet2.coinbase);
+        await tokenService.useWallet(wallet).burn(1000);
+        const balanceAfter = await tokenService.getBalance(wallet.coinbase);
         expect(balanceAfter).to.equal(4000);
     });
 
