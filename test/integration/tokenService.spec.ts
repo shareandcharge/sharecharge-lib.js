@@ -44,6 +44,33 @@ describe('TokenService', function () {
         expect(balance).to.equal(10);
     });
 
+    it('should burn tokens from user wallet', async () => {
+        const wallet2 = Wallet.generate().wallet;
+        TestHelper.ensureFunds(web3, wallet2.keychain[0]);
+        await tokenService.useWallet(wallet).deploy('MSP Token', 'MSP');
+        await tokenService.useWallet(wallet).mint(wallet2.coinbase, 5000);
+        const balanceBefore = await tokenService.getBalance(wallet2.coinbase);
+        expect(balanceBefore).to.equal(5000);
+        await tokenService.useWallet(wallet2).burn(1000);
+        const balanceAfter = await tokenService.getBalance(wallet2.coinbase);
+        expect(balanceAfter).to.equal(4000);
+    });
+
+    it('should transfer tokens to user wallet', async () => {
+        const wallet2 = Wallet.generate().wallet;
+        await tokenService.useWallet(wallet).deploy('MSP Token', 'MSP');
+        await tokenService.useWallet(wallet).mint(wallet.coinbase, 2000);
+        const fromBalanceBefore = await tokenService.getBalance(wallet.coinbase);
+        const toBalanceBefore = await tokenService.getBalance(wallet2.coinbase);
+        expect(fromBalanceBefore).to.equal(2000);
+        expect(toBalanceBefore).to.equal(0);
+        await tokenService.useWallet(wallet).transfer(wallet2.coinbase, 500);
+        const fromBalanceAfter = await tokenService.getBalance(wallet.coinbase);
+        const toBalanceAfter = await tokenService.getBalance(wallet2.coinbase);
+        expect(fromBalanceAfter).to.equal(1500);
+        expect(toBalanceAfter).to.equal(500);
+    });
+
     it('should re-initialise the token service instance with a new token address', async () => {
         const address = tokenService.address;
         await tokenService.useWallet(wallet).deploy('MSPToken', 'MSP');

@@ -64,6 +64,7 @@ export class TokenService {
      * @param keyIndex the index of the key containing the private key which will sign the transaction [default: 0]
      */
     useWallet(wallet: Wallet, keyIndex = 0) {
+        const key = wallet.keychain[keyIndex];
         return {
             /**
              * Deploy a new MSP token contract
@@ -77,7 +78,6 @@ export class TokenService {
              * @returns the address of the new MSP token on the network
              */
             deploy: async (name: string, symbol: string): Promise<string> => {
-                const key = wallet.keychain[keyIndex];
                 this.contract = await this.contractProvider.deploy('MSPToken', [name, symbol], key);
                 return this.address;
             },
@@ -88,7 +88,6 @@ export class TokenService {
              * @returns transaction object if successful
              */
             setAccess: async (chargingContractAddress: string): Promise<any> => {
-                const key = wallet.keychain[keyIndex];
                 return this.contract.send('setAccess', [chargingContractAddress], key);
             },
 
@@ -99,8 +98,26 @@ export class TokenService {
              * @returns transaction object if successful
              */
             mint: async(address: string, value: number): Promise<any> => {
-                const key = wallet.keychain[keyIndex];
                 return this.contract.send('mint', [address, value], key);
+            },
+
+            /**
+             * Burn tokens from the wallet of the sender
+             * @param value the amount of tokens to burn from the address
+             * @returns transaction object if successful
+             */
+            burn: async(value: number): Promise<any> => {
+                return this.contract.send('burn', [value], key);
+            },
+
+            /**
+             * Transfer tokens from the wallet of the sender to the recipient address
+             * @param address the recipient of the token transfer
+             * @param value the amount of tokens to burn from the address
+             * @returns transaction object if successful
+             */
+            transfer: async(address: string, value: number): Promise<any> => {
+                return this.contract.send('transfer', [address, value], key);
             }
         };
     }
