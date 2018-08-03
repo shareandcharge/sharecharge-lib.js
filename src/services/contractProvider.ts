@@ -12,7 +12,6 @@ export class ContractProvider {
 
     constructor(private config: ConfigProvider) {
         this.web3 = new Web3(config.ethProvider);
-        // console.log("Using eth provider", config.ethProvider);
         this.definitions = ToolKit.contractDefsForStage(config.stage);
     }
 

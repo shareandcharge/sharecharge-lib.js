@@ -82,7 +82,6 @@ export class StorageService {
                     });
                 }
             } catch (err) {
-                console.log('scId does not exist:', scId);
             }
         }
 
