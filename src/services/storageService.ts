@@ -147,13 +147,18 @@ export class StorageService {
     /**
      * Get tariffs data belonging to a sepcific Charge Point Operator
      * @param cpoId the identity (address) of the Charge Point Operator which owns the Charge Point
+     * @param deserialize choose whether to return the raw OCPI tariffs array or a deserialized tariffs object
      * @returns array of tariff objects or single tariff object if filtered by tariff ID
      */
-    async getAllTariffsByCPO(cpoId: string): Promise<{ [key: string]: Tariff }> {
+    async getAllTariffsByCPO(cpoId: string, deserialize = true): Promise<{ [key: string]: Tariff } | ITariff[]> {
         const hash = await this.contract.call('getTariffsByCPO', cpoId);
         if (hash !== ToolKit.emptyByteString(32)) {
             const data = await this.ipfs.cat(hash);
-            return Tariff.deserialize(data);
+            if (deserialize) {
+                return Tariff.deserialize(data);
+            } else {
+                return data;
+            }
         } else {
             return {};
         }

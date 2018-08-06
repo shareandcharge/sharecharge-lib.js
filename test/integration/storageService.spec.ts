@@ -13,6 +13,7 @@ import { ContractProvider } from '../../src/services/contractProvider';
 import { StorageService } from '../../src/services/storageService';
 import { IpfsProvider } from '../../src/services/ipfsProvider';
 import IpfsMock from '../ipfsMock';
+import { ITariff } from '@motionwerk/sharecharge-common/dist/common';
 
 const config = new ConfigProvider();
 const ocpiLocation = require('../data/ocpiLocation.json');
@@ -117,6 +118,12 @@ describe('StorageService', function () {
         const tariff = await storageService.getAllTariffsByCPO(wallet.coinbase);
         expect(tariff['1'].currency).to.equal('EUR');
         expect(tariff['2']).to.equal(undefined);
+    });
+
+    it('should get serialized tariff if specified', async () => {
+        const result = await storageService.useWallet(wallet).addTariffs(ocpiTariffs);
+        const tariff = <ITariff[]>await storageService.getAllTariffsByCPO(wallet.coinbase, false);
+        expect(tariff.length).to.equal(1);
     });
 
     it('should get the tariff for an EVSE', async () => {
