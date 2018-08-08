@@ -6,7 +6,7 @@ export default {
         return {
             add: async (content: any) => {
                 // if location, else tariffs
-                if (content.id) {
+                if (content.evses) {
                     return {
                         ipfs: 'QmUVB2FKuQ66s5Fueu6BBX5Nsxf1eVXcif5dq3qPKeRFLj',
                         solidity: '0x5b550af4e10a5631201589b74703d5d2217efbfadc4a8816eee55696f3b4cc40'

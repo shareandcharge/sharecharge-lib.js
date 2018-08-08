@@ -87,6 +87,18 @@ describe('StorageService', function () {
         });
     });
 
+    context('#deleteTariffs()', () => {
+        it('should reset tariffs and allow adding again', async () => {
+            await storageService.useWallet(wallet).addTariffs(ocpiTariffs);
+            await storageService.useWallet(wallet).removeTariffs();
+            const tariffs0 = await storageService.getAllTariffsByCPO(wallet.coinbase);
+            expect(Object.keys(tariffs0).length).to.equal(0);
+            await storageService.useWallet(wallet).addTariffs(ocpiTariffs);
+            const tariffs1 = await storageService.getAllTariffsByCPO(wallet.coinbase);
+            expect(Object.keys(tariffs1).length).to.equal(1);
+        });
+    });
+
     it('should get owner of a registered location', async () => {
         const result = await storageService.useWallet(wallet).addLocation(ocpiLocation);
         const owner = await storageService.getOwnerOfLocation(result.scId);

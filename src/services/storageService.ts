@@ -223,6 +223,11 @@ export class StorageService {
              * @returns the ipfs hash of the new tariffs data
              */
             updateTariffs: this.updateTariffs(key),
+
+            /**
+             * Remove tariffs data on the Share & Charge Network
+             */
+            removeTariffs: this.removeTariffs(key),
         };
     }
 
@@ -271,6 +276,12 @@ export class StorageService {
             const hash = await this.ipfs.add(tariffs);
             await this.contract.send('updateTariffs', [hash['solidity']], key);
             return hash['ipfs'];
+        };
+    }
+
+    private removeTariffs(key: Key) {
+        return async () => {
+            return this.contract.send('updateTariffs', [ToolKit.emptyByteString(32)], key);
         };
     }
 }
