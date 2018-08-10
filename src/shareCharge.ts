@@ -44,13 +44,7 @@ export class ShareCharge {
         eventPoller.monitor('ExternalStorage', this.store.contract);
 
         eventPoller.events.subscribe(events => events.forEach(item => {
-            if (item.returnValues.scId) {
-                item.returnValues.scId = ToolKit.hexToScId(item.returnValues.scId);
-            }
-            if (item.returnValues.evseId) {
-                item.returnValues.evseId = ToolKit.hexToString(item.returnValues.evseId);
-            }
-
+            item.returnValues = ToolKit.formatReturnValues(item.returnValues);
             const returnValues = {
                 ...ToolKit.removeIndexKeys(item.returnValues),
                 transactionHash: item.transactionHash,

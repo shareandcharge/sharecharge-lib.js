@@ -33,16 +33,20 @@ export class EventPoller {
     }
 
     async poll() {
-        if (this.fromBlock === -1) {
-            this.fromBlock = await this.web3.eth.getBlockNumber();
+        try {
+            if (this.fromBlock === -1) {
+                this.fromBlock = await this.web3.eth.getBlockNumber();
+            }
+            const promises: any[] = [];
+            this.contracts.forEach(contract => promises.push(
+                contract.native.getPastEvents({ fromBlock: this.fromBlock })
+                    .then(pastEvents => this.events.next(pastEvents))
+            ));
+            await Promise.all(promises);
+            this.fromBlock = await this.web3.eth.getBlockNumber() + 1;
+        } catch (err) {
+            console.log(err.message);
         }
-        const promises: any[] = [];
-        this.contracts.forEach(contract => promises.push(
-            contract.native.getPastEvents({ fromBlock: this.fromBlock })
-                .then(pastEvents => this.events.next(pastEvents))
-        ));
-        await Promise.all(promises);
-        this.fromBlock = await this.web3.eth.getBlockNumber() + 1;
     }
 
     monitor(key: string, contract: Contract) {

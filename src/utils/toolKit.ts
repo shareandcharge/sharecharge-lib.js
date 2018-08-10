@@ -29,6 +29,16 @@ export class ToolKit {
         return web3Utils.asciiToHex(val);
     }
 
+    static formatReturnValues(returnValues: any): any {
+        if (returnValues.scId) {
+            returnValues.scId = ToolKit.hexToScId(returnValues.scId);
+        }
+        if (returnValues.evseId) {
+            returnValues.evseId = ToolKit.hexToString(returnValues.evseId);
+        }
+        return returnValues;
+    }
+
     static isAddress(val: string): boolean {
         return web3Utils.isAddress(val);
     }

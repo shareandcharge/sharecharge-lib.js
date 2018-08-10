@@ -1,4 +1,5 @@
 import { Key } from "./key";
+import { ToolKit } from "..";
 
 export class Contract {
 
@@ -39,10 +40,11 @@ export class Contract {
                 logs = logs.filter(log => log.returnValues[key].toLowerCase() === value);
             }
         }
-
         return Promise.all(logs.map(async filtered => {
             const receipt = await this.web3.eth.getTransactionReceipt(filtered.transactionHash);
             const block = await this.web3.eth.getBlock(filtered.blockHash);
+            filtered.returnValues = ToolKit.formatReturnValues(filtered.returnValues);
+            filtered.returnValues = ToolKit.removeIndexKeys(filtered.returnValues);
             filtered.gasUsed = receipt.gasUsed;
             filtered.timestamp = block.timestamp;
             return filtered;
