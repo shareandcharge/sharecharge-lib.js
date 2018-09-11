@@ -64,7 +64,7 @@ export class ChargingService {
              * @returns transaction object if successful
              */
             confirmStart: async (scId: string, evseId: string, sessionId: string) => {
-                const start = Date.now() / 1000;
+                const start = Math.round(Date.now() / 1000);
                 return this.contract.send("confirmStart", [scId, ToolKit.asciiToHex(evseId), sessionId, start], key);
             },
 
@@ -97,7 +97,7 @@ export class ChargingService {
              * @returns transaction object if successful
              */
             chargeDetailRecord: async (scId: string, evseId: string, tariffValue: number, finalPrice: number) => {
-                const endTime = Date.now() / 1000;
+                const endTime = Math.round(Date.now() / 1000);
                 return this.contract.send("chargeDetailRecord", [scId, ToolKit.asciiToHex(evseId), finalPrice, tariffValue, endTime], key);
             },
 
