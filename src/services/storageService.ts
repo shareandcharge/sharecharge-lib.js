@@ -1,4 +1,6 @@
 import { ILocation, IEvse, ITariff } from '@motionwerk/sharecharge-common';
+import { Location as OCPILocation } from '@motionwerk/sharecharge-common';
+import { Tariff as OCPITariff } from '@motionwerk/sharecharge-common';
 import { Tariff } from '../models/tariff';
 import { Contract } from "../models/contract";
 import { ContractProvider } from './contractProvider';
@@ -232,9 +234,10 @@ export class StorageService {
     }
 
     private addLocation(key: Key) {
-        return async (location: ILocation) => {
-            const scId = ToolKit.geolocationToScId(location.coordinates);
-            const hash = await this.ipfs.add(location);
+        return async (input: any) => {
+            const loc = OCPILocation.deserialize(input);
+            const scId = ToolKit.geolocationToScId(loc.coordinates);
+            const hash = await this.ipfs.add(loc);
             await this.contract.send('addLocation', [scId, hash['solidity']], key);
             return {
                 scId,
@@ -253,7 +256,11 @@ export class StorageService {
     }
 
     private addTariffs(key: Key) {
-        return async (tariffs: ITariff) => {
+        return async (input: any) => {
+            const tariffs = <OCPITariff[]>[];
+            for (const tariff of input) {
+                tariffs.push(OCPITariff.deserialize(tariff));
+            }
             const hash = await this.ipfs.add(tariffs);
             await this.contract.send('addTariffs', [hash['solidity']], key);
             return hash['ipfs'];
