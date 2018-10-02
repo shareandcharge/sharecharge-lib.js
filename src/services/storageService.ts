@@ -235,9 +235,9 @@ export class StorageService {
 
     private addLocation(key: Key) {
         return async (input: any) => {
-            const loc = OCPILocation.deserialize(input);
-            const scId = ToolKit.geolocationToScId(loc.coordinates);
-            const hash = await this.ipfs.add(loc);
+            const location = OCPILocation.deserialize(input);
+            const scId = ToolKit.geolocationToScId(location.coordinates);
+            const hash = await this.ipfs.add(location);
             await this.contract.send('addLocation', [scId, hash['solidity']], key);
             return {
                 scId,
@@ -268,7 +268,8 @@ export class StorageService {
     }
 
     private updateLocation(key: Key) {
-        return async (scId: string, location: ILocation) => {
+        return async (scId: string, input: any) => {
+            const location = OCPILocation.deserialize(input);
             const hash = await this.ipfs.add(location);
             await this.contract.send('updateLocation', [scId, hash['solidity']], key);
             return {
@@ -279,7 +280,11 @@ export class StorageService {
     }
 
     private updateTariffs(key: Key) {
-        return async (tariffs: ITariff) => {
+        return async (input: any) => {
+            const tariffs = <OCPITariff[]>[];
+            for (const tariff of input) {
+                tariffs.push(OCPITariff.deserialize(tariff));
+            }
             const hash = await this.ipfs.add(tariffs);
             await this.contract.send('updateTariffs', [hash['solidity']], key);
             return hash['ipfs'];
