@@ -67,6 +67,18 @@ describe('StorageService', function () {
             expect(result2.scId).to.equal(result.scId);
             expect(result2.ipfs).to.not.equal(undefined);
         });
+
+        it('should throw if coordinates have changed', async () => {
+            const result = await storageService.useWallet(wallet).addLocation(ocpiLocation);
+            ocpiLocation.coordinates.latitude = 52.123456;
+            ocpiLocation.coordinates.longitude = 100.123456;
+            try {
+                await storageService.useWallet(wallet).updateLocation(result.scId, ocpiLocation);
+                expect.fail();
+            } catch (err) {
+                expect(err.message).to.equal('Coordinates for this location have changed. Please remove the old location and add a new one instead.');
+            }
+        });
     });
 
     context('#addTariffs()', () => {

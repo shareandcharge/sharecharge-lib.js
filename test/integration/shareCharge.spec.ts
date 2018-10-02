@@ -95,10 +95,10 @@ describe('ShareCharge', function () {
 
     beforeEach(async () => {
         const lat = ocpiLocation.coordinates.latitude;
-        ocpiLocation.coordinates.latitude = lat.slice(0, 3) + Math.round(Math.random() * 10000000);
+        ocpiLocation.coordinates.latitude = lat.slice(0, 3) + parseInt(Math.random().toString().slice(2, 9));
 
         const lng = ocpiLocation.coordinates.longitude;
-        ocpiLocation.coordinates.longitude = lng.slice(0, 2) + Math.round(Math.random() * 10000000);
+        ocpiLocation.coordinates.longitude = lng.slice(0, 2) + parseInt(Math.random().toString().slice(2, 9));
     });
 
     afterEach(async () => {

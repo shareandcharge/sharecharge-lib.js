@@ -269,8 +269,12 @@ export class StorageService {
 
     private updateLocation(key: Key) {
         return async (scId: string, input: any) => {
-            const location = OCPILocation.deserialize(input);
-            const hash = await this.ipfs.add(location);
+            const newLocation = OCPILocation.deserialize(input);
+            const scIdHasChanged = ToolKit.geolocationToScId(newLocation.coordinates) !== scId;
+            if (scIdHasChanged) {
+                throw Error('Coordinates for this location have changed. Please remove the old location and add a new one instead.');
+            }
+            const hash = await this.ipfs.add(newLocation);
             await this.contract.send('updateLocation', [scId, hash['solidity']], key);
             return {
                 scId,
