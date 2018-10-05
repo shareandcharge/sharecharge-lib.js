@@ -68,17 +68,15 @@ export class StorageService {
      * @param cpoId the identity (address) of the Charge Point Operator
      * @returns array of objects containing the Share & Charge ID for the Charge Point and its data
      */
-    async getLocationsByCPO(cpoId: string): Promise<{ [scId: string]: Location }[]> {
+    async getLocationsByCPO(cpoId: string): Promise<{ [scId: string]: Location }> {
         const scIds: string[] = await this.contract.call('getShareAndChargeIdsByCPO', cpoId);
         const uniqueIds = new Set(scIds);
-        const resolvedLocations: { [scId: string]: Location }[] = [];
+        const resolvedLocations: { [scId: string]: Location } = {};
         for (const scId of Array.from(uniqueIds)) {
             try {
-                const data = await this.getLocationById(cpoId, scId);
-                if (data) {
-                    resolvedLocations.push({
-                        [ToolKit.hexToScId(scId)]: data
-                    });
+                const location = await this.getLocationById(cpoId, scId);
+                if (location) {
+                    resolvedLocations[ToolKit.hexToScId(scId)] = location;
                 }
             } catch (err) {
             }
