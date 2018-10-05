@@ -1,4 +1,3 @@
-import { ILocation } from '@motionwerk/sharecharge-common/dist/common';
 import { ToolKit } from '../../src/utils/toolKit';
 import 'mocha';
 import { expect } from 'chai';
@@ -19,7 +18,7 @@ import { StorageService } from '../../src/services/storageService';
 import { IpfsProvider } from '../../src/services/ipfsProvider';
 import IpfsMock from '../ipfsMock';
 
-const ocpiLocation: ILocation = require('../data/ocpiLocation.json');
+const ocpiLocation = require('../data/ocpiLocation.json');
 
 const config = new ConfigProvider();
 

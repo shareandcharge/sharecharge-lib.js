@@ -13,7 +13,6 @@ import { ContractProvider } from '../../src/services/contractProvider';
 import { StorageService } from '../../src/services/storageService';
 import { IpfsProvider } from '../../src/services/ipfsProvider';
 import IpfsMock from '../ipfsMock';
-import { ITariff } from '@motionwerk/sharecharge-common/dist/common';
 
 const config = new ConfigProvider();
 const ocpiLocation = require('../data/ocpiLocation.json');
