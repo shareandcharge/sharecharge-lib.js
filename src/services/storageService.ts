@@ -77,7 +77,7 @@ export class StorageService {
                 const data = await this.getLocationById(cpoId, scId);
                 if (data) {
                     resolvedLocations.push({
-                        [scId]: data
+                        [ToolKit.hexToScId(scId)]: data
                     });
                 }
             } catch (err) {
