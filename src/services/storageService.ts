@@ -1,7 +1,4 @@
-import { ILocation, IEvse, ITariff } from '@motionwerk/sharecharge-common';
-import { Location as OCPILocation } from '@motionwerk/sharecharge-common';
-import { Tariff as OCPITariff } from '@motionwerk/sharecharge-common';
-import { Tariff } from '../models/tariff';
+import { Tariff, Location } from '@motionwerk/sharecharge-common';
 import { Contract } from "../models/contract";
 import { ContractProvider } from './contractProvider';
 import { IpfsProvider } from './ipfsProvider';
@@ -37,10 +34,11 @@ export class StorageService {
      * @param scId the unique Share & Charge location identity
      * @returns charge point (location) object in OCPI(?) format
      */
-    async getLocationById(cpoId: string, scId: string): Promise<ILocation> {
+    async getLocationById(cpoId: string, scId: string): Promise<Location> {
         const hash = await this.contract.call('getLocationById', cpoId, scId);
         if (hash !== ToolKit.emptyByteString(32)) {
-            return this.ipfs.cat(hash);
+            const data = await this.ipfs.cat(hash);
+            return Location.deserialize(data);
         } else {
             throw Error('Location does not exist!');
         }
@@ -70,23 +68,21 @@ export class StorageService {
      * @param cpoId the identity (address) of the Charge Point Operator
      * @returns array of objects containing the Share & Charge ID for the Charge Point and its data
      */
-    async getLocationsByCPO(cpoId: string): Promise<{ scId: string, data: ILocation }[]> {
+    async getLocationsByCPO(cpoId: string): Promise<{ [scId: string]: Location }[]> {
         const scIds: string[] = await this.contract.call('getShareAndChargeIdsByCPO', cpoId);
         const uniqueIds = new Set(scIds);
-        const resolvedLocations: { scId: string, data: any }[] = [];
+        const resolvedLocations: { [scId: string]: Location }[] = [];
         for (const scId of Array.from(uniqueIds)) {
             try {
                 const data = await this.getLocationById(cpoId, scId);
                 if (data) {
                     resolvedLocations.push({
-                        scId: ToolKit.hexToScId(scId),
-                        data
+                        [scId]: data
                     });
                 }
             } catch (err) {
             }
         }
-
         return resolvedLocations;
     }
 
@@ -101,84 +97,23 @@ export class StorageService {
     }
 
     /**
-     * Find the EVSEs on a location
-     * @param scId the unique Share & Charge location identifier
-     * @returns array of EVSE IDs on the location
-     */
-    async getEvseIds(scId: string): Promise<string[]> {
-        const owner = await this.getOwnerOfLocation(scId);
-        const location = await this.getLocationById(owner, scId);
-        try {
-            return location.evses.map(evse => evse['evse_id']);
-        } catch (err) {
-            throw Error('Unable to parse location for EVSE ids. Ensure your location data is in OCPI format.');
-        }
-    }
-
-    /**
-     * Find EVSEs within a location
-     * @param scId the unique Share & Charge location identifier
-     * @returns array of EVSE objects
-     */
-    async getAllEvses(scId: string): Promise<IEvse[]> {
-        const owner = await this.getOwnerOfLocation(scId);
-        const location = await this.getLocationById(owner, scId);
-        try {
-            return location.evses;
-        } catch (err) {
-            throw Error('Unable to parse location for EVSEs. Ensure your location data is in OCPI format.');
-        }
-    }
-
-    /**
-     * Obtain an EVSE object from a location
-     * @param scId the unique Share & Charge location identifier
-     * @param evseId the ID of the EVSE to obtain
-     * @returns EVSE object
-     */
-    async getEvse(scId: string, evseId: string): Promise<IEvse> {
-        const owner = await this.getOwnerOfLocation(scId);
-        const location = await this.getLocationById(owner, scId);
-        try {
-            return location.evses.filter(evse => evse['evse_id'] === evseId)[0];
-        } catch (err) {
-            throw Error('Unable to parse location for EVSEs. Ensure your location data is in OCPI format.');
-        }
-    }
-
-    /**
      * Get tariffs data belonging to a sepcific Charge Point Operator
      * @param cpoId the identity (address) of the Charge Point Operator which owns the Charge Point
-     * @param deserialize choose whether to return the raw OCPI tariffs array or a deserialized tariffs object
      * @returns array of tariff objects or single tariff object if filtered by tariff ID
      */
-    async getAllTariffsByCPO(cpoId: string, deserialize = true): Promise<{ [key: string]: Tariff } | ITariff[]> {
+    async getAllTariffsByCPO(cpoId: string): Promise<{ [key: string]: Tariff }> {
         const hash = await this.contract.call('getTariffsByCPO', cpoId);
         if (hash !== ToolKit.emptyByteString(32)) {
+            const returnObject = {};
             const data = await this.ipfs.cat(hash);
-            if (deserialize) {
-                return Tariff.deserialize(data);
-            } else {
-                return data;
+            for (const tariff of data) {
+                const deserializedTariff = Tariff.deserialize(tariff);
+                returnObject[deserializedTariff.id] = deserializedTariff;
             }
+            return returnObject;
         } else {
             return {};
         }
-    }
-
-    /**
-     * Get tariffs relating to a certain EVSE
-     * @param scId the unique Share & Charge location identifier
-     * @param evseId the EVSE ID to get tariffs for
-     * @param type optional type of tariff to get (ENERGY, TIME, PARKING_TIME, or FLAT)
-     * @returns filtered or unfiltered tariff object
-     */
-    async getTariffByEvse(scId: string, evseId: string, type?: string): Promise<Tariff> {
-        const owner = await this.getOwnerOfLocation(scId);
-        const evse = await this.getEvse(scId, evseId);
-        const tariffId = evse.connectors.map(conn => conn['tariff_id'])[0];
-        const tariffs = await this.getAllTariffsByCPO(owner);
-        return tariffs[tariffId];
     }
 
     /**
@@ -235,7 +170,7 @@ export class StorageService {
 
     private addLocation(key: Key) {
         return async (input: any) => {
-            const location = OCPILocation.deserialize(input);
+            const location = Location.deserialize(input);
             const scId = ToolKit.geolocationToScId(location.coordinates);
             const hash = await this.ipfs.add(location);
             await this.contract.send('addLocation', [scId, hash['solidity']], key);
@@ -257,9 +192,9 @@ export class StorageService {
 
     private addTariffs(key: Key) {
         return async (input: any) => {
-            const tariffs = <OCPITariff[]>[];
+            const tariffs = <Tariff[]>[];
             for (const tariff of input) {
-                tariffs.push(OCPITariff.deserialize(tariff));
+                tariffs.push(Tariff.deserialize(tariff));
             }
             const hash = await this.ipfs.add(tariffs);
             await this.contract.send('addTariffs', [hash['solidity']], key);
@@ -269,7 +204,7 @@ export class StorageService {
 
     private updateLocation(key: Key) {
         return async (scId: string, input: any) => {
-            const newLocation = OCPILocation.deserialize(input);
+            const newLocation = Location.deserialize(input);
             const scIdHasChanged = ToolKit.geolocationToScId(newLocation.coordinates) !== scId;
             if (scIdHasChanged) {
                 throw Error('Coordinates for this location have changed. Please remove the old location and add a new one instead.');
@@ -285,9 +220,9 @@ export class StorageService {
 
     private updateTariffs(key: Key) {
         return async (input: any) => {
-            const tariffs = <OCPITariff[]>[];
+            const tariffs = <Tariff[]>[];
             for (const tariff of input) {
-                tariffs.push(OCPITariff.deserialize(tariff));
+                tariffs.push(Tariff.deserialize(tariff));
             }
             const hash = await this.ipfs.add(tariffs);
             await this.contract.send('updateTariffs', [hash['solidity']], key);
