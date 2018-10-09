@@ -2,6 +2,11 @@ import { Contract } from "../models/contract";
 import { Wallet } from "../models/wallet";
 import { ContractProvider } from "./contractProvider";
 import { ToolKit } from '../utils/toolKit';
+import RequestStart from '../models/transactions/requestStart';
+import ConfirmStart from "../models/transactions/confirmStart";
+import Stop from "../models/transactions/stop";
+import ChargeDetailRecord from "../models/transactions/chargeDetailRecord";
+import LogError from "../models/transactions/logError";
 
 export class ChargingService {
 
@@ -43,76 +48,51 @@ export class ChargingService {
         return {
 
             /**
-             * Request a remote start at a specific EVSE
-             * @param scId the unique Share & Charge location identity string
-             * @param evseId the unique identity string of the EVSE
-             * @param tariffId the enumerated value of the tariff to use (e.g. 3 if time-based)
-             * @param tariffValue the quantity of the proposed charging session based on the tariff (e.g. 60 if charging for one hour on a time-based tariff)
-             * @param tokenAddress the address on the network of the eMobility Service Provider token to use
-             * @param estimatedPrice the estimated price of the charging session (calculated beforehand by an eMobility Service Provider based on Charge Point Operator tariff data)
-             * @returns transaction object if successful
+             * Request a remote start at a specific location
+             * @returns RequestStart transaction object
              */
-            requestStart: async (scId: string, evseId: string, tariffId: number, tariffValue: number, tokenAddress: string, estimatedPrice: number) => {
-                return this.contract.send("requestStart", [scId, ToolKit.asciiToHex(evseId), tariffId, tariffValue, tokenAddress, estimatedPrice], key);
+            requestStart: () => {
+                return new RequestStart(this.contract, key);
             },
 
             /**
-             * Confirm a remote start at a specific EVSE
-             * @param scId the unique Share & Charge location identity string
-             * @param evseId the unique identity string of the EVSE
-             * @param sessionId the identifier of the session (not currently used to identify the charging session in other parts of the process)
-             * @returns transaction object if successful
+             * Confirm a remote start at a specific location
+             * @returns ConfirmStart transaction object
              */
-            confirmStart: async (scId: string, evseId: string, sessionId: string) => {
-                const start = Math.round(Date.now() / 1000);
-                return this.contract.send("confirmStart", [scId, ToolKit.asciiToHex(evseId), sessionId, start], key);
+            confirmStart: () => {
+                return new ConfirmStart(this.contract, key);
             },
 
             /**
-             * Request a remote stop at a specific EVSE
-             * @param scId the unique Share & Charge location identity string
-             * @param evseId the unique identity string of the EVSE
-             * @returns transaction object if successful
+             * Request a remote stop at a specific location
+             * @returns Stop transaction object
              */
-            requestStop: async (scId: string, evseId: string) => {
-                return this.contract.send("requestStop", [scId, ToolKit.asciiToHex(evseId)], key);
+            requestStop: () => {
+                return new Stop('requestStop', this.contract, key);
             },
 
             /**
-             * Confirm a remote stop at a specific EVSE
-             * @param scId the unique Share & Charge location identity string
-             * @param evseId the unique identity string of the EVSE
-             * @returns transaction object if successful
+             * Confirm a remote stop at a specific location
+             * @returns Stop transaction object
              */
-            confirmStop: async (scId: string, evseId: string) => {
-                return this.contract.send("confirmStop", [scId, ToolKit.asciiToHex(evseId)], key);
+            confirmStop: () => {
+                return new Stop('confirmStop', this.contract, key);
             },
 
             /**
-             * Issue a Charge Detail Record after the completion of a session at an EVSE
-             * @param scId the unique Share & Charge location identity string
-             * @param evseId the unique identity string of the EVSE
-             * @param tariffValue the final quantity of units charged based on the chosen tariff
-             * @param finalPrice the final price of the charging session (calculated by the Charge Point Operator)
-             * @returns transaction object if successful
+             * Issue a Charge Detail Record after the completion of a session at a location
+             * @returns ChargeDetailRecord transaction object
              */
-            chargeDetailRecord: async (scId: string, evseId: string, tariffValue: number, finalPrice: number) => {
-                const endTime = Math.round(Date.now() / 1000);
-                return this.contract.send("chargeDetailRecord", [scId, ToolKit.asciiToHex(evseId), finalPrice, tariffValue, endTime], key);
-            },
-
-            reset: async (scId: string, evseId: string) => {
-                return this.contract.send("reset", [scId, ToolKit.asciiToHex(evseId)], key);
+            chargeDetailRecord: () => {
+                return new ChargeDetailRecord(this.contract, key);
             },
 
             /**
-             * Log an error that has occurred at a particular EVSE
-             * @param scId the unique Share & Charge location identity string
-             * @param evseId the unique identity string of the EVSE
-             * @param errorCode notify the driver of a particular error (TBD - currently 0 = start error; 1 = stop error)
+             * Log an error that has occurred at a particular location
+             * @returns LogError transaction object
              */
-            error: async (scId: string, evseId: string, errorCode: number) => {
-                return this.contract.send("logError", [scId, ToolKit.asciiToHex(evseId), errorCode], key);
+            logError: () => {
+                return new LogError(this.contract, key);
             }
         };
     }

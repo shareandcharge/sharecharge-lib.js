@@ -17,6 +17,7 @@ import { TokenService } from '../../src/services/tokenService';
 import { StorageService } from '../../src/services/storageService';
 import { IpfsProvider } from '../../src/services/ipfsProvider';
 import IpfsMock from '../ipfsMock';
+import { SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION } from 'constants';
 
 const ocpiLocation = require('../data/ocpiLocation.json');
 
@@ -79,9 +80,9 @@ describe('ShareCharge', function () {
         });
 
         const tokenContract = await TestHelper.createContract(web3, config, contractDefs["MSPToken"], ["S&C Token", "SCT"]);
-        tokenService = new TokenService(new ContractProvider(new ConfigProvider({tokenAddress: tokenContract.address})));
+        tokenService = new TokenService(new ContractProvider(new ConfigProvider({ tokenAddress: tokenContract.address })));
 
-        await chargingContract.native.methods["setStorageAddress"](storageContract.address).send({from: coinbase});
+        await chargingContract.native.methods["setStorageAddress"](storageContract.address).send({ from: coinbase });
         // await evseContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
 
         eventPoller = new EventPoller(config);
@@ -119,8 +120,21 @@ describe('ShareCharge', function () {
                 }
             });
 
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, 0, 20, tokenAddress, 100);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStart(location.scId, evseId, '0x01');
+            const requestStart = shareCharge.charging.useWallet(driverWallet).requestStart();
+            requestStart.scId = location.scId;
+            requestStart.evse = evseId;
+            requestStart.connector = '1';
+            requestStart.tariff = 'ENERGY';
+            requestStart.chargeUnits = 20000;
+            requestStart.tokenAddress = tokenAddress;
+            requestStart.estimatedPrice = 100;
+            await requestStart.send();
+
+            const confirmStart = shareCharge.charging.useWallet(cpoWallet).confirmStart();
+            confirmStart.scId = location.scId;
+            confirmStart.evse = evseId;
+            confirmStart.sessionId = '0x01';
+            await confirmStart.send();
 
             await eventPoller.poll();
             expect(controller.toLowerCase()).to.equal(driverKey.address);
@@ -148,14 +162,36 @@ describe('ShareCharge', function () {
                 token = result.tokenAddress;
             });
 
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, 3, 60, shareCharge.token.address, 300);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStart(location.scId, evseId, '0x01');
-            await shareCharge.charging.useWallet(driverWallet).requestStop(location.scId, evseId);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStop(location.scId, evseId);
+            const requestStart = shareCharge.charging.useWallet(driverWallet).requestStart();
+            requestStart.scId = location.scId;
+            requestStart.evse = evseId;
+            requestStart.connector = '1';
+            requestStart.tariff = 'TIME';
+            requestStart.chargeUnits = 60;
+            requestStart.tokenAddress = shareCharge.token.address;
+            requestStart.estimatedPrice = 300;
+            await requestStart.send();
+
+            const confirmStart = shareCharge.charging.useWallet(cpoWallet).confirmStart();
+            confirmStart.scId = location.scId;
+            confirmStart.evse = evseId;
+            confirmStart.sessionId = '0x01';
+            await confirmStart.send();
+
+            const confirmStop = shareCharge.charging.useWallet(cpoWallet).confirmStop();
+            confirmStop.scId = location.scId;
+            confirmStop.evse = evseId;
+            await confirmStop.send();
 
             await eventPoller.poll();
 
-            await shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord(location.scId, evseId, 30, finalPrice);
+            const cdr = shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord();
+            cdr.scId = location.scId;
+            cdr.evse = evseId;
+            cdr.chargedUnits = 30000;
+            cdr.finalPrice = finalPrice;
+            await cdr.send();
+
             await eventPoller.poll();
 
             expect(controller.toLowerCase()).to.equal(driverKey.address);
@@ -177,8 +213,21 @@ describe('ShareCharge', function () {
                 }
             });
 
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, 0, 20, shareCharge.token.address, 0);
-            await shareCharge.charging.useWallet(cpoWallet).error(location.scId, evseId, 0);
+            const request = shareCharge.charging.useWallet(driverWallet).requestStart();
+            request.scId = location.scId;
+            request.evse = evseId;
+            request.connector = '1';
+            request.tariff = 'ENERGY';
+            request.chargeUnits = 20000;
+            request.tokenAddress = shareCharge.token.address;
+            request.estimatedPrice = 0;
+            await request.send();
+
+            const error = shareCharge.charging.useWallet(cpoWallet).logError();
+            error.scId = location.scId;
+            error.evse = evseId;
+            error.code = 0;
+            await error.send();
 
             await eventPoller.poll();
 
@@ -198,9 +247,26 @@ describe('ShareCharge', function () {
                 }
             });
 
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, 0, 11, shareCharge.token.address, 0);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStart(location.scId, evseId, '0x01');
-            await shareCharge.charging.useWallet(driverWallet).requestStop(location.scId, evseId);
+            const request = shareCharge.charging.useWallet(driverWallet).requestStart();
+            request.scId = location.scId;
+            request.evse = evseId;
+            request.connector = '1';
+            request.tariff = 'ENERGY';
+            request.chargeUnits = 11000;
+            request.tokenAddress = shareCharge.token.address;
+            request.estimatedPrice = 0;
+            await request.send();
+
+            const confirmStart = shareCharge.charging.useWallet(cpoWallet).confirmStart();
+            confirmStart.scId = location.scId;
+            confirmStart.evse = evseId;
+            confirmStart.sessionId = '0x01';
+            await confirmStart.send();
+
+            const requestStop = shareCharge.charging.useWallet(driverWallet).requestStop();
+            requestStop.scId = location.scId;
+            requestStop.evse = evseId;
+            await requestStop.send();
 
             await eventPoller.poll();
 
@@ -220,7 +286,15 @@ describe('ShareCharge', function () {
                 }
             });
 
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, 1, 0, shareCharge.token.address, 0);
+            const request = shareCharge.charging.useWallet(driverWallet).requestStart();
+            request.scId = location.scId;
+            request.evse = evseId;
+            request.connector = '1';
+            request.tariff = 'FLAT';
+            request.chargeUnits = 60;
+            request.tokenAddress = shareCharge.token.address;
+            request.estimatedPrice = 0;
+            await request.send();
 
             await eventPoller.poll();
 
@@ -230,7 +304,15 @@ describe('ShareCharge', function () {
 
         it('should get session information during a charge', async () => {
             const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, 1, 0, shareCharge.token.address, 0);
+            const request = shareCharge.charging.useWallet(driverWallet).requestStart();
+            request.scId = location.scId;
+            request.evse = evseId;
+            request.connector = '1';
+            request.tariff = 'FLAT';
+            request.chargeUnits = 200;
+            request.tokenAddress = shareCharge.token.address;
+            request.estimatedPrice = 0;
+            await request.send();
             const session = await shareCharge.charging.getSession(location.scId, evseId);
 
             expect(session.controller.toLowerCase()).to.equal(driverKey.address);
@@ -298,11 +380,37 @@ describe('ShareCharge', function () {
 
             const logsBefore = await shareCharge.charging.contract.getLogs('StartRequested');
 
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, 1, 0, shareCharge.token.address, 0);
-            await shareCharge.charging.useWallet(cpoWallet).requestStart(location.scId, evseId, 1, 0, shareCharge.token.address, 0);
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, 1, 0, shareCharge.token.address, 0);
+            const request0 = shareCharge.charging.useWallet(driverWallet).requestStart();
+            request0.scId = location.scId;
+            request0.evse = evseId;
+            request0.connector = '1';
+            request0.tariff = 'ENERGY';
+            request0.chargeUnits = 20000;
+            request0.tokenAddress = shareCharge.token.address;
+            request0.estimatedPrice = 0;
+            await request0.send();
 
-            const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', {controller: driverKey.address});
+            const request1 = shareCharge.charging.useWallet(mspWallet).requestStart();
+            request1.scId = location.scId;
+            request1.evse = evseId;
+            request1.connector = '1';
+            request1.tariff = 'ENERGY';
+            request1.chargeUnits = 20000;
+            request1.tokenAddress = shareCharge.token.address;
+            request1.estimatedPrice = 0;
+            await request1.send();
+
+            const request2 = shareCharge.charging.useWallet(driverWallet).requestStart();
+            request2.scId = location.scId;
+            request2.evse = evseId;
+            request2.connector = '1';
+            request2.tariff = 'ENERGY';
+            request2.chargeUnits = 20000;
+            request2.tokenAddress = shareCharge.token.address;
+            request2.estimatedPrice = 0;
+            await request2.send();
+
+            const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', { controller: driverKey.address });
             expect(logsAfter.length).to.equal(logsBefore.length + 2);
         });
 
@@ -318,23 +426,54 @@ describe('ShareCharge', function () {
                 finalPrice = result.finalPrice;
             });
 
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, 1, 0, shareCharge.token.address, 200);
-            await shareCharge.charging.useWallet(cpoWallet).confirmStart(location.scId, evseId, '0x01');
-            await shareCharge.charging.useWallet(cpoWallet).confirmStop(location.scId, evseId);
-            await shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord(location.scId, evseId, 0, finalPrice);
+            const request = shareCharge.charging.useWallet(driverWallet).requestStart();
+            request.scId = location.scId;
+            request.evse = evseId;
+            request.connector = '1';
+            request.tariff = 'ENERGY';
+            request.chargeUnits = 20000;
+            request.tokenAddress = shareCharge.token.address;
+            request.estimatedPrice = 200;
+            await request.send();
+
+            const confirmStart = shareCharge.charging.useWallet(cpoWallet).confirmStart();
+            confirmStart.scId = location.scId;
+            confirmStart.evse = evseId;
+            confirmStart.sessionId = '0x01';
+            await confirmStart.send();
+
+            const confirmStop = shareCharge.charging.useWallet(cpoWallet).confirmStop();
+            confirmStop.scId = location.scId;
+            confirmStop.evse = evseId;
+            await confirmStop.send();
+
+            const cdr = shareCharge.charging.useWallet(cpoWallet).chargeDetailRecord();
+            cdr.scId = location.scId;
+            cdr.evse = evseId;
+            cdr.chargedUnits = 30000;
+            cdr.finalPrice = finalPrice;
+            await cdr.send();
 
             const logsAfter = await shareCharge.charging.contract.getLogs('ChargeDetailRecord', {
                 controller: driverKey.address,
-                endTime: {start: 152469000, end: 3524843383145}
+                endTime: { start: 152469000, end: 3524843383145 }
             });
             expect(logsAfter.length).to.equal(logsBefore.length + 1);
         });
 
         it('should return gasUsed and timestamp', async () => {
             const location = await shareCharge.store.useWallet(cpoWallet).addLocation(ocpiLocation);
-            await shareCharge.charging.useWallet(driverWallet).requestStart(location.scId, evseId, 1, 0, shareCharge.token.address, 0);
+            const request = shareCharge.charging.useWallet(driverWallet).requestStart();
+            request.scId = location.scId;
+            request.evse = evseId;
+            request.connector = '1';
+            request.tariff = 'ENERGY';
+            request.chargeUnits = 20000;
+            request.tokenAddress = shareCharge.token.address;
+            request.estimatedPrice = 0;
+            await request.send();
 
-            const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', {controller: driverKey.address});
+            const logsAfter = await shareCharge.charging.contract.getLogs('StartRequested', { controller: driverKey.address });
             expect(logsAfter[0].gasUsed).to.not.be.undefined;
             expect(logsAfter[0].timestamp).to.not.be.undefined;
         });

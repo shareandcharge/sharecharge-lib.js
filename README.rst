@@ -135,9 +135,6 @@ The module has a default configuration object:
     const config = {
         stage: 'local',
         ethProvider: 'http://localhost:8545';
-        ipfsProvider: '/ip4/127.0.0.1/tcp/5001';
-        gasPrice: 18000000000;
-        tokenAddress: "";
     }
 
 *Retrieving instance*
@@ -149,10 +146,19 @@ The module has a default configuration object:
     // get instance of ShareCharge class with overwritten configuration value
     const sc = ShareCharge.getInstance({ stage: 'test' });
 
+*Example usage*
 
-*Example Usage*
+.. code-block:: typescript
 
-see `examples <https://github.com/motionwerkGmbH/sharecharge-lib/tree/domain/examples>`__
+    const request = sc.charging.useWallet(myWallet).requestStart();
+    request.scId = '0x123...';
+    request.evse = 'DE-1234';
+    request.connector = '1';
+    request.tariff = 'ENERGY';
+    request.chargeUnits = 5000;
+    request.tokenAddress = '0x123..';
+    request.estimatedPrice = 100;
+    await request.send();
 
 ----
 
@@ -170,35 +176,35 @@ The following events are subscribable:
 
 ----
 
-``sc.charging``
+``ShareCharge.charging``
 
-- ``useWallet(wallet: Wallet).requestStart(scId: string, evseId: string, tokenAddress: string, estimatedPrice: number)``
+- ``useWallet(wallet: Wallet).requestStart()``
 
     Request a start at an EVSE, specifying the token contract to use and the estimated price of charging 
 
-- ``useWallet(wallet: Wallet).confirmStart(scId: string, evseId: string, sessionId: string)``
+- ``useWallet(wallet: Wallet).confirmStart()``
 
     Confirm a start on an EVSE.
 
-- ``useWallet(wallet: Wallet).requestStop(scId: string, evseId: string)``
+- ``useWallet(wallet: Wallet).requestStop()``
 
     Request a stop at an EVSE.
 
-- ``useWallet(wallet: Wallet).confirmStop(scId: string, evseId: string)``
+- ``useWallet(wallet: Wallet).confirmStop()``
 
     Confirm a stop on an EVSE.
 
-- ``useWallet(wallet: Wallet).chargeDetailRecord(scId: string, evseId: string, finalPrice: number)``
+- ``useWallet(wallet: Wallet).chargeDetailRecord()``
 
     Issue a charge detail record for a charging session.
 
-- ``useWallet(wallet: Wallet).logError(scId: string, evseId: string, errorCode: number)``
+- ``useWallet(wallet: Wallet).logError()``
 
     Notify the network that an error occurred with the charging session for a given evse. Error codes are TBC.
 
 ----
 
-``sc.store``
+``ShareCharge.store``
 
 - ``getLocationById(cpoId: string, locationId: string)``
 
@@ -208,7 +214,7 @@ The following events are subscribable:
 
     Get all charge points by CPO address.
 
-- ``getTariffsByCPO(cpoId)``
+- ``getAllTariffsByCPO(cpoId)``
 
     Get tariffs information by CPO address.
 
@@ -228,13 +234,9 @@ The following events are subscribable:
 
     Update CPO tariffs data.
 
-- ``useWallet(wallet: Wallet).batch().addLocations(...data: any[])``
-
-    Batch add CPO charge point data.
-
 ----
 
-``sc.token``
+``ShareCharge.token``
 
 - ``getBalance(address: string)``
 
