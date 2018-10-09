@@ -36,6 +36,9 @@ export class ToolKit {
         if (returnValues.evseId) {
             returnValues.evseId = ToolKit.hexToString(returnValues.evseId);
         }
+        if (returnValues.connectorId) {
+            returnValues.connectorId = ToolKit.hexToString(returnValues.connectorId);
+        }
         return returnValues;
     }
 
