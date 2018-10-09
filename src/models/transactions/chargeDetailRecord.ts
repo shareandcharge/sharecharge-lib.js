@@ -47,8 +47,8 @@ export default class ChargeDetailRecord {
         return this.contract.send('chargeDetailRecord', [
             this.scId,
             this._evse,
-            this.finalPrice,
             this.chargedUnits,
+            this.finalPrice,
             endTime
         ], this.key);
     }

@@ -316,8 +316,8 @@ describe('ShareCharge', function () {
             const session = await shareCharge.charging.getSession(location.scId, evseId);
 
             expect(session.controller.toLowerCase()).to.equal(driverKey.address);
-            expect(session.token).to.equal(shareCharge.token.address);
-            expect(session.price).to.equal('0');
+            expect(session.tokenAddress).to.equal(shareCharge.token.address);
+            expect(session.estimatedPrice).to.equal('0');
         });
 
     });
