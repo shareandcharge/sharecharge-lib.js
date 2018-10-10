@@ -170,6 +170,10 @@ export class StorageService {
         return async (input: any) => {
             const location = Location.deserialize(input);
             const scId = ToolKit.geolocationToScId(location.coordinates);
+            const owner = await this.getOwnerOfLocation(scId);
+            if (owner !== ToolKit.emptyByteString(20)) {
+                throw Error('Duplicate location detected!');
+            }
             const hash = await this.ipfs.add(location);
             await this.contract.send('addLocation', [scId, hash['solidity']], key);
             return {

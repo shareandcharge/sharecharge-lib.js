@@ -8,7 +8,6 @@ import { Wallet } from '../../src/models/wallet';
 import { Contract } from '../../src/models/contract';
 import { ConfigProvider } from "../../src/services/configProvider";
 import { ToolKit } from '../../src/utils/toolKit';
-import { Key } from '../../src/models/key';
 import { ContractProvider } from '../../src/services/contractProvider';
 import { StorageService } from '../../src/services/storageService';
 import { IpfsProvider } from '../../src/services/ipfsProvider';
@@ -22,7 +21,7 @@ describe('StorageService', function () {
 
     this.timeout(30 * 1000);
 
-    let storageService: StorageService, wallet: Wallet, key: Key, web3;
+    let storageService: StorageService, wallet: Wallet, wallet2: Wallet, web3;
 
     const defs = ToolKit.contractDefsForStage(config.stage);
     const seed = 'filter march urge naive sauce distance under copy payment slow just warm';
@@ -31,8 +30,9 @@ describe('StorageService', function () {
     before(async () => {
         web3 = new Web3(config.ethProvider);
         wallet = new Wallet(seed);
-        key = wallet.keychain[0];
-        await TestHelper.ensureFunds(web3, key);
+        wallet2 = new Wallet('anything');
+        await TestHelper.ensureFunds(web3, wallet.keychain[0]);
+        await TestHelper.ensureFunds(web3, wallet2.keychain[0]);
     });
 
     beforeEach(async () => {
@@ -49,11 +49,21 @@ describe('StorageService', function () {
     context('#addLocation()', () => {
         it('should add location to storage', async () => {
             const result = await storageService.useWallet(wallet).addLocation(ocpiLocation);
-            const scIds = await storageService.getIdsByCPO(key.address);
-            const location = await storageService.getLocationById(key.address, result.scId);
+            const scIds = await storageService.getIdsByCPO(wallet.coinbase);
+            const location = await storageService.getLocationById(wallet.coinbase, result.scId);
             expect(scIds.length).to.equal(1);
             expect(scIds[0]).to.equal(result.scId);
             expect(location.id).to.equal(ocpiLocation.id);
+        });
+
+        it('should not allow adding a duplicate location', async () => {
+            const result = await storageService.useWallet(wallet).addLocation(ocpiLocation);
+            try {
+                await storageService.useWallet(wallet2).addLocation(ocpiLocation);
+                expect.fail();
+            } catch (err) {
+                expect(err.message).to.equal('Duplicate location detected!');
+            }
         });
 
     });
@@ -84,7 +94,7 @@ describe('StorageService', function () {
         it('should add tariffs to storage', async () => {
             const result = await storageService.useWallet(wallet).addTariffs(ocpiTariffs);
             expect(result).to.not.equal(undefined);
-            const result2 = await storageService.getAllTariffsByCPO(key.address);
+            const result2 = await storageService.getAllTariffsByCPO(wallet.coinbase);
             expect(result2['1'].currency).to.equal('EUR');
         });
     });
