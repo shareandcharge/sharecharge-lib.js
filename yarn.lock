@@ -11,10 +11,10 @@
     rxjs "^6.2.0"
     uuid "^3.3.2"
 
-"@motionwerk/sharecharge-contracts@^0.7.0":
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/@motionwerk/sharecharge-contracts/-/sharecharge-contracts-0.7.0.tgz#41cf4797bb09eb3914ee9a8b3d4f71ea47eb8314"
-  integrity sha512-NlQh65D10Ujx34NjgXLmZJX/d6NGNhZ4gzKSM+w/IRDtg6ISAdjL3uuBBcyFiA2s1TfIrz/1ygHY597ocz/GwA==
+"@motionwerk/sharecharge-contracts@^0.8.0":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/@motionwerk/sharecharge-contracts/-/sharecharge-contracts-0.8.0.tgz#3531ec4b09f7f4ac9afaea75ca4e09624ac26591"
+  integrity sha512-Eh0rreuDuAaRuGm0NbycaOKIFuEr7BPma4VOaKSvXL/5eVFXYhW/jB/7tT8Ol8miVJIN3artxYZ1Qhre6CCOSg==
   dependencies:
     ganache-cli "^6.1.0"
     mkdirp "^0.5.1"
