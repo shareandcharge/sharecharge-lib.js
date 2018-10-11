@@ -31,7 +31,7 @@ const config = {
     ethProvider: 'http://localhost:8545',
 }
 
-const sc = ShareCharge.obtain(config);
+const sc = ShareCharge.getInstance(config);
 ```
 
 ### Retrieving data
@@ -76,7 +76,7 @@ const wallet = Wallet.generate();
 */
 
 wallet.coinbase
-// 0x3d3e776f83ccf6aa443b8bd5b6f245dd429f94e9
+// "0x3d3e776f83ccf6aa443b8bd5b6f245dd429f94e9"
 ```
 
 The wallet can store many different keys, each of which can make transactions. These keys are *hierarchical deterministic* - they are restored each time using the same seed. It is therefore necessary to keep the seed safe and preferably offline. 
@@ -87,7 +87,7 @@ Upon restoring a wallet, the same wallet object will be returned:
 ```ts
 const wallet = new Wallet('maid left ostrich minor ask stomach outdoor vacuum beach admit dinner avoid');
 wallet.coinbase
-// 0x3d3e776f83ccf6aa443b8bd5b6f245dd429f94e9
+// "0x3d3e776f83ccf6aa443b8bd5b6f245dd429f94e9"
 ```
 
 ### Writing data
