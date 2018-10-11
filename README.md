@@ -14,7 +14,7 @@ mobile app. This is the reference implementation written in TypeScript.
 
 In order to get started, first obtain an instance of the Share & Charge library. 
 
-A configuration object can be used as an argument to overwite default configuration values. See config options [here](https://github.com/motionwerkGmbH/sharecharge-lib/tree/domain/examples/config/)
+A configuration object can be used as an argument to overwite default configuration values. See config options [here](https://github.com/motionwerkGmbH/sharecharge-lib.js/tree/develop/examples/config)
 
 **IMPORTANT**: Consider the network you wish to interact with. The node
 you connect to must have the same contracts as specified in the stage.
