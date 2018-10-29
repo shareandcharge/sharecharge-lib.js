@@ -1,9 +1,8 @@
-import * as mocha from 'mocha';
+import 'mocha';
 import { expect } from 'chai';
 import { ConfigProvider } from "../../src/services/configProvider";
-import { Key } from '../../src/models/key';
 import { Wallet } from '../../src/models/wallet';
-import { TokenService } from '../../src/services/tokenService';
+import { MSPService } from '../../src/services/mspService';
 import { TestHelper } from '../testHelper';
 import { ToolKit } from '../../src/utils/toolKit';
 import { Contract } from '../../src/models/contract';
@@ -17,7 +16,7 @@ describe('TokenService', function () {
 
     const defs = ToolKit.contractDefsForStage(config.stage);
 
-    let tokenService: TokenService, wallet: Wallet, contract: Contract, web3;
+    let tokenService: MSPService, wallet: Wallet, contract: Contract, web3;
 
     wallet = Wallet.generate().wallet;
 
@@ -25,7 +24,7 @@ describe('TokenService', function () {
         web3 = new Web3(config.ethProvider);
         await TestHelper.ensureFunds(web3, wallet.keychain[0]);
         contract = await TestHelper.createContract(web3, config, defs["MSPToken"], ["MSPToken", "MSP"]);
-        tokenService = new TokenService(new ContractProvider(new ConfigProvider({ tokenAddress: contract.address })));
+        tokenService = new MSPService(new ContractProvider(new ConfigProvider({ tokenAddress: contract.address })));
     });
 
     it('should deploy new MSP token', async () => {

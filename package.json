@@ -1,6 +1,6 @@
 {
   "name": "@motionwerk/sharecharge-lib",
-  "version": "0.13.1",
+  "version": "0.15.0",
   "description": "Share & Charge EV Network Library",
   "repository": {
     "type": "git",
@@ -20,8 +20,8 @@
     "webpack": "webpack"
   },
   "dependencies": {
-    "@motionwerk/sharecharge-common": "^1.16.0",
-    "@motionwerk/sharecharge-contracts": "^0.8.0",
+    "@motionwerk/sharecharge-common": "^1.17.0",
+    "@motionwerk/sharecharge-contracts": "^0.9.0",
     "bip39": "^2.5.0",
     "bs58": "^4.0.1",
     "ethereumjs-tx": "^1.3.4",

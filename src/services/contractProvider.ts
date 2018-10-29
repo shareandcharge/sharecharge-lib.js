@@ -19,7 +19,7 @@ export class ContractProvider {
         const contractDef = this.definitions[contractDefKey];
         if (contractDefKey === 'MSPToken') {
             // use the address parameter, else from the config, else the default
-            contractDef.address = address || this.config.tokenAddress || contractDef.address;
+            contractDef.address = address || this.config.mspToken || contractDef.address;
         }
         return new Contract(this.web3, {
             abi: contractDef.abi,
@@ -42,7 +42,7 @@ export class ContractProvider {
         };
         const signedTx = key.sign(txData);
         const receipt = await this.web3.eth.sendSignedTransaction('0x' + signedTx.toString('hex'));
-        this.config.tokenAddress = receipt.contractAddress;
+        this.config.mspToken = receipt.contractAddress;
         return this.obtain(contractDefKey);
     }
 

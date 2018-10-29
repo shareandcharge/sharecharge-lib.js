@@ -1,5 +1,6 @@
 import { ChargingService } from './services/chargingService';
-import { TokenService } from './services/tokenService';
+import { EVTokenService } from './services/evTokenService';
+import { MSPService } from './services/mspService';
 import { EventPoller } from './services/eventPoller';
 import { EventDispatcher } from './services/eventDispatcher';
 import { ConfigProvider } from './services/configProvider';
@@ -22,25 +23,32 @@ export class ShareCharge {
     public readonly charging: ChargingService;
 
     /**
-     * Access eMobility Service Provider token functionality
-     */
-    public readonly token: TokenService;
-
-    /**
      * Access Share & Charge storage functionality
      */
     public readonly store: StorageService;
 
+    /**
+     * Access EV token functionality
+     */
+    public readonly evt: EVTokenService;
+
+    /**
+     * Access eMobility Service Provider token functionality
+     */
+    public readonly msp: MSPService;
+
     constructor(chargingService: ChargingService,
-                tokenService: TokenService,
+                evTokenService: EVTokenService,
+                mspService: MSPService,
                 storageService: StorageService,
                 private eventPoller: EventPoller) {
         this.charging = chargingService;
-        this.token = tokenService;
+        this.evt = evTokenService;
+        this.msp = mspService;
         this.store = storageService;
 
         eventPoller.monitor('Charging', this.charging.contract);
-        eventPoller.monitor('MSPToken', this.token.contract);
+        eventPoller.monitor('MSPToken', this.msp.contract);
         eventPoller.monitor('ExternalStorage', this.store.contract);
 
         eventPoller.events.subscribe(events => events.forEach(item => {
@@ -105,9 +113,10 @@ export class ShareCharge {
             const ipfsProvider = new IpfsProvider(configProvider);
             const eventPoller = new EventPoller(configProvider);
             const chargingService = new ChargingService(contractProvider);
-            const tokenService = new TokenService(contractProvider);
+            const evTokenService = new EVTokenService(contractProvider);
+            const mspService = new MSPService(contractProvider);
             const storageService = new StorageService(contractProvider, ipfsProvider);
-            ShareCharge.instance = new ShareCharge(chargingService, tokenService, storageService, eventPoller);
+            ShareCharge.instance = new ShareCharge(chargingService, evTokenService, mspService, storageService, eventPoller);
         }
         return ShareCharge.instance;
     }
