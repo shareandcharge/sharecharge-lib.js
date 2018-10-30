@@ -15,7 +15,7 @@ export class EVTokenService {
     }
 
     /**
-     * Get the owner of the MSP token
+     * Get the owner of the EV token
      */
     async getOwner(): Promise<string> {
         return this.contract.call('owner');
