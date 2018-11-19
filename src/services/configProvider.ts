@@ -5,7 +5,7 @@ export class ConfigProvider {
     public readonly ipfsProvider: { host: string, port: string, protocol: string };
     public readonly gasPrice: number;
     public readonly pollingInterval: number;
-    public mspToken: string;
+    public tokenAddress: string;
 
     constructor(config: any = {}) {
         this.stage = config.stage || 'local';
@@ -17,6 +17,6 @@ export class ConfigProvider {
         };
         this.gasPrice = config.gasPrice || 18000000000;
         this.pollingInterval = config.pollingInterval || 1000;
-        this.mspToken = config.mspToken || "";
+        this.tokenAddress = config.tokenAddress || "";
     }
 }

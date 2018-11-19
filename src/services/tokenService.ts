@@ -3,7 +3,7 @@ import { Wallet } from '../models/wallet';
 import { Contract } from '../models/contract';
 import { ConfigProvider } from './configProvider';
 
-export class MSPService {
+export class TokenService {
 
     /**
      * Access to generic contract functions (e.g. getLogs)

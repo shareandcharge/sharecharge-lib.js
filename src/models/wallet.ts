@@ -26,7 +26,7 @@ export class Wallet {
     constructor(seedPhrase: string, subAccount: number = 0, numberOfKeys: number = 1) {
         // master / purpose' / chain_id' / account' / address_index
         // chain_id of ethereum main net is 60 (see https://github.com/satoshilabs/slips/blob/master/slip-0044.md)
-        this.path = `m/44'/60'/0'/${subAccount}`;
+        this.path = `m/44'/60'/${subAccount}'`;
 
         // the master from which keys are derived from
         const master = hdkey.fromMasterSeed(seedPhrase);
@@ -80,20 +80,6 @@ export class Wallet {
     }
 
     /**
-     * Add new account to the wallet from a private key
-     * @param privKey
-     */
-    addPrivateKey(privKey: string): boolean {
-        if (privKey.startsWith('0x')) {
-            privKey = privKey.slice(2, privKey.length);
-        }
-        const newKey = ethWallet.fromPrivateKey(Buffer.from(privKey, 'hex'));
-        const key = new Key(newKey);
-        this.keychain.push(key);
-        return true;
-    }
-
-    /**
      * Remove a key at a certain index
      * @param index the index of the key to remove [default: 0]
      * @returns boolean upon success
@@ -110,17 +96,6 @@ export class Wallet {
     static generate(): { seed: string, wallet: Wallet } {
         const seed: string = bip39.generateMnemonic();
         return { seed, wallet: new Wallet(seed) };
-    }
-
-    /**
-     * Generate new wallet from private key
-     * @param privKey
-     */
-    static fromPrivateKey(privKey: string): Wallet {
-        const wallet = Wallet.generate().wallet;
-        wallet.removeKey();
-        wallet.addPrivateKey(privKey);
-        return wallet;
     }
 
     /**

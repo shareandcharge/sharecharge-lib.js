@@ -10,14 +10,14 @@ import { Wallet } from '../../src/models/wallet';
 import { Contract } from '../../src/models/contract';
 import { EventPoller } from '../../src/services/eventPoller';
 import { ChargingService } from '../../src/services/chargingService';
-import { EVTokenService } from '../../src/services/evTokenService';
 import { ConfigProvider } from "../../src/services/configProvider";
 import { Key } from '../../src/models/key';
 import { ContractProvider } from '../../src/services/contractProvider';
-import { MSPService } from '../../src/services/mspService';
+import { TokenService } from '../../src/services/tokenService';
 import { StorageService } from '../../src/services/storageService';
 import { IpfsProvider } from '../../src/services/ipfsProvider';
 import IpfsMock from '../ipfsMock';
+import { SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION } from 'constants';
 
 const ocpiLocation = require('../data/ocpiLocation.json');
 
@@ -34,15 +34,13 @@ describe('ShareCharge', function () {
     const seed3 = 'filter march urge naive sauce distance under copy payment slow just cold';
 
     let shareCharge: ShareCharge;
-    let evtOwnerWallet: Wallet, evtOwnerKey: Key;
     let cpoWallet: Wallet, cpoKey: Key;
     let mspWallet: Wallet, mspKey: Key;
     let driverWallet: Wallet, driverKey: Key;
     let chargingService: ChargingService;
-    let evtService: EVTokenService;
-    let mspService: MSPService;
+    let tokenService: TokenService;
     let storageService: StorageService;
-    let mspTokenAddress: string;
+    let tokenAddress: string;
     let eventPoller: EventPoller;
     let web3;
 
@@ -51,9 +49,6 @@ describe('ShareCharge', function () {
     before(async () => {
 
         web3 = new Web3(config.ethProvider);
-
-        evtOwnerWallet = Wallet.fromPrivateKey('0xfd53621cbf3aa58d0030b36c34f985ab54d13ff2dd4a39624bfb6bcc421f7390');
-        evtOwnerKey = evtOwnerWallet.keychain[0];
 
         cpoWallet = new Wallet(seed1);
         cpoKey = cpoWallet.keychain[0];
@@ -68,7 +63,7 @@ describe('ShareCharge', function () {
         await TestHelper.ensureFunds(web3, mspKey);
         await TestHelper.ensureFunds(web3, driverKey);
 
-        // const coinbase = await web3.eth.getCoinbase();
+        const coinbase = await web3.eth.getCoinbase();
 
         const storageContract = await TestHelper.createContract(web3, config, contractDefs["ExternalStorage"]);
         storageService = new StorageService(<ContractProvider>{
@@ -77,35 +72,25 @@ describe('ShareCharge', function () {
             }
         }, <IpfsProvider>IpfsMock);
 
-        const evtContract = await TestHelper.createContract(web3, config, contractDefs['EVToken']);
-        evtService = new EVTokenService(<ContractProvider>{
-            obtain(key: string): Contract {
-                return evtContract;
-            }
-        });
-
-        const chargingContract = await TestHelper.createContract(web3, config, contractDefs["Charging"], [storageContract.address, evtContract.address]);
+        const chargingContract = await TestHelper.createContract(web3, config, contractDefs["Charging"]);
         chargingService = new ChargingService(<ContractProvider>{
             obtain(key: string): Contract {
                 return chargingContract;
             }
         });
 
-        const mspContract = await TestHelper.createContract(web3, config, contractDefs["MSPToken"], ["S&C Token", "SCT"]);
-        mspService = new MSPService(new ContractProvider(new ConfigProvider({ mspToken: mspContract.address })));
+        const tokenContract = await TestHelper.createContract(web3, config, contractDefs["MSPToken"], ["S&C Token", "SCT"]);
+        tokenService = new TokenService(new ContractProvider(new ConfigProvider({ tokenAddress: tokenContract.address })));
 
-        // await chargingContract.native.methods["setStorageAddress"](storageContract.address).send({ from: coinbase });
+        await chargingContract.native.methods["setStorageAddress"](storageContract.address).send({ from: coinbase });
         // await evseContract.native.methods["setAccess"](chargingContract.address).send({ from: coinbase });
 
         eventPoller = new EventPoller(config);
 
-        shareCharge = new ShareCharge(chargingService, evtService, mspService, storageService, eventPoller);
-        mspTokenAddress = await shareCharge.msp.useWallet(mspWallet).deploy('MSP Token', 'MSP');
-        await shareCharge.msp.useWallet(mspWallet).setAccess(shareCharge.charging.address);
-        await shareCharge.msp.useWallet(mspWallet).mint(driverKey.address, 1000);
-
-        await shareCharge.evt.useWallet(evtOwnerWallet).mint(mspKey.address, 100);
-        await shareCharge.evt.useWallet(mspWallet).transfer(driverKey.address, 1);
+        shareCharge = new ShareCharge(chargingService, tokenService, storageService, eventPoller);
+        tokenAddress = await shareCharge.token.useWallet(mspWallet).deploy('MSP Token', 'MSP');
+        await shareCharge.token.useWallet(mspWallet).setAccess(shareCharge.charging.address);
+        await shareCharge.token.useWallet(mspWallet).mint(driverKey.address, 1000);
     });
 
     beforeEach(async () => {
@@ -141,7 +126,7 @@ describe('ShareCharge', function () {
             requestStart.connector = '1';
             requestStart.tariff = 'ENERGY';
             requestStart.chargeUnits = 20000;
-            requestStart.mspToken = mspTokenAddress;
+            requestStart.tokenAddress = tokenAddress;
             requestStart.estimatedPrice = 100;
             await requestStart.send();
 
@@ -174,7 +159,7 @@ describe('ShareCharge', function () {
             await shareCharge.on("ChargeDetailRecord", async (result) => {
                 finalPrice = result.finalPrice;
                 timestamp = result.timestamp;
-                token = result.mspToken;
+                token = result.tokenAddress;
             });
 
             const requestStart = shareCharge.charging.useWallet(driverWallet).requestStart();
@@ -183,7 +168,7 @@ describe('ShareCharge', function () {
             requestStart.connector = '1';
             requestStart.tariff = 'TIME';
             requestStart.chargeUnits = 60;
-            requestStart.mspToken = shareCharge.msp.address;
+            requestStart.tokenAddress = shareCharge.token.address;
             requestStart.estimatedPrice = 300;
             await requestStart.send();
 
@@ -211,7 +196,7 @@ describe('ShareCharge', function () {
 
             expect(controller.toLowerCase()).to.equal(driverKey.address);
             expect(Number(finalPrice)).to.equal(200);
-            expect(token).to.equal(shareCharge.msp.address);
+            expect(token).to.equal(shareCharge.token.address);
         });
 
         it('should broadcast error to msp', async () => {
@@ -234,7 +219,7 @@ describe('ShareCharge', function () {
             request.connector = '1';
             request.tariff = 'ENERGY';
             request.chargeUnits = 20000;
-            request.mspToken = shareCharge.msp.address;
+            request.tokenAddress = shareCharge.token.address;
             request.estimatedPrice = 0;
             await request.send();
 
@@ -268,7 +253,7 @@ describe('ShareCharge', function () {
             request.connector = '1';
             request.tariff = 'ENERGY';
             request.chargeUnits = 11000;
-            request.mspToken = shareCharge.msp.address;
+            request.tokenAddress = shareCharge.token.address;
             request.estimatedPrice = 0;
             await request.send();
 
@@ -307,7 +292,7 @@ describe('ShareCharge', function () {
             request.connector = '1';
             request.tariff = 'FLAT';
             request.chargeUnits = 60;
-            request.mspToken = shareCharge.msp.address;
+            request.tokenAddress = shareCharge.token.address;
             request.estimatedPrice = 0;
             await request.send();
 
@@ -325,13 +310,13 @@ describe('ShareCharge', function () {
             request.connector = '1';
             request.tariff = 'FLAT';
             request.chargeUnits = 200;
-            request.mspToken = shareCharge.msp.address;
+            request.tokenAddress = shareCharge.token.address;
             request.estimatedPrice = 0;
             await request.send();
             const session = await shareCharge.charging.getSession(location.scId, evseId);
 
             expect(session.controller.toLowerCase()).to.equal(driverKey.address);
-            expect(session.mspToken).to.equal(shareCharge.msp.address);
+            expect(session.tokenAddress).to.equal(shareCharge.token.address);
             expect(session.estimatedPrice).to.equal('0');
         });
 
@@ -364,13 +349,13 @@ describe('ShareCharge', function () {
     context('#token', () => {
 
         it('should set the token address for subsequent instances', async () => {
-            const address = shareCharge.msp.address;
-            const address2 = await shareCharge.msp.useWallet(mspWallet).deploy('MSPToken', 'MSP');
-            expect(shareCharge.msp.address).to.not.equal(address);
-            shareCharge.msp.address = address;
-            expect(shareCharge.msp.address).to.equal(address);
+            const address = shareCharge.token.address;
+            const address2 = await shareCharge.token.useWallet(mspWallet).deploy('MSPToken', 'MSP');
+            expect(shareCharge.token.address).to.not.equal(address);
+            shareCharge.token.address = address;
+            expect(shareCharge.token.address).to.equal(address);
             const sc2 = ShareCharge.getInstance();
-            expect(sc2.msp.address).to.equal(address);
+            expect(sc2.token.address).to.equal(address);
         });
     });
 
@@ -401,7 +386,7 @@ describe('ShareCharge', function () {
             request0.connector = '1';
             request0.tariff = 'ENERGY';
             request0.chargeUnits = 20000;
-            request0.mspToken = shareCharge.msp.address;
+            request0.tokenAddress = shareCharge.token.address;
             request0.estimatedPrice = 0;
             await request0.send();
 
@@ -411,7 +396,7 @@ describe('ShareCharge', function () {
             request1.connector = '1';
             request1.tariff = 'ENERGY';
             request1.chargeUnits = 20000;
-            request1.mspToken = shareCharge.msp.address;
+            request1.tokenAddress = shareCharge.token.address;
             request1.estimatedPrice = 0;
             await request1.send();
 
@@ -421,7 +406,7 @@ describe('ShareCharge', function () {
             request2.connector = '1';
             request2.tariff = 'ENERGY';
             request2.chargeUnits = 20000;
-            request2.mspToken = shareCharge.msp.address;
+            request2.tokenAddress = shareCharge.token.address;
             request2.estimatedPrice = 0;
             await request2.send();
 
@@ -447,7 +432,7 @@ describe('ShareCharge', function () {
             request.connector = '1';
             request.tariff = 'ENERGY';
             request.chargeUnits = 20000;
-            request.mspToken = shareCharge.msp.address;
+            request.tokenAddress = shareCharge.token.address;
             request.estimatedPrice = 200;
             await request.send();
 
@@ -484,7 +469,7 @@ describe('ShareCharge', function () {
             request.connector = '1';
             request.tariff = 'ENERGY';
             request.chargeUnits = 20000;
-            request.mspToken = shareCharge.msp.address;
+            request.tokenAddress = shareCharge.token.address;
             request.estimatedPrice = 0;
             await request.send();
 

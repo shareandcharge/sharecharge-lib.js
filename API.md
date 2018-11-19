@@ -13,7 +13,7 @@ should they lose it.
 
 *Example Usage (in TypeScript)*
 
-```ts
+``` {.sourceCode .typescript}
 import { Wallet } from 'sharecharge-lib';
 
 // generate new seed and keypair
@@ -50,7 +50,7 @@ access to charging, token and storage contracts.
 
 The module has a default configuration object:
 
-```ts
+``` {.sourceCode .typescript}
 const config = {
     stage: 'local',
     ethProvider: 'http://localhost:8545';
@@ -59,7 +59,7 @@ const config = {
 
 *Retrieving instance*
 
-```ts
+``` {.sourceCode .typescript}
 import { ShareCharge } from 'sharecharge-lib';
 
 // get instance of ShareCharge class with overwritten configuration value
@@ -68,14 +68,14 @@ const sc = ShareCharge.getInstance({ stage: 'test' });
 
 *Example usage*
 
-```ts
+``` {.sourceCode .typescript}
 const request = sc.charging.useWallet(myWallet).requestStart();
 request.scId = '0x123...';
 request.evse = 'DE-1234';
 request.connector = '1';
 request.tariff = 'ENERGY';
 request.chargeUnits = 5000;
-request.mspToken = '0x123..';
+request.tokenAddress = '0x123..';
 request.estimatedPrice = 100;
 await request.send();
 ```
@@ -148,7 +148,7 @@ await request.send();
 
 ------------------------------------------------------------------------
 
-`ShareCharge.msp`
+`ShareCharge.token`
 
 -   `getBalance(address: string)`
 
@@ -167,18 +167,3 @@ await request.send();
     > Mint tokens for a certain address.
 
 
---------------------------------------------------------------------------
-
-`ShareCharge.evt`
-
--   `getBalance(address: string)`
-
-    > Get balance of a particular address.
-
--   `useWallet(wallet: Wallet).mint(address: string, value: number)`
-
-    > Mint tokens for a certain address (Note: only owner can do this).
-
--   `useWallet(wallet: Wallet).transfer(address: string, value: number)`
-
-    > Transfer tokens from one wallet to another (via its address)

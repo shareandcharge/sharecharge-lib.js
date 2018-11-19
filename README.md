@@ -134,7 +134,7 @@ tx.evse = 'DE-1234-X';
 tx.connector = '1';
 tx.tariff = 'TIME';
 tx.chargeUnits = 3600;
-tx.mspToken = sc.token.address;
+tx.tokenAddress = sc.token.address;
 tx.estimatedPrice = 120;
 await tx.send();
 ```
@@ -278,17 +278,16 @@ This section looks into common errors on the smart contract level. Revert messag
 The following conditions should be met:
 
 ### `[charging] requestStart`
-- The driver requesting the charging session start should hold at least 1 EV Token
 - The `scId` should exist on the Share & Charge network
-- The driver requesting the charging session start should hold the MSP tokens necessary to pay for the `estimatedPrice`
+- The driver requesting the charging session start should hold the tokens necessary to pay for the `estimatedPrice` on the MSP token contract specified (i.e. the `tokenAddress`)
 - The MSP token contract should grant access to the charging contract. By default the library does not link newly deployed MSP tokens with the current charging contract. It is recommended to use the [sharecharge-cli](https://github.com/motionwerkGmbH/sharecharge-cli) for deploying new MSP token contracts. This can however be done progrmatically in a seperate transaction:
 ```ts
-sc.msp.useWallet(wallet).deploy('My New MSP Token', 'NMT')
+sc.token.useWallet(wallet).deploy('My New MSP Token', 'NMT')
     .then(async (address: string) => {
         // set the tokenAddress for the current ShareCharge object
-        sc.msp.address = address;
+        sc.token.address = address;
         // grant the charging contract access to the new MSP token
-        await sc.msp.useWallet(wallet).setAccess(sc.charging.address)
+        await sc.token.useWallet(wallet).setAccess(sc.charging.address)
     });
 ```
 
@@ -314,7 +313,7 @@ sc.store.getAllTariffsByCPO('0x3d3e776f83ccf6aa443b8bd5b6f245dd429f94e9')
 ```
 - Note that bridges will often take the estimated price in the case that a charging session has run over the specified session consumption or duration. To be on the safe side, it is possible to increase the estimate. On the event that the final CDR price is lower than the estimate, the remaining unspent tokens will be returned to the driver's wallet. 
 
-### `[msp] mint`
+### `[token] mint`
 - Only the owner of an MSP token contract can mint those tokens for drivers
 
 ------------------------------------------------------------------------

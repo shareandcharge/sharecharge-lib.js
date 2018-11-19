@@ -27,7 +27,7 @@ export default class RequestStart {
     /**
      * The address of the MSP token to pay for the charging session
      */
-    mspToken: string;
+    tokenAddress: string;
     /**
      * The estimated price of the charging session, as calculated by the tariff Id
      */
@@ -39,7 +39,7 @@ export default class RequestStart {
         this._connector = '';
         this._tariff = 0;
         this.chargeUnits = 0;
-        this.mspToken = '';
+        this.tokenAddress = '';
         this.estimatedPrice = 0;
     }
 
@@ -91,7 +91,7 @@ export default class RequestStart {
             this._connector,
             this._tariff,
             this.chargeUnits,
-            this.mspToken,
+            this.tokenAddress,
             this.estimatedPrice
         ], this.key);
     }

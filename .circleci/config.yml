@@ -84,23 +84,23 @@ jobs:
           command: npm test
 
   # run integration tests against geth dev
-  # staging:  
+  staging:  
 
-  #   <<: *stage_defaults
+    <<: *stage_defaults
 
-  #   docker:
-  #     - <<: *docker_defaults
-  #     - image: ethereum/client-go
-  #       command: [--dev, --dev.period=1, --rpc, --rpcaddr=0.0.0.0]
+    docker:
+      - <<: *docker_defaults
+      - image: ethereum/client-go
+        command: [--dev, --dev.period=1, --rpc, --rpcaddr=0.0.0.0]
 
-  #   steps:
+    steps:
 
-  #     - attach_workspace:
-  #         at: ~/lib
+      - attach_workspace:
+          at: ~/lib
 
-  #     - run:
-  #         name: Run test
-  #         command: npm test
+      - run:
+          name: Run test
+          command: npm test
   
   transpile:
 
@@ -148,9 +148,9 @@ workflows:
       - test:
           requires:
             - build
-      # - staging:
-      #     requires:
-      #       - build
+      - staging:
+          requires:
+            - build
       - transpile:
           requires:
             - build
@@ -158,5 +158,5 @@ workflows:
           context: npm-access
           requires:
             - test
-            # - staging
+            - staging
             - transpile
