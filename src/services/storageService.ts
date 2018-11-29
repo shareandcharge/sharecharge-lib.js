@@ -1,4 +1,4 @@
-import { Tariff, Location } from '@motionwerk/sharecharge-common';
+import { Tariff, Location } from '@shareandcharge/sharecharge-common';
 import { Contract } from "../models/contract";
 import { ContractProvider } from './contractProvider';
 import { IpfsProvider } from './ipfsProvider';

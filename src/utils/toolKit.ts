@@ -89,7 +89,7 @@ export class ToolKit {
     }
 
     static contractDefsForStage(stage: string, verbose: boolean = false) {
-        const json = require(`@motionwerk/sharecharge-contracts/contract.defs.${stage}.json`);
+        const json = require(`@shareandcharge/sharecharge-contracts/contract.defs.${stage}.json`);
         return json;
     }
 }
