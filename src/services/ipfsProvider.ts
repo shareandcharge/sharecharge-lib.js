@@ -1,4 +1,4 @@
-import * as ipfsApi from 'ipfs-api';
+import * as ipfsApi from 'ipfs-http-client';
 import { Ipfs } from '../models/ipfs';
 import { ConfigProvider } from './configProvider';
 
