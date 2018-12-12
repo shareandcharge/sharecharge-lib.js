@@ -6,7 +6,7 @@ It can be implemented in a browser or server environment, for example by
 the Share & Charge CPO Core Client or by an eMobility Service Provider's
 mobile app. This is the reference implementation written in TypeScript.
 
-    npm install @motionwerk/sharecharge-lib
+    npm install @shareandcharge/sharecharge-lib
 
 ------------------------------------------------------------------------
 
